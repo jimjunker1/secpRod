@@ -1,11 +1,17 @@
 Package: secpRod
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Workflow Functions for estimating Secondary Production
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Authors: Jim Junker
+Maintainer: Jim Junker<james.junker1@gmail.com>
+Description: This package contains a set of functions to move from raw data to 
+estimates of animal population and community secondary production. These functions
+include the data manipulation steps, QA/QC, data visualisation, and estimation options
+to choose between estimation methods, population and community levels, and annual 
+and/or interval estimates. 
+    Secondary production estimates and variability around estimates are calculated 
+using a variation of the bootstrap approach outlined by Huryn and Benke in Lambert and
+Castillo "Methods in Stream Ecology"
+License: GNU General Public License v3.0
 Encoding: UTF-8
 LazyData: true
