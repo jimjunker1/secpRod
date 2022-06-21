@@ -25,6 +25,21 @@ Installation
 # install.packges('devtools')
 devtools::install_github("jimjunker1/secpRod")
 ```
+Workflow
+--------
+
+sequence of actions for calculation of community secondary production
+
+- split taxa by production method
+
+- convert length to mass
+
+- determine date wrap around
+
+- split taxa into bootstrapped sample lists
+
+- run production methods
+
 
 Functions
 ---------

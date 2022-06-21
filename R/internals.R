@@ -1,6 +1,7 @@
 #'
 #'
 #'
+#'@export factorise
 factorise <- function(x) {
   x <- length(x)
   if(x == 1){return(1)}
@@ -9,8 +10,10 @@ factorise <- function(x) {
   return(out)
 }
 
+#' @title
 #'
 #'
+#' @export findreps
 #' @source https://stackoverflow.com/questions/33155662/find-and-break-on-repeated-runs
 findreps <- function(x, counter = NULL){
   if(is.null(counter)){
@@ -58,4 +61,32 @@ replace_formula_terms <- function(x, termList = NULL, ...) {
 
   newRHSForm = paste(names(sort(c(otherVars, lengthVar, onesPositions, runsStarts))), collapse = "")
 
+}
+
+#'
+#'
+#'
+MissLt <- function(x, ratio = 0.5){
+  sum(is.na(x))/length(x) <= ratio
+}
+
+#'
+#'
+#'
+dateCoercible  <- function(x, addformat = NULL, exactformat = NULL){
+  if (is.null(exactformat)){
+    format = c("%m/%d/%Y", "%m-%d-%Y","%Y/%m/%d" ,"%Y-%m-%d", addformat)
+    y <- as.Date(as.character(x),format= format)
+    MissLt(y,ratio = 1-(1/length(y)))}
+  else{
+    y <- as.Date(as.character(x),format= exactformat)
+    MissLt(y,ratio = 1-(1/length(y)))}
+}
+
+#'
+#'
+#'
+cleanAggDf = function(df,...){
+  good_cols = !grepl("Group\\.\\d{1}", names(df), ignore.case = TRUE)
+  Filter(function(x)!all(is.na(x)), df[good_cols])
 }
