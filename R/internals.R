@@ -10,8 +10,8 @@ factorise <- function(x) {
   return(out)
 }
 
-#' @title
-#'
+#' @title findreps
+#' @description This function finds and sets breaks on repeated runs of similar character types. It is used to parse the formula structure and variables in `massForm` for converting lengths to mass in `convert_length_to_mass()`.
 #'
 #' @export findreps
 #' @source https://stackoverflow.com/questions/33155662/find-and-break-on-repeated-runs
@@ -90,3 +90,8 @@ cleanAggDf = function(df,...){
   good_cols = !grepl("Group\\.\\d{1}", names(df), ignore.case = TRUE)
   Filter(function(x)!all(is.na(x)), df[good_cols])
 }
+
+#'
+#'
+#'
+

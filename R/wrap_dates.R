@@ -1,7 +1,7 @@
 #'
 #'
 #'
-wrap_dates <- function(df = NULL, dateCol = NULL, wrap = TRUE,...) {
+wrap_dates <- function(df = NULL, dateCol = NULL, wrapDate = TRUE,...) {
   if(is.null(dateCol)){
     # check if any columns are date
     if(any(unlist(lapply(df, function(x) inherits(x, c("Date","POSIXt")))))){
@@ -17,8 +17,8 @@ wrap_dates <- function(df = NULL, dateCol = NULL, wrap = TRUE,...) {
       t.int = diff(t)
 
       # Do we want to create a wrap around interval for the last interval to complete a year?
-      if(wrap){
-        t.int = c(t.int, (365-sum(t.int)),NA)
+      if(wrapDate){
+        t.int = c(t.int, (364-sum(t.int)),NA)
         date1 = c(date1, as.Date(date1[length(date1)])+t.int[length(t.int)-1])
       }
       returnDf = list()
@@ -42,8 +42,8 @@ wrap_dates <- function(df = NULL, dateCol = NULL, wrap = TRUE,...) {
       t.int = diff(t)
 
       # Do we want to create a wrap around interval for the last interval to complete a year?
-      if(wrap){
-        t.int = c(t.int, (365-sum(t.int)),NA)
+      if(wrapDate){
+        t.int = c(t.int, (364-sum(t.int)),NA)
         date1 = c(date1, as.Date(date1[length(date1)])+t.int[length(t.int)-1])
       }
       returnDf = list()
