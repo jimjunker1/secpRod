@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
------
+------------------------------------------------------------------------
 
 ## Overview
 
@@ -22,25 +22,37 @@ production estimation.
 devtools::install_github("jimjunker1/secpRod")
 ```
 
+## Workflow
+
+sequence of actions for calculation of community secondary production
+
+- split taxa by production method
+
+- convert length to mass
+
+- determine date wrap around
+
+- split taxa into bootstrapped sample lists
+
+- run production methods
+
 ## Functions
 
-secpRod has XX functions related to data organization:
+<!-- secpRod has XX functions related to data organization: -->
+<!-- - `frac_merge` takes raw count data and provides areal and subsampling adjustments. This function includes QA/QC checks for un-paired fractions and returns size-class abundance standardized to area. -->
+<!-- - `mass_adj` combines  -->
+<!-- secpRod has XX functions related to data visualization: -->
+<!-- - `len_freq` combines data returned from `frac_merge` to taxon-level histograms -->
+<!-- - `allen_curve` takes  -->
 
-  - `frac_merge` takes raw count data and provides areal and subsampling
-    adjustments. This function includes QA/QC checks for un-paired
-    fractions and returns size-class abundance standardized to area.
-  - `mass_adj` combines
+`calc_production` is the main function. This function estimates
+bootstrapped secondary production from multiple methods determined in
+the `taxaInfo` object.
 
-secpRod has XX functions related to data visualization:
-
-  - `len_freq` combines data returned from `frac_merge` to taxon-level
-    histograms
-  - `allen_curve` takes
-
------
+------------------------------------------------------------------------
 
 Please note that the ‘secpRod’ project is released with a [Contributor
 Code of Conduct](.github/CODE_OF_CONDUCT.md). By contributing to this
 project, you agree to abide by its terms.
 
------
+------------------------------------------------------------------------

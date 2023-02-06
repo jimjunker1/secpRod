@@ -94,4 +94,34 @@ cleanAggDf = function(df,...){
 #'
 #'
 #'
+estimate_ann_stats = function(df, var = NULL, wrap = TRUE,...){
+  # sum across lengthClass
+  varDateSum <- setNames(aggregate(df[var], by = list(df$dateID, df$repID), sum, na.rm = TRUE), nm = c("dateID", "repID", paste0(var,"_sum")))
+  # take means of all dates across reps
+  varDateSumMean <- setNames(aggregate(varDateSum[grep(var, names(varDateSum))], by = list(varDateSum$dateID), mean, na.rm = TRUE), nm = c("dateID", paste0(var,"_mean")))
+  # take sd of all dates across reps
+  varDateSumSD <- setNames(aggregate(varDateSum[grep(var, names(varDateSum))], by = list(varDateSum$dateID), sd, na.rm = TRUE), nm = c("dateID", paste0(var,"_sd")))
+  # wrap the date around
+  if(wrap){
+    varSumMeanWrap = (varDateSumMean[1,grep(var, names(varDateSumMean))]+varDateSumMean[nrow(varDateSumMean),grep(var, names(varDateSumMean))])/2
+    varSumMeanWrapSD = sqrt(varDateSumSD[1,grep(var, names(varDateSumSD))]^2+varDateSumSD[nrow(varDateSumSD),grep(var, names(varDateSumSD))]^2)
+    varDateWrap = as.Date(varDateSumMean[1,'dateID']+364)
+    wrapDf = data.frame("dateID" = varDateWrap)
+    wrapDf[paste0(var,"_mean")] <- varSumMeanWrap
+    wrapDf[paste0(var,"_sd")] <- varSumMeanWrapSD
+    varDateSumMean <- rbind(varDateSumMean, wrapDf[,c(1,2)])
+    varDateSumSD <- rbind(varDateSumSD, wrapDf[,c(1,3)])
+  }
 
+  # estimate the annual mean
+  varMean = mean(unlist(varDateSumMean[grep(var, names(varDateSumMean))]), na.rm = TRUE)
+  # estimate the SD of the annual mean
+  varSD = sqrt(sum(unlist(varDateSumSD[grep(var, names(varDateSumSD))])^2, na.rm = TRUE))
+
+  varMeanName = paste0(var,"_mean")
+  varSDName = paste0(var,"_sd")
+  x = list()
+  x[[varMeanName]] <- varMean
+  x[[varSDName]] <- varSD
+  return(x)
+}

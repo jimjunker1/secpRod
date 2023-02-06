@@ -35,11 +35,13 @@ calc_production = function(taxaSampleListMass = NULL,
     wrap = TRUE
   )
 
-  debugonce(calc_prod_sf)
-  do.call(calc_prod_sf, args = funcList)
+  debugonce(sf_prod.sample)
+  sf_prod = do.call(calc_prod_sf, args = funcList)
   # calc_prod_sf(df = taxaSampleListMass,  )
   # calc_prod_rs()
   # calc_prod_is()
   # calc_prod_igr()
+
+  return(sf_prod)
 
 }

@@ -54,6 +54,8 @@ Functions
 <!-- - `len_freq` combines data returned from `frac_merge` to taxon-level histograms -->
 <!-- - `allen_curve` takes  -->
 
+`calc_production` is the main function of secpRod. This function estimates bootstrapped secondary production from multiple methods determined in the `taxaInfo` object.
+
 -----
 
 Please note that the 'secpRod' project is released with a [Contributor Code of Conduct](.github/CODE_OF_CONDUCT.md). By contributing to this project, you agree to abide by its terms.

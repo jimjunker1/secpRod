@@ -13,8 +13,15 @@ sf_prod.sample <- function(df = NULL,
 
   #### tests ####
   #### GUTS of function ####
-  #### calculate SAMPLE annual production ####
+  # calculate mean biomass and abundance across all dates
+  df$afdm_mg_m2 <- df$n_m2 * df$afdm_mg
+  N.ann.list = estimate_ann_stats(df,
+                     var = 'n_m2')
+  B.ann.list = estimate_ann_stats(df,
+                                  var = 'afdm_mg_m2')
+ df$afdm_mg_m2 <- NULL
 
+  #### calculate SAMPLE annual production ####
   # Create a matrix with these 4 columns: individual length (mm), mean density for all samples throughout year (number m^-2), individual mass (mg AFDM), and biomass (mg AFDM m^-2) for each size class (rows)
   SF <- matrix(0, length(unique(unlist(df$lengthClass))), 4)
 
@@ -43,15 +50,22 @@ sf_prod.sample <- function(df = NULL,
       SF.int[s, 4] <- 0
     }
   }
+
   # Calculate "uncorrected" production by summing all values in the the column of biomass * number of size classes (mg AFDM m^-2)
   P.uncorr.samp <- sum(SF.int[, 4])
   # Calculate annual production using the cohort production interval (cpi) given in days for this taxon
   P.ann.samp <- P.uncorr.samp * (365 / cpi)
 
   if(full == TRUE){
-    return(list(P.ann.samp = P.ann.samp,P.uncorr.samp = P.uncorr.samp))
+    return(list(P.ann.samp = P.ann.samp,P.uncorr.samp = P.uncorr.samp,
+                B.ann.mean = B.ann.list$afdm_mg_m2_mean,
+                B.ann.sd = B.ann.list$afdm_mg_m2_sd,
+                N.ann.mean = N.ann.list$n_m2_mean,
+                N.ann.sd = N.ann.list$n_m2_sd))
   } else{
-    return(P.ann.samp = P.ann.samp)
+    return(list(P.ann.samp = P.ann.samp,
+                B.ann.samp = B.ann.list$afdm_mg_m2_mean,
+                N.ann.samp = N.ann.list$n_m2_mean))
   }
   # #### create SAMPLE information to export as summary ####
   # # summarise sample sizes across dates
