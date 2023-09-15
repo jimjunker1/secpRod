@@ -37,7 +37,7 @@ calc_production = function(taxaSampleListMass = NULL,
     sizesDf = unique(taxaSampleListMass[, c("lengthClass", rev(names(taxaSampleListMass))[1])]),
     bootNum = bootNum,
     taxaSummary = taxaSummary,
-    wrap = TRUE
+    wrap = wrap
   )
 
 ## calculated production based on methods
