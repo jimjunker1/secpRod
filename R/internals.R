@@ -68,7 +68,7 @@ replace_formula_terms <- function(x, termList = NULL, ...) {
   names(onesPositions) = sapply(substring(x, onesPositions, onesPositions), function(a) names(termList)[termList %in% a])
   runs = as.numeric(names(termRepsTable)[termRepsTable > 1])
   if(length(sapply(runs, function(a) grep(a,
-                                          termReps)) == 0)){
+                                          termReps))) == 0){
     runsPositions = 0
   } else{
   runsPositions = termVars[sapply(runs, function(a) grep(a, termReps))]}
