@@ -1,10 +1,12 @@
-#' @name igr_prod.sample
+#' @title igr_prod.sample
 #' @description This function calculates taxa production based on the instantaneous growth method
-#' @param taxaSampleListMass a data.frame of long format returned from \code{convert_length_to_mass()} function
-#' @param taxaInfo a data.frame of the important taxonomic information for converting length to mass, growth rate formulas, cohort production intervals (cpi), etc.
-#' @param taxaSummary character. Should the taxa summary returned be full or abridged. This accepts values "full", "short", or "none".
+#' @param df a data.frame of long format returned from \code{convert_length_to_mass()} function
+#' @param sizesDf a data.frame of the
+#' @param full logical. should the full summary be returned with mean and sd
+#' @param cpi integer. The cohort production interval.
+#' @param ... additional arguments passed to function
 #' @return list object with taxa summary of the sampled data
-#' @export sf_prod.sample
+#' @export
 igr_prod.sample <- function(df = NULL,
                            sizesDf = NULL,
                            cpi = NULL,

@@ -1,26 +1,32 @@
-#' .. content for \description{} (no empty lines) ..
+#' @description
+#' This function prepares bootstrap samples.
 #'
-#' .. content for \details{} ..
-#'
-#' @title
-#' @param df
-#' @param bootNum
-prep_boots <- function(df = taxaSampleListMass,
+#' @title prep_boots
+#' @param df data.frame. A dataframe of the species size, mass, and frequency data.
+#' @param bootNum integer. The number of bootstrapped data sets that should be created.
+#' @importFrom tidyr pivot_wider
+#' @export
+
+prep_boots <- function(df = NULL,
                        bootNum = bootNum) {
-
   ### tests ###
-  samp_num = unlist(aggregate(df$repID, by = list(df$dateID), FUN = function(x) length(unique(x)))$x)
-  if(var(samp_num) !=0 ) warning("Warning: sample numbers are not equal among dates")
+  samp_num <- unlist(aggregate(df$repID, by = list(df$dateID), FUN = function(x) length(unique(x)))$x)
+  if (var(samp_num) != 0) warning("Warning: sample numbers are not equal among dates")
 
-  #allocate vectors
-  bootList = vector(mode = 'list', length = bootNum)
+  # allocate vectors
+  bootList <- vector(mode = "list", length = bootNum)
 
   # create the boot lists
-  bootList = lapply(bootList,
-                    FUN = function(x) do.call(rbind,
-                                              lapply(split(df, df$dateID),
-                                                     function(x) x[sample(nrow(x), unique(samp_num), replace = TRUE), ])))
+  bootList <- lapply(bootList,
+    FUN = function(x) {
+      do.call(
+        rbind,
+        mapply(FUN = function(x,y) {
+          x[which(x$repID %in% sample(1:y, y, replace = TRUE)), ]
+        }, x = split(df, df$dateID), y = samp_num, SIMPLIFY = FALSE)
+      )
+    }
+  )
 
   return(bootList)
-
 }

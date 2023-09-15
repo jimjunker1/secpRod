@@ -1,7 +1,19 @@
+#' @description
+#' This function is the opposite of \code{\%in\%} in that it finds items not in a vector
+#' @title \%ni\%
+#' @param x vector or NULL: the values to exclude. Long vectors are supported.
+#' @param table vector or NULL: the values to be excluded against. Long vectors are not supported.
+#' #' @returns A logical vector, indicating if a match was not located for each element of x: thus the values are TRUE or FALSE and never NA.
+`%ni%` <- function(x, table) {!(x %in% table)}
+# '%ni%' <- Negate('%in%')
+
+
+#' @title inv.logit
+#' @param eta from mixtools
+inv.logit <- binomial()$linkinv
+
 #'
 #'
-#'
-#'@export factorise
 factorise <- function(x) {
   x <- length(x)
   if(x == 1){return(1)}
@@ -11,9 +23,9 @@ factorise <- function(x) {
 }
 
 #' @title findreps
-#' @description This function finds and sets breaks on repeated runs of similar character types. It is used to parse the formula structure and variables in `massForm` for converting lengths to mass in `convert_length_to_mass()`.
-#'
-#' @export findreps
+#' @description This function finds and sets breaks on repeated runs of similar character types. It is used to parse the formula structure and variables in `massForm` for converting lengths to mass in \code{convert_length_to_mass()}.
+#' @param x character string of the formula structure
+#' @param counter stuff
 #' @source https://stackoverflow.com/questions/33155662/find-and-break-on-repeated-runs
 findreps <- function(x, counter = NULL){
   if(is.null(counter)){
@@ -87,7 +99,7 @@ dateCoercible  <- function(x, addformat = NULL, exactformat = NULL){
 #'
 #'
 cleanAggDf = function(df,...){
-  good_cols = !grepl("Group\\.\\d{1}", names(df), ignore.case = TRUE)
+  good_cols = !grepl("Group\\.\\d{1}|repID", names(df), ignore.case = TRUE)
   Filter(function(x)!all(is.na(x)), df[good_cols])
 }
 

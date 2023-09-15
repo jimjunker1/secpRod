@@ -1,8 +1,21 @@
-#' .. content for \description{} (no empty lines) ..
-#'
-#' .. content for \details{} ..
-#'
-#' @title
+#' @description
+#' This function calculates secondary production with the size-frequency method.
+#' @title calc_prod_sf
+#' @param taxaSampleListMass description
+#' @param taxaInfo data frame of taxonomic information for calculating production
+#' @param bootNum integer. How many bootstrap samples should be constructed
+#' @param dateDf data frame of date information with external predictors for each month. There should be a column name identical to all variables in the growth equation found in taxaInfo data.frame.
+#' @param taxaSummary string of 'short', 'full', or 'none'. What type of summary information should be returned.
+#' @param wrap logical. Should the dates wrap to create a full year?
+#' @param massValue string. What is the mass value and units of the production
+#' @param massLabel string. What label should the output units be. It is possible this will default to 'massValue' in the future.
+#' @param ... additional arguments to be passed to the function
+#' @returns returns a list of 2 objects:
+#' @returns P.boots: the boostrapped estimates of production, abundance, and biomass.
+#' @returns taxaSummary: is the summary of the sample production, abundance, and biomass
+#' @importFrom dplyr count
+#' @import stats
+#' @export
 
 calc_prod_sf <- function(taxaSampleListMass= NULL,
                          taxaInfo = NULL,
@@ -17,6 +30,7 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
 
   ## end tests ##
   speciesName = unique(taxaSampleListMass$taxonID)
+  taxaInfo = taxaInfo[which(taxaInfo$taxonID == speciesName),]
   # ## function prep ##
   # ### make a list of key variables to pass to sample function
   funcList = list(
@@ -29,15 +43,17 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
   funcList = c(funcList, list(cpi = taxaCPI))
   P.samp = do.call(sf_prod.sample, args = funcList)
 
-  # prep boots
+  # prep size-abundance boots
   bootList = prep_boots(df = taxaSampleListMass,
                          bootNum = bootNum)
 
-  P.boots = lapply(bootList, sf_prod.sample,
-                   sizesDf = funcList$sizesDf,
-                   cpi = funcList$cpi,
-                   full = FALSE)
+  cpiBoots = sample(seq.int(from = as.integer(taxaInfo$min.cpi), to = as.integer(taxaInfo$max.cpi), by = 1), as.integer(bootNum), replace = TRUE)
 
+  P.boots = mapply(FUN = sf_prod.sample,
+                   df = bootList,
+                   sizesDf = lapply(1:bootNum, function(x) funcList$sizesDf),
+                   cpi = cpiBoots,
+                   full = FALSE)
   #### create SAMPLE information to export as summary ####
   # summarise sample sizes across dates
   sampDatesInfo <- setNames(unique(aggregate(taxaSampleListMass[c("repID")], by = list(taxaSampleListMass$dateID, taxaSampleListMass$lengthClass), count)[c(1, 3)]), c("dateID", "N"))

@@ -1,1 +1,4 @@
-destination: docs
+url: https://jimjunker1.github.io/secpRod/
+template:
+  bootstrap: 5
+

@@ -4,3 +4,7 @@
 ^docs$
 ^pkgdown$
 ^ignore$
+^\.github$
+^README.Rmd
+^example_README.Rmd
+^_config\.yml

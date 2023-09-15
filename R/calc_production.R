@@ -1,9 +1,14 @@
 #' @name calc_production
-#' @description This is the main function of the secpRod package. It will calculate secondary production for all groups based on the methods described in the taxa information object. Depending on input values varying summaries
-#' @param sizeInfo dataframe (or coercible); The size-abundance data for each species and sampling date
-#' @param infoCols integer vector; Any columns in the sizeInfo object that are not the taxonomic ID, sampling data, or size class columns
-#' @param taxaInfo dataframe (or coercible); The taxonomic information for calculating secondary production. This must include a taxonomic ID column with the same name as that of `sizeInfo`, other information
-#'
+#' @title calc_production
+#' @description This is the main function of the secpRod package. It will calculate secondary production for all groups based on the methods described in the taxa information object. Depending on input values varying summaries are returned.
+#' @param taxaSampleListMass data.frame of sample length-masses and abundances
+#' @param infoCols integer vector; Any columns in the sizeInfo object that are not the taxonomic ID, sampling metadata, or size class columns
+#' @param taxaInfo dataframe (or coercible); The taxonomic information for calculating secondary production. This must include a taxonomic ID column with the same name as that of \code{taxaSampleListMass}
+#' @param bootNum integer. The number of bootsrapt samples to create
+#' @param wrap logical should an extra date be added to make a full calendar year?
+#' @param taxaSummary string of \code{'short'}, \code{'full'}, or \code{'none'} to distinguish the information returned
+#' @param ... additional arguments passed to function
+#'@export
 
 calc_production = function(taxaSampleListMass = NULL,
                            infoCols = NULL,
@@ -14,9 +19,9 @@ calc_production = function(taxaSampleListMass = NULL,
                            ...){
   ### tests ###
 
-
   ### end tests ###
   ## function prep ##
+  ##
   ### make a list of key variables to pass
   massValue = rev(names(taxaSampleListMass))[1]
   massLabel = paste0(massValue, "_m2")
@@ -35,12 +40,17 @@ calc_production = function(taxaSampleListMass = NULL,
     wrap = TRUE
   )
 
-  debugonce(sf_prod.sample)
+## calculated production based on methods
+### size frequency
+#   debugonce(sf_prod.sample)
+#   debugonce(calc_prod_sf)
   sf_prod = do.call(calc_prod_sf, args = funcList)
-  # calc_prod_sf(df = taxaSampleListMass,  )
-  # calc_prod_rs()
-  # calc_prod_is()
-  # calc_prod_igr()
+### instantaneous growth
+  # igr_prod = do.call(calc_prod_igr, args = funcList)
+### removal summation
+  # rs_prod = calc_prod_rs()
+### increment summation
+  # is_prod = calc_prod_is()
 
   return(sf_prod)
 

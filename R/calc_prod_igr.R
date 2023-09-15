@@ -1,8 +1,21 @@
-#' .. content for \description{} (no empty lines) ..
-#'
-#' .. content for \details{} ..
-#'
-#' @title
+#' @description
+#' This function calculates production using the instantaneous growth rate method.
+#' @details
+#' Additional details...
+#' @title calc_prod_igr
+#' @param taxaSampleListMass description
+#' @param taxaInfo The taxa info data.frame
+#' @param bootNum integer. The number of bootstrap samples to produce.
+#' @param dateDf data frame of date information with external predictors for each month. There should be a column name identical to all variables in the growth equation found in taxaInfo data.frame.
+#' @param taxaSummary string of 'short', 'full', or 'none'. What type of summary information should be returned.
+#' @param wrap logical. Should the dates wrap to create a full year?
+#' @param massValue string. What is the mass value and units of the production
+#' @param massLabel string. What label should the output units be. It is possible this will default to 'massValue' in the future.
+#' @param ... additional arguments to pass to the function
+#' @returns returns a list of 2 objects
+#' @importFrom dplyr count
+#' @import stats
+#' @export
 
 calc_prod_igr <- function(taxaSampleListMass= NULL,
                          taxaInfo = NULL,
@@ -21,7 +34,7 @@ calc_prod_igr <- function(taxaSampleListMass= NULL,
   # ### make a list of key variables to pass to sample function
   funcList = list(
     df = taxaSampleListMass,
-    sizesDf = unique(taxaSampleListMass[, c("lengthClass", rev(names(taxaSampleListMass))[1])]),
+    sizesDf = unique(taxaSampleListMass[, c("lengthClass", rev(names(taxaSampleListMass))[1])])
 
   )
 
