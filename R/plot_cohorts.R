@@ -74,7 +74,7 @@ plot_cohorts = function(taxaSampleListMass = NULL, param = c('length','mass'), m
   parStore <- vector(mode = 'numeric', length = nDates)
   brks <- seq(0,xMax, length.out = 50)
   for(j in 1:nDates){
-    dateDf <- with(.data$plotDfexpanded, subset(plotDfExpanded, dateID == dateVec[i]))
+    dateDf <- with(.data$plotDfexpanded, subset(plotDfExpanded, dateID == dateVec[j]))
     if(param == 'length'){
       lVec <- unlist(dateDf['lengthClass'])
     } else{
