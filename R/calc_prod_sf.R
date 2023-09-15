@@ -13,7 +13,6 @@
 #' @returns returns a list of 2 objects:
 #' @returns P.boots: the boostrapped estimates of production, abundance, and biomass.
 #' @returns taxaSummary: is the summary of the sample production, abundance, and biomass
-#' @importFrom junkR count
 #' @import stats
 #' @export
 
@@ -56,7 +55,7 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
                    full = FALSE)
   #### create SAMPLE information to export as summary ####
   # summarise sample sizes across dates
-  sampDatesInfo <- setNames(unique(aggregate(taxaSampleListMass[c("repID")], by = list(taxaSampleListMass$dateID, taxaSampleListMass$lengthClass), junkR::count)[c(1, 3)]), c("dateID", "N"))
+  sampDatesInfo <- setNames(unique(aggregate(taxaSampleListMass[c("repID")], by = list(taxaSampleListMass$dateID, taxaSampleListMass$lengthClass), vers_count)[c(1, 3)]), c("dateID", "N"))
   if (wrap) {
     temp <- data.frame(dateID = dateDf[nrow(dateDf), "dateID"])
     temp[["N"]] <- NA

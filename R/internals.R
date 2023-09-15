@@ -143,3 +143,12 @@ estimate_ann_stats = function(df, var = NULL, wrap = TRUE,...){
   x[[varSDName]] <- varSD
   return(x)
 }
+
+#'
+#'
+vers_count = function (..., condition = (function(x) TRUE))
+{
+  data <- c(...)
+  result <- sum(sapply(data, function(x) if (condition(x)) 1 else 0))
+  return(result)
+}
