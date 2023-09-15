@@ -41,6 +41,8 @@ plot_cohorts = function(taxaSampleListMass = NULL, param = c('length','mass'), m
     if(any(grepl("repID",names(taxaSampleListMass)))){
     repForm = as.formula(paste0("n_m2 ~ dateID + lengthClass + ",eval(massClass)))
       df = aggregate(repForm, data = taxaSampleListMass, FUN = 'sum')
+    } else{
+      df = taxaSampleListMass
     }
     # split by sampling dates and create length or mass vectors
   # if(param == 'length'){.
