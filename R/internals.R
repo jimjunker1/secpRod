@@ -71,7 +71,7 @@ replace_formula_terms <- function(x, termList = NULL, ...) {
                                           termReps))) == 0){
     runsPositions = NA
     onesPositions = termVars
-    names(onesPositions) = sapply(substring(x, onesPositions, onesPositions), function(a) neames(termList)[termList %in% a])
+    names(onesPositions) = sapply(substring(x, onesPositions, onesPositions), function(a) names(termList)[termList %in% a])
   } else{
   runsPositions = termVars[sapply(runs, function(a) grep(a, termReps))]}
   runsStarts = min(runsPositions)
