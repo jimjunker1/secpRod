@@ -13,7 +13,7 @@
 #' @returns returns a list of 2 objects:
 #' @returns P.boots: the boostrapped estimates of production, abundance, and biomass.
 #' @returns taxaSummary: is the summary of the sample production, abundance, and biomass
-#' @importFrom dplyr count
+#' @importFrom junkR count
 #' @import stats
 #' @export
 
