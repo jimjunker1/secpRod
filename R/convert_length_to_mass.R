@@ -20,7 +20,7 @@ convert_length_to_mass <- function(taxaSampleList = NULL, taxaInfo = NULL, reduc
   if (any(is.null(taxaSubInfo))) stop(paste("No taxonomic information available for", taxonID, ". Check for correct spelling in sampleInfo and taxaInfo."))
 
   # convert the length-to-mass formula to a formula
-  massFormula <- as.formula(gsub(" ", "", taxaSubInfo$massForm))
+  massFormula <- as.formula(paste0(gsub(" ", "", taxaSubInfo$massForm)))
   # if(!as.formula(massFormula)) stop("The length-to-mass formula, 'massForm', cannot be coercied into a formula class.")
   # get the mass units from the LHS of massFormula
   massUnits <- formula.tools::lhs(massFormula)

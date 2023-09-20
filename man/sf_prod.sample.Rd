@@ -4,12 +4,24 @@
 \alias{sf_prod.sample}
 \title{sf_prod.sample}
 \usage{
-sf_prod.sample(df = NULL, sizesDf = NULL, cpi = NULL, full = TRUE, ...)
+sf_prod.sample(
+  df = NULL,
+  sizesDf = NULL,
+  massValue = NULL,
+  massLabel = NULL,
+  cpi = NULL,
+  full = TRUE,
+  ...
+)
 }
 \arguments{
 \item{df}{a data.frame of long format returned from \code{convert_length_to_mass()} function}
 
 \item{sizesDf}{a data.frame of the}
+
+\item{massValue}{character string identifying the column name of the mass value}
+
+\item{massLabel}{character string identifying the column name of the mass value}
 
 \item{cpi}{integer. The cohort production interval.}
 

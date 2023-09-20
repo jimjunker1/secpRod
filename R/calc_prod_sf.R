@@ -34,7 +34,10 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
   # ### make a list of key variables to pass to sample function
   funcList = list(
     df = taxaSampleListMass,
-    sizesDf = unique(taxaSampleListMass[, c("lengthClass", rev(names(taxaSampleListMass))[1])])
+    # sizesDf = unique(taxaSampleListMass[, c("lengthClass", rev(names(taxaSampleListMass))[1])])
+    sizesDf = unique(taxaSampleListMass[, c("lengthClass", eval(massValue))]),
+    massValue = massValue,
+    massLabel = massLabel
   )
 
   # calculate the production from the full samples
@@ -51,6 +54,8 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
   P.boots = mapply(FUN = sf_prod.sample,
                    df = bootList,
                    sizesDf = lapply(1:bootNum, function(x) funcList$sizesDf),
+                   massValue = massValue,
+                   massLabel = massLabel,
                    cpi = cpiBoots,
                    full = FALSE)
   #### create SAMPLE information to export as summary ####
