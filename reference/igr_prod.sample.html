@@ -55,7 +55,14 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">igr_prod.sample</span><span class="op">(</span>df <span class="op">=</span> <span class="cn">NULL</span>, sizesDf <span class="op">=</span> <span class="cn">NULL</span>, cpi <span class="op">=</span> <span class="cn">NULL</span>, full <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">igr_prod.sample</span><span class="op">(</span></span>
+<span>  df <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  sizesDf <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  massValue <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  massLabel <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  full <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -68,16 +75,20 @@
 <dd><p>a data.frame of the</p></dd>
 
 
-<dt>cpi</dt>
-<dd><p>integer. The cohort production interval.</p></dd>
+<dt>massValue</dt>
+<dd><p>character string identifying the column name of the mass value</p></dd>
+
+
+<dt>massLabel</dt>
+<dd><p>character string identifying the column name of the mass value</p></dd>
 
 
 <dt>full</dt>
-<dd><p>logical. should the full summary be returned with mean and sd</p></dd>
+<dd><p>logical. should the full summary be returned with mean and sd.</p></dd>
 
 
 <dt>...</dt>
-<dd><p>additional arguments passed to function</p></dd>
+<dd><p>additional arguments passed to function, including variables to predict growth rate from growth function</p></dd>
 
 </dl></div>
     <div class="section level2">
