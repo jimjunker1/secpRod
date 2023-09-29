@@ -28,10 +28,21 @@ sf_prod.sample <- function(df = NULL,
                                   var = massLabel)
  df[[massLabel]] <- NULL
  if(B.ann.list[[eval(paste0(massLabel,"_mean"))]] == 0){
-   taxon = unlist(unique(df$taxonID))
-   return(warning(paste0("Warning: ",taxon," has no observations.")))
+   if(full == TRUE){
+     return(list(P.ann.samp = 0,
+                 P.uncorr.samp = 0,
+                 B.ann.mean = 0,
+                 B.ann.sd = NA_real_,
+                 N.ann.mean = 0,
+                 N.ann.sd = NA_real_))
+   } else{
+     return(list(P.ann.samp = 0,
+                 B.ann.samp = 0,
+                 N.ann.samp = 0))
+   }
 
- }
+ } else{
+
 
   #### calculate SAMPLE annual production ####
   # Create a matrix with these 4 columns: individual length (mm), mean density for all samples throughout year (number m^-2), individual mass (mg AFDM), and biomass (mg AFDM m^-2) for each size class (rows)
@@ -67,7 +78,7 @@ sf_prod.sample <- function(df = NULL,
   P.uncorr.samp <- sum(SF.int[, 4])
   # Calculate annual production using the cohort production interval (cpi) given in days for this taxon
   P.ann.samp <- P.uncorr.samp * (365 / cpi)
-
+}
   if(full == TRUE){
     return(list(P.ann.samp = P.ann.samp,
                 P.uncorr.samp = P.uncorr.samp,
