@@ -44,7 +44,7 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
   taxaCPI <- mean(c(taxaInfo$min.cpi, taxaInfo$max.cpi))
   funcList = c(funcList, list(cpi = taxaCPI))
   P.samp = do.call(sf_prod.sample, args = funcList)
-if(grepl("warning", P.samp, ignore.case = TRUE)){return(P.samp)}
+  if(grepl("warning", P.samp, ignore.case = TRUE)){return(P.samp)}
   # prep size-abundance boots
   bootList = prep_boots(df = taxaSampleListMass,
                          bootNum = bootNum)
