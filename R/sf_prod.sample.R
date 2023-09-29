@@ -27,6 +27,11 @@ sf_prod.sample <- function(df = NULL,
   B.ann.list = estimate_ann_stats(df,
                                   var = massLabel)
  df[[massLabel]] <- NULL
+ if(B.ann.list[[eval(paste0(massLabel,"_mean"))]] == 0){
+   taxon = unlist(unique(df$taxonID))
+   return(warning(paste0("Warning: ",taxon," has no observations.")))
+
+ }
 
   #### calculate SAMPLE annual production ####
   # Create a matrix with these 4 columns: individual length (mm), mean density for all samples throughout year (number m^-2), individual mass (mg AFDM), and biomass (mg AFDM m^-2) for each size class (rows)
