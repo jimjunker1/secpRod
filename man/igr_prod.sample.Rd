@@ -4,18 +4,27 @@
 \alias{igr_prod.sample}
 \title{igr_prod.sample}
 \usage{
-igr_prod.sample(df = NULL, sizesDf = NULL, cpi = NULL, full = TRUE, ...)
+igr_prod.sample(
+  df = NULL,
+  sizesDf = NULL,
+  massValue = NULL,
+  massLabel = NULL,
+  full = TRUE,
+  ...
+)
 }
 \arguments{
 \item{df}{a data.frame of long format returned from \code{convert_length_to_mass()} function}
 
 \item{sizesDf}{a data.frame of the}
 
-\item{cpi}{integer. The cohort production interval.}
+\item{massValue}{character string identifying the column name of the mass value}
 
-\item{full}{logical. should the full summary be returned with mean and sd}
+\item{massLabel}{character string identifying the column name of the mass value}
 
-\item{...}{additional arguments passed to function}
+\item{full}{logical. should the full summary be returned with mean and sd.}
+
+\item{...}{additional arguments passed to function, including variables to predict growth rate from growth function}
 }
 \value{
 list object with taxa summary of the sampled data

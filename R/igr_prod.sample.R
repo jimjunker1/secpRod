@@ -1,27 +1,30 @@
+#' @name igr_prod.sample
 #' @title igr_prod.sample
 #' @description This function calculates taxa production based on the instantaneous growth method
 #' @param df a data.frame of long format returned from \code{convert_length_to_mass()} function
 #' @param sizesDf a data.frame of the
-#' @param full logical. should the full summary be returned with mean and sd
-#' @param cpi integer. The cohort production interval.
-#' @param ... additional arguments passed to function
+#' @param massValue character string identifying the column name of the mass value
+#' @param massLabel character string identifying the column name of the mass value
+#' @param full logical. should the full summary be returned with mean and sd.
+#' @param ... additional arguments passed to function, including variables to predict growth rate from growth function
 #' @return list object with taxa summary of the sampled data
 #' @export
 igr_prod.sample <- function(df = NULL,
                            sizesDf = NULL,
-                           cpi = NULL,
+                           massValue = NULL,
+                           massLabel = NULL,
                            full = TRUE,
                            ...) {
 
   #### tests ####
   #### GUTS of function ####
   # calculate mean biomass and abundance across all dates
-  df$afdm_mg_m2 <- df$n_m2 * df$afdm_mg
+  df[[massLabel]] <- df$n_m2 * df[[massValue]]
   N.ann.list = estimate_ann_stats(df,
-                     var = 'n_m2')
+                                  var = 'n_m2')
   B.ann.list = estimate_ann_stats(df,
-                                  var = 'afdm_mg_m2')
- df$afdm_mg_m2 <- NULL
+                                  var = massLabel)
+  df[[massLabel]] <- NULL
 
   #### calculate SAMPLE annual production ####
   # Create a matrix with these 4 columns: individual length (mm), mean density for all samples throughout year (number m^-2), individual mass (mg AFDM), and biomass (mg AFDM m^-2) for each size class (rows)

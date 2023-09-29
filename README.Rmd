@@ -22,7 +22,7 @@ Installation
 
 ```r
 # To install the latest version Github:
-# install.packges('devtools')
+# install.packages('devtools')
 devtools::install_github("jimjunker1/secpRod")
 ```
 Workflow

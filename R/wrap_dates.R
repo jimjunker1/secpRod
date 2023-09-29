@@ -20,6 +20,8 @@ wrap_dates <- function(df = NULL, dateCol = NULL, wrapDate = TRUE,...) {
       if(wrapDate){
         t.int = c(t.int, (364-sum(t.int)),NA)
         date1 = c(date1, as.Date(date1[length(date1)])+t.int[length(t.int)-1])
+      } else{
+        date1 = date1[-length(date1)]
       }
       returnDf = list()
       returnDf[[dateCol]] <- as.Date(date1, origin = as.Date("1970-01-01"))
