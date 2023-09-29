@@ -44,6 +44,41 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
   taxaCPI <- mean(c(taxaInfo$min.cpi, taxaInfo$max.cpi))
   funcList = c(funcList, list(cpi = taxaCPI))
   P.samp = do.call(sf_prod.sample, args = funcList)
+  if(P.samp$P.ann.samp == 0){
+    if(taxaSummary == "none"){
+      taxaSummary <- NULL
+    } else if (taxaSummary == "full") {
+      # # create a list for output
+      taxaSummary <- list(
+        summaryType = "full",
+        taxonID = taxaInfo$taxonID,
+        method = "sf",
+        P.ann.samp = 0,
+        P.uncorr.samp = 0,
+        cpi = NA_real_,
+        meanN = 0,
+        meanB = 0,
+        meanIndMass = 0,
+        Nmean = 0,
+        Nsd = 0,
+        Bmean = 0,
+        Bsd = 0,
+        datesInfo = NULL
+      )
+    } else if(taxaSummary == "short"){
+      taxaSummary <- list(
+        summaryType = "short",
+        taxonID = taxaInfo$taxonID,
+        method = "sf",
+        P.ann.samp = 0,
+        cpi = NA_real_,
+        meanN = 0,
+        meanB = 0,
+        meanIndMass = 0,
+        datesInfo = NULL
+      )
+    }
+  }
   # prep size-abundance boots
   bootList = prep_boots(df = taxaSampleListMass,
                          bootNum = bootNum)
