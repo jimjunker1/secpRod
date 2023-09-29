@@ -78,6 +78,8 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
         datesInfo = NULL
       )
     }
+    return(assign(speciesName, list(P.boots = P.samp,
+                                    taxaSummary = taxaSummary)))
   }
   # prep size-abundance boots
   bootList = prep_boots(df = taxaSampleListMass,
