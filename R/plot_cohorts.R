@@ -69,7 +69,7 @@ plot_cohorts = function(taxaSampleListMass = NULL, param = c('length','mass'), m
     }
   # determine sampling dates
   nDates = length(unique(df$dateID))
-  dateVec = unlist(unique(df$dateID))
+  dateVec = sort(unlist(unique(df$dateID)))
   # determine maximum y
   parStore <- vector(mode = 'numeric', length = nDates)
   brks <- seq(0,xMax, length.out = 50)
