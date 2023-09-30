@@ -62,7 +62,7 @@ sf_prod.sample <- function(df = NULL,
   # Calculate the geometric mean of individual masses between size classes, but use the individual mass of the largest size class for the "final" transition out of the largest size class, as Benke & Huryn (2007) suggest
   SF.int[, 2] <- c((SF[(1:(dim(SF)[1] - 1)), 3] * SF[(2:dim(SF)[1]), 3])^(1 / 2), SF[dim(SF)[1], 3])
   SF.int[, 3] <- SF.int[, 1] * SF.int[, 2]
-  SF.int[, 4] <- SF.int[, 3] * nrow(sizesDf)
+  SF.int[, 4] <- SF.int[, 3] * max(sizesDf[[1]])
   # If the first value in the column of biomass * number of size classes (mg AFDM m^-2) is negative, set it to zero
   if (SF.int[1, 4] < 0) {
     SF.int[1, 4] <- 0

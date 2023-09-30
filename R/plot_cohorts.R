@@ -72,7 +72,7 @@ plot_cohorts = function(taxaSampleListMass = NULL, param = c('length','mass'), m
   dateVec = sort(unlist(unique(df$dateID)))
   # determine maximum y
   parStore <- vector(mode = 'numeric', length = nDates)
-  brks <- seq(0,xMax, length.out = 50)
+  brks <- seq(0,(ceiling(xMax)+1), by = 1)
   for(j in 1:nDates){
     dateDf <- with(.data, subset(plotDfExpanded, dateID == dateVec[j]))
     if(param == 'length'){
