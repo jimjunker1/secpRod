@@ -78,9 +78,156 @@
 
     
     
+<div class="section level2">
+<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+</h2>
+<p>Currently, the only method for analysis fully implemented is
+size-frequency. This quick tutorial will outline steps to calculate
+secondary production for whole communities. First, load the package with
+<code><a href="https://jimjunker1.github.io/secpRod/">library(secpRod)</a></code>.</p>
+<p>The package comes with a data set of macroinvertebrate community data
+from <span class="citation">(<strong>junker2014?</strong>)</span> that
+can be accessed with <code>data("wbtData")</code></p>
+<p>This data object is a list with two (2) elements:</p>
+<ol style="list-style-type: decimal">
+<li><p>sampleInfo: a list with 32 data frames. One (1) for each
+taxonomic entity</p></li>
+<li><p>taxaInfo: a data frame with 32 rows and 13 columns. Each row
+represents the taxonomic information for a single taxonomic entity and
+the columns contain information for calculation of production. These
+include, but are not limited to:</p></li>
+</ol>
+<ul>
+<li><p>taxonID: a character string that matches the name of taxonID from
+sampleInfo</p></li>
+<li><p>massForm: a character string that is coercible to a formula for
+the conversion from length to mass (e.g.,
+<code>afdm_mg~(a*lengthClass^b)</code>)</p></li>
+<li><p>a: numeric variable for the coefficients used in
+massForm</p></li>
+<li><p>b: numeric variable for the coefficients used in
+massForm</p></li>
+<li><p>percAsh: numeric integer 0–100</p></li>
+<li><p>method: character string for the method to use. Must be one of
+the following: ‘sf’ (this will be updated as methods are
+finalized.)</p></li>
+<li><p>g.a: description forthcoming…</p></li>
+<li><p>growthForm: description forthcoming…</p></li>
+<li><p>min.cpi: integer of the minimum estimated cohort production
+interval for adjusting annual production estimates using the
+size-frequency method</p></li>
+<li><p>max.cpi: integer of the maximum estimated cohort production
+interval for adjusting annual production estimates using the
+size-frequency method</p></li>
+<li><p>pb: description forthcoming…</p></li>
+<li><p>min.growth: description forthcoming…</p></li>
+<li><p>notes: notes for researcher use. This column will be maintained
+in output summaries.</p></li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="examples">Examples<a class="anchor" aria-label="anchor" href="#examples"></a>
+</h2>
+<div class="section level3">
+<h3 id="single-species-walkthrough">Single-species walkthrough<a class="anchor" aria-label="anchor" href="#single-species-walkthrough"></a>
+</h3>
+<p>A quick walkthrough of the calculation of secondary production for a
+single species.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://jimjunker1.github.io/secpRod/">secpRod</a></span><span class="op">)</span></span></code></pre></div>
-  </main>
+<code class="sourceCode R"><span><span class="co">## isolate a single species data frame from sampleInfo object</span></span>
+<span></span>
+<span><span class="va">acentrella</span> <span class="op">&lt;-</span> <span class="va">wbtData</span><span class="op">[[</span><span class="st">'sampleInfo'</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">'Acentrella sp.'</span><span class="op">]</span><span class="op">]</span></span>
+<span></span>
+<span><span class="co">## let's take a look at the data set</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">acentrella</span>, <span class="fl">10</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 10 × 5</span></span></span>
+<span><span class="co">#&gt;    taxonID        repID dateID              lengthClass  n_m2</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>                    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> Acentrella sp.     1 2008-07-17 <span style="color: #949494;">00:00:00</span>         0.5   0  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> Acentrella sp.     1 2008-07-17 <span style="color: #949494;">00:00:00</span>         1     0  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> Acentrella sp.     1 2008-07-17 <span style="color: #949494;">00:00:00</span>         2    62.5</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> Acentrella sp.     1 2008-07-17 <span style="color: #949494;">00:00:00</span>         3    72.9</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> Acentrella sp.     1 2008-07-17 <span style="color: #949494;">00:00:00</span>         4    72.9</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> Acentrella sp.     1 2008-07-17 <span style="color: #949494;">00:00:00</span>         5    52.1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> Acentrella sp.     1 2008-07-17 <span style="color: #949494;">00:00:00</span>         6     0  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> Acentrella sp.     1 2008-07-17 <span style="color: #949494;">00:00:00</span>         7     0  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> Acentrella sp.     1 2008-07-17 <span style="color: #949494;">00:00:00</span>         8     0  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> Acentrella sp.     1 2008-07-17 <span style="color: #949494;">00:00:00</span>         9     0</span></span></code></pre></div>
+<p>The data contain all the replicates of density and body length
+distributions in long format.</p>
+<p>The first step is to convert length to mass for estimating biomass
+patterns. Here we use the <code><a href="../reference/convert_length_to_mass.html">convert_length_to_mass()</a></code>
+function.</p>
+<p>Information on its use can be viewed with
+<code>?convert_lenght_to_mass</code></p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">accentrellaMass</span> <span class="op">=</span> <span class="fu"><a href="../reference/convert_length_to_mass.html">convert_length_to_mass</a></span><span class="op">(</span>taxaSampleList <span class="op">=</span> <span class="va">acentrella</span>,</span>
+<span>                                         taxaInfo <span class="op">=</span> <span class="va">wbtData</span><span class="op">[[</span><span class="st">'taxaInfo'</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">accentrellaMass</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 6</span></span></span>
+<span><span class="co">#&gt;   taxonID        repID dateID              lengthClass  n_m2 afdm_mg</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>                    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Acentrella sp.     1 2008-07-17 <span style="color: #949494;">00:00:00</span>         0.5   0   0.005<span style="text-decoration: underline;">77</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Acentrella sp.     1 2008-07-17 <span style="color: #949494;">00:00:00</span>         1     0   0.037<span style="text-decoration: underline;">2</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Acentrella sp.     1 2008-07-17 <span style="color: #949494;">00:00:00</span>         2    62.5 0.240  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Acentrella sp.     1 2008-07-17 <span style="color: #949494;">00:00:00</span>         3    72.9 0.716  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> Acentrella sp.     1 2008-07-17 <span style="color: #949494;">00:00:00</span>         4    72.9 1.55   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> Acentrella sp.     1 2008-07-17 <span style="color: #949494;">00:00:00</span>         5    52.1 2.83</span></span></code></pre></div>
+<p>From here you can view the size frequency histograms using the
+<code><a href="../reference/plot_cohorts.html">plot_cohorts()</a></code> function. Check out the</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="fu"><a href="../reference/plot_cohorts.html">plot_cohorts</a></span><span class="op">(</span>taxaSampleListMass <span class="op">=</span> <span class="va">accentrellaMass</span>,</span>
+<span>             param <span class="op">=</span> <span class="st">'mass'</span>,</span>
+<span>             massClass <span class="op">=</span> <span class="st">'afdm_mg'</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in hist.default(lVec, breaks = brks, col = "lightgrey", border =</span></span>
+<span><span class="co">#&gt; "grey", : arguments 'probability', 'col', 'border', 'main', 'xlim', 'ylim',</span></span>
+<span><span class="co">#&gt; 'axes', '...' are not made use of</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning in hist.default(lVec, breaks = brks, col = "lightgrey", border =</span></span>
+<span><span class="co">#&gt; "grey", : arguments 'probability', 'col', 'border', 'main', 'xlim', 'ylim',</span></span>
+<span><span class="co">#&gt; 'axes', '...' are not made use of</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning in hist.default(lVec, breaks = brks, col = "lightgrey", border =</span></span>
+<span><span class="co">#&gt; "grey", : arguments 'probability', 'col', 'border', 'main', 'xlim', 'ylim',</span></span>
+<span><span class="co">#&gt; 'axes', '...' are not made use of</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning in hist.default(lVec, breaks = brks, col = "lightgrey", border =</span></span>
+<span><span class="co">#&gt; "grey", : arguments 'probability', 'col', 'border', 'main', 'xlim', 'ylim',</span></span>
+<span><span class="co">#&gt; 'axes', '...' are not made use of</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning in hist.default(lVec, breaks = brks, col = "lightgrey", border =</span></span>
+<span><span class="co">#&gt; "grey", : arguments 'probability', 'col', 'border', 'main', 'xlim', 'ylim',</span></span>
+<span><span class="co">#&gt; 'axes', '...' are not made use of</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning in hist.default(lVec, breaks = brks, col = "lightgrey", border =</span></span>
+<span><span class="co">#&gt; "grey", : arguments 'probability', 'col', 'border', 'main', 'xlim', 'ylim',</span></span>
+<span><span class="co">#&gt; 'axes', '...' are not made use of</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning in hist.default(lVec, breaks = brks, col = "lightgrey", border =</span></span>
+<span><span class="co">#&gt; "grey", : arguments 'probability', 'col', 'border', 'main', 'xlim', 'ylim',</span></span>
+<span><span class="co">#&gt; 'axes', '...' are not made use of</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning in hist.default(lVec, breaks = brks, col = "lightgrey", border =</span></span>
+<span><span class="co">#&gt; "grey", : arguments 'probability', 'col', 'border', 'main', 'xlim', 'ylim',</span></span>
+<span><span class="co">#&gt; 'axes', '...' are not made use of</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning in hist.default(lVec, breaks = brks, col = "lightgrey", border =</span></span>
+<span><span class="co">#&gt; "grey", : arguments 'probability', 'col', 'border', 'main', 'xlim', 'ylim',</span></span>
+<span><span class="co">#&gt; 'axes', '...' are not made use of</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning in hist.default(lVec, breaks = brks, col = "lightgrey", border =</span></span>
+<span><span class="co">#&gt; "grey", : arguments 'probability', 'col', 'border', 'main', 'xlim', 'ylim',</span></span>
+<span><span class="co">#&gt; 'axes', '...' are not made use of</span></span>
+<span><span class="co">#&gt; Warning in mtext(eval(taxonID), size = 3, outer = TRUE): "size" is not a</span></span>
+<span><span class="co">#&gt; graphical parameter</span></span></code></pre></div>
+<p><img src="simple-example_files/figure-html/plot%20cohorts-1.png" width="700"></p>
+</div>
+</div>
+  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 
