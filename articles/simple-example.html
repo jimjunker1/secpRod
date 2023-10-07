@@ -157,10 +157,15 @@ single species.</p>
 distributions in long format.</p>
 <p>The first step is to convert length to mass for estimating biomass
 patterns. Here we use the <code><a href="../reference/convert_length_to_mass.html">convert_length_to_mass()</a></code>
-function.</p>
+function, which adds a column of the individual masses based on the
+length-to-mass formula and coefficients in taxaInfo.</p>
+<p>We can take a look at what this looks like:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">accentrellaInfo</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">wbtData</span><span class="op">[[</span><span class="st">'taxaInfo'</span><span class="op">]</span><span class="op">]</span>, <span class="va">taxonID</span> <span class="op">==</span> <span class="st">"Accentrella sp."</span><span class="op">)</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'taxonID'</span>, <span class="st">'massForm'</span>,<span class="st">'a'</span>,<span class="st">'b'</span>,<span class="st">'percAsh'</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
 <p>Information on its use can be viewed with
 <code>?convert_lenght_to_mass</code></p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">accentrellaMass</span> <span class="op">=</span> <span class="fu"><a href="../reference/convert_length_to_mass.html">convert_length_to_mass</a></span><span class="op">(</span>taxaSampleList <span class="op">=</span> <span class="va">acentrella</span>,</span>
 <span>                                         taxaInfo <span class="op">=</span> <span class="va">wbtData</span><span class="op">[[</span><span class="st">'taxaInfo'</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
@@ -177,52 +182,11 @@ function.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> Acentrella sp.     1 2008-07-17 <span style="color: #949494;">00:00:00</span>         5    52.1 2.83</span></span></code></pre></div>
 <p>From here you can view the size frequency histograms using the
 <code><a href="../reference/plot_cohorts.html">plot_cohorts()</a></code> function. Check out the</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/plot_cohorts.html">plot_cohorts</a></span><span class="op">(</span>taxaSampleListMass <span class="op">=</span> <span class="va">accentrellaMass</span>,</span>
-<span>             param <span class="op">=</span> <span class="st">'mass'</span>,</span>
-<span>             massClass <span class="op">=</span> <span class="st">'afdm_mg'</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in hist.default(lVec, breaks = brks, col = "lightgrey", border =</span></span>
-<span><span class="co">#&gt; "grey", : arguments 'probability', 'col', 'border', 'main', 'xlim', 'ylim',</span></span>
-<span><span class="co">#&gt; 'axes', '...' are not made use of</span></span>
-<span></span>
-<span><span class="co">#&gt; Warning in hist.default(lVec, breaks = brks, col = "lightgrey", border =</span></span>
-<span><span class="co">#&gt; "grey", : arguments 'probability', 'col', 'border', 'main', 'xlim', 'ylim',</span></span>
-<span><span class="co">#&gt; 'axes', '...' are not made use of</span></span>
-<span></span>
-<span><span class="co">#&gt; Warning in hist.default(lVec, breaks = brks, col = "lightgrey", border =</span></span>
-<span><span class="co">#&gt; "grey", : arguments 'probability', 'col', 'border', 'main', 'xlim', 'ylim',</span></span>
-<span><span class="co">#&gt; 'axes', '...' are not made use of</span></span>
-<span></span>
-<span><span class="co">#&gt; Warning in hist.default(lVec, breaks = brks, col = "lightgrey", border =</span></span>
-<span><span class="co">#&gt; "grey", : arguments 'probability', 'col', 'border', 'main', 'xlim', 'ylim',</span></span>
-<span><span class="co">#&gt; 'axes', '...' are not made use of</span></span>
-<span></span>
-<span><span class="co">#&gt; Warning in hist.default(lVec, breaks = brks, col = "lightgrey", border =</span></span>
-<span><span class="co">#&gt; "grey", : arguments 'probability', 'col', 'border', 'main', 'xlim', 'ylim',</span></span>
-<span><span class="co">#&gt; 'axes', '...' are not made use of</span></span>
-<span></span>
-<span><span class="co">#&gt; Warning in hist.default(lVec, breaks = brks, col = "lightgrey", border =</span></span>
-<span><span class="co">#&gt; "grey", : arguments 'probability', 'col', 'border', 'main', 'xlim', 'ylim',</span></span>
-<span><span class="co">#&gt; 'axes', '...' are not made use of</span></span>
-<span></span>
-<span><span class="co">#&gt; Warning in hist.default(lVec, breaks = brks, col = "lightgrey", border =</span></span>
-<span><span class="co">#&gt; "grey", : arguments 'probability', 'col', 'border', 'main', 'xlim', 'ylim',</span></span>
-<span><span class="co">#&gt; 'axes', '...' are not made use of</span></span>
-<span></span>
-<span><span class="co">#&gt; Warning in hist.default(lVec, breaks = brks, col = "lightgrey", border =</span></span>
-<span><span class="co">#&gt; "grey", : arguments 'probability', 'col', 'border', 'main', 'xlim', 'ylim',</span></span>
-<span><span class="co">#&gt; 'axes', '...' are not made use of</span></span>
-<span></span>
-<span><span class="co">#&gt; Warning in hist.default(lVec, breaks = brks, col = "lightgrey", border =</span></span>
-<span><span class="co">#&gt; "grey", : arguments 'probability', 'col', 'border', 'main', 'xlim', 'ylim',</span></span>
-<span><span class="co">#&gt; 'axes', '...' are not made use of</span></span>
-<span></span>
-<span><span class="co">#&gt; Warning in hist.default(lVec, breaks = brks, col = "lightgrey", border =</span></span>
-<span><span class="co">#&gt; "grey", : arguments 'probability', 'col', 'border', 'main', 'xlim', 'ylim',</span></span>
-<span><span class="co">#&gt; 'axes', '...' are not made use of</span></span>
-<span><span class="co">#&gt; Warning in mtext(eval(taxonID), size = 3, outer = TRUE): "size" is not a</span></span>
-<span><span class="co">#&gt; graphical parameter</span></span></code></pre></div>
+<span>             param <span class="op">=</span> <span class="st">'length'</span>,</span>
+<span>             massClass <span class="op">=</span> <span class="st">'afdm_mg'</span><span class="op">)</span></span></code></pre></div>
 <p><img src="simple-example_files/figure-html/plot%20cohorts-1.png" width="700"></p>
 </div>
 </div>
