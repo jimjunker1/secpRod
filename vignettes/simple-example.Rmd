@@ -5,6 +5,10 @@ vignette: >
   %\VignetteIndexEntry{simple-example}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+bibliography: refs.bib
+link-citations: no
+link-color: grey
+csl: ecology.csl
 ---
 
 ```{r, include = FALSE}
@@ -14,6 +18,95 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
+```{r setup, echo=FALSE, include=TRUE}
 library(secpRod)
+# load the example data set
+load("wbtData.rda")
+
 ```
+
+## Introduction 
+
+Currently, the only method for analysis fully implemented is size-frequency. This quick tutorial will outline steps to calculate secondary production for whole communities. First, load the package with `library(secpRod)`.
+
+The package comes with a data set of macroinvertebrate community data from @junker2014 that can be accessed with `data("wbtData")`
+
+This data object is a list with two (2) elements:
+
+1) sampleInfo: a list with 32 data frames. One (1) for each taxonomic entity
+
+2) taxaInfo: a data frame with 32 rows and 13 columns. Each row represents the taxonomic information for a single taxonomic entity and the columns contain information for calculation of production. These include, but are not limited to:
+
+- taxonID: a character string that matches the name of taxonID from sampleInfo
+
+- massForm: a character string that is coercible to a formula for the conversion from length to mass (e.g., `afdm_mg~(a*lengthClass^b)`)
+
+- a: numeric variable for the coefficients used in massForm
+
+- b: numeric variable for the coefficients used in massForm
+
+- percAsh: numeric integer 0--100
+
+- method: character string for the method to use. Must be one of the following: 'sf' (this will be updated as methods are finalized.)
+
+- g.a: description forthcoming...
+
+- growthForm: description forthcoming...
+
+- min.cpi: integer of the minimum estimated cohort production interval for adjusting annual production estimates using the size-frequency method
+
+- max.cpi: integer of the maximum estimated cohort production interval for adjusting annual production estimates using the size-frequency method
+
+- pb: description forthcoming...
+
+- min.growth: description forthcoming...
+
+- notes: notes for researcher use. This column will be maintained in output summaries.
+
+## Examples
+
+### Single-species walkthrough
+
+A quick walkthrough of the calculation of secondary production for a single species.
+
+```{r single species data prep, echo =TRUE, include=TRUE}
+## isolate a single species data frame from sampleInfo object
+
+acentrella <- wbtData[['sampleInfo']][['Acentrella sp.']]
+
+## let's take a look at the data set
+head(acentrella, 10)
+
+```
+
+The data contain all the replicates of density and body length distributions in long format.
+
+The first step is to convert length to mass for estimating biomass patterns. Here we use the `convert_length_to_mass()` function. 
+
+Information on its use can be viewed with `?convert_lenght_to_mass`
+
+```{r length to mass, include=TRUE, echo=TRUE}
+
+accentrellaMass = convert_length_to_mass(taxaSampleList = acentrella,
+                                         taxaInfo = wbtData[['taxaInfo']])
+
+head(accentrellaMass)
+
+```
+
+From here you can view the size frequency histograms using the `plot_cohorts()` function. Check out the 
+
+```{r plot cohorts, include=TRUE, echo=TRUE}
+
+plot_cohorts(taxaSampleListMass = accentrellaMass,
+             param = 'mass',
+             massClass = 'afdm_mg')
+
+```
+
+
+
+
+
+
+
