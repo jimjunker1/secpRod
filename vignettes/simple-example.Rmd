@@ -20,6 +20,7 @@ knitr::opts_chunk$set(
 
 ```{r setup, echo=FALSE, include=TRUE}
 library(secpRod)
+# library(tidyverse)
 # load the example data set
 load("wbtData.rda")
 
@@ -81,7 +82,26 @@ head(acentrella, 10)
 
 The data contain all the replicates of density and body length distributions in long format.
 
-The first step is to convert length to mass for estimating biomass patterns. Here we use the `convert_length_to_mass()` function. 
+```{r acentrella LM form, echo=FALSE}
+
+taxaInfo = wbtData[['taxaInfo']]
+
+accentrellaInfo = subset(taxaInfo, taxonID == "Accentrella sp.")
+
+# accentrellaLMform = 
+
+
+```
+
+The first step is to convert length to mass for estimating biomass patterns. Here we use the `convert_length_to_mass()` function, which adds a column of the individual masses based on the length-to-mass formula and coefficients in taxaInfo.
+
+We can take a look at what this looks like:
+
+```{r accentrella view}
+
+accentrellaInfo = subset(wbtData[['taxaInfo']], taxonID == "Accentrella sp.")[,c('taxonID', 'massForm','a','b','percAsh')]
+
+```
 
 Information on its use can be viewed with `?convert_lenght_to_mass`
 
@@ -96,10 +116,10 @@ head(accentrellaMass)
 
 From here you can view the size frequency histograms using the `plot_cohorts()` function. Check out the 
 
-```{r plot cohorts, include=TRUE, echo=TRUE}
+```{r plot cohorts, include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
 
 plot_cohorts(taxaSampleListMass = accentrellaMass,
-             param = 'mass',
+             param = 'length',
              massClass = 'afdm_mg')
 
 ```
