@@ -13,7 +13,8 @@ Imports:
   magrittr,
   tidyr,
   dplyr,
-  rlang
+  rlang,
+  purrr
 Suggests:
     knitr,
     plyr,

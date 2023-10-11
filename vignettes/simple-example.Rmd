@@ -175,9 +175,8 @@ The code below shows how to accomplish this. Again, only size frequency is accep
 
 ```{r multi species, include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
 # load needed packages
-library(tidyverse)
-# I want to run this parallel to speed 'er up
-library(furrr)
+library(magrittr)
+library(purrr)
 
 # The sampleInfo is already a list by taxonID
 str(wbtData[['sampleInfo']])
@@ -200,7 +199,7 @@ sampleInfoListMass = sampleInfoList %>%
   )
 
 fullProduction = sampleInfoListMass %>% 
-  furrr::future_map2(., list(taxaInfo),
+  purrr::map2(., list(taxaInfo),
                      ~calc_production(.x,
                                       infoCols = c(1:3),
                                       taxaInfo = .y, 
