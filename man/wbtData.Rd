@@ -5,8 +5,8 @@
 \alias{wbtData}
 \title{Sample data for community secondary production analysis}
 \format{
-## `wbtData`
-A list of two objects. One list of 32 data frames for each taxonomic entity and the second a data frame with 32 rows and 13 columns:
+`wbtData`
+A list of two objects. 'sampleInfo' is list of 32 data frames for each taxonomic entity and the second, 'taxaInfo' is a data frame with 32 rows and 13 columns:
 \describe{
   \item{taxonID}{the taxonomic identifier}
   \item{repID}{the replicate identifier}

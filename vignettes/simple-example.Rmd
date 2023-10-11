@@ -86,7 +86,7 @@ The data contain all the replicates of density and body length distributions in 
 
 taxaInfo = wbtData[['taxaInfo']]
 
-accentrellaInfo = subset(taxaInfo, taxonID == "Accentrella sp.")
+acentrellaInfo = subset(taxaInfo, taxonID == "Acentrella sp.")
 
 # accentrellaLMform = 
 
@@ -99,7 +99,8 @@ We can take a look at what this looks like:
 
 ```{r accentrella view}
 
-accentrellaInfo = subset(wbtData[['taxaInfo']], taxonID == "Accentrella sp.")[,c('taxonID', 'massForm','a','b','percAsh')]
+acentrellaInfo = subset(taxaInfo, taxonID == "Acentrella sp.")
+acentrellaInfo
 
 ```
 
@@ -107,26 +108,109 @@ Information on its use can be viewed with `?convert_lenght_to_mass`
 
 ```{r length to mass, include=TRUE, echo=TRUE}
 
-accentrellaMass = convert_length_to_mass(taxaSampleList = acentrella,
+acentrellaMass = convert_length_to_mass(taxaSampleList = acentrella,
                                          taxaInfo = wbtData[['taxaInfo']])
 
-head(accentrellaMass)
+head(acentrellaMass)
 
 ```
 
-From here you can view the size frequency histograms using the `plot_cohorts()` function. Check out the 
+From here you can view the size frequency histograms using the `plot_cohorts()` function. Check out the function options with `?plot_cohorts`.
 
 ```{r plot cohorts, include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
 
-plot_cohorts(taxaSampleListMass = accentrellaMass,
+plot_cohorts(taxaSampleListMass = acentrellaMass,
              param = 'length',
              massClass = 'afdm_mg')
 
 ```
 
+These figures can be helpful for identifying cohort structures and getting ballpark cohort production intervals (CPI) for species when estimating production using the size frequency method. In the future, I hope to implement an approach to delineate cohorts and estimate growth parameters from size-frequency data, but this is a feature still under development.
 
+The next step is to estimate production. Again, only size-frequency is fully operational but I will work to update the other methods soon!
 
+The function `calc_production()` is the workhorse function that will estimate community production. 
 
+To apply it to our single species example, we input the sample information and taxa information along with how many bootstraps we would like, as:
 
+```{r single species production,include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
 
+calc_production(
+  taxaSampleListMass = acentrellaMass,
+  infoCols = c(1:3),
+  taxaInfo = acentrellaInfo,
+  bootNum = 10,
+  wrap = TRUE,
+  taxaSummary = 'full'
+)
+
+```
+
+This will output a lot of information though it has a simple structure:
+
+1) P.boots--vectors of bootstrapped estimates of annual production, annual biomass, and annual abundance. 
+
+2) taxaSummary--this comes in 'full' and 'short' versions. As you see above the full can be a lot. The 'short' is a paired down version of this 
+
+```{r single species short,include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+
+calc_production(
+  taxaSampleListMass = acentrellaMass,
+  infoCols = c(1:3),
+  taxaInfo = acentrellaInfo,
+  bootNum = 10,
+  wrap = TRUE,
+  taxaSummary = 'short'
+)
+
+```
+
+You can also turn this off with 'none'. 
+
+## Applying this to multiple taxa
+
+The current internal code to do this with just `calc_production` is still buggy. But you can run production by splitting the full sampleInfo into a list by taxa and using `apply` or functions from the (`purrr` package)[https://purrr.tidyverse.org/]
+
+The code below shows how to accomplish this. Again, only size frequency is accepted currently. 
+
+```{r multi species, include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+# load needed packages
+library(tidyverse)
+# I want to run this parallel to speed 'er up
+library(furrr)
+
+# The sampleInfo is already a list by taxonID
+str(wbtData[['sampleInfo']])
+
+# if you have a large data frame with all taxa the code below shows how to do this:
+## install a package to split into a named_list
+# devtools::install_github('jimjunker1/junkR')
+# library(junkR)
+## Convert to data frame
+# sampleInfoDf = wbtData[['sampleInfo']] %>% bind_rows
+## Convert back to named list split by taxonID
+# sampleInfoList = sampleInfoDf %>% junkR::named_group_split(taxonID)
+
+sampleInfoList = wbtData[['sampleInfo']]
+
+sampleInfoListMass = sampleInfoList %>% 
+  purrr::map(
+    ~convert_length_to_mass(.x,
+                            taxaInfo = taxaInfo)
+  )
+
+fullProduction = sampleInfoListMass %>% 
+  furrr::future_map2(., list(taxaInfo),
+                     ~calc_production(.x,
+                                      infoCols = c(1:3),
+                                      taxaInfo = .y, 
+                                      bootNum = 10, 
+                                      wrap = TRUE,
+                                      taxaSummary = 'short'
+                                      )
+                     )
+
+str(fullProduction)
+
+```
 

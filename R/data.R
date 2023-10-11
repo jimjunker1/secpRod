@@ -6,8 +6,8 @@
 #'
 #' A collection of community macroinvertebrate data for estimating secondary production
 #'
-#' @format ## `wbtData`
-#' A list of two objects. One list of 32 data frames for each taxonomic entity and the second a data frame with 32 rows and 13 columns:
+#' @format `wbtData`
+#' A list of two objects. 'sampleInfo' is list of 32 data frames for each taxonomic entity and the second, 'taxaInfo' is a data frame with 32 rows and 13 columns:
 #' \describe{
 #'   \item{taxonID}{the taxonomic identifier}
 #'   \item{repID}{the replicate identifier}
