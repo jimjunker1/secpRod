@@ -21,7 +21,7 @@ calc_production(
 
 \item{taxaInfo}{dataframe (or coercible); The taxonomic information for calculating secondary production. This must include a taxonomic ID column with the same name as that of \code{taxaSampleListMass}}
 
-\item{bootNum}{integer. The number of bootsrapt samples to create}
+\item{bootNum}{integer. The number of bootstrapped samples to create}
 
 \item{wrap}{logical should an extra date be added to make a full calendar year?}
 

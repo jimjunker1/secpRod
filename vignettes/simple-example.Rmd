@@ -58,7 +58,7 @@ This data object is a list with two (2) elements:
 
 - max.cpi: integer of the maximum estimated cohort production interval for adjusting annual production estimates using the size-frequency method
 
-- pb: description forthcoming...
+- pb: numeric of the production to biomass (PB) ratio for the specific taxa. This can take three forms 1) a single value, 2) a vector of values the same length as `bootNum`, and 3) a string of a distribution to randomly sample, **not** including the `n =` (e.g., 'rnorm(mean = 5, sd = 0.5)', 'runif(min = 3, max = 8)'). The function will automatically sample the `bootNum` values. ***Fair warning***: We suggest you explicitly name the parameters in the function call string. Possible unwanted and unknown things may happen otherwise. The tests for this feature are still under development, it will not reject any nonsensical values (e.g, negative, NA, or Inf). If your distribution samples negative values you will get negative productions estimates--at least until the `min.growth` feature is implemented.
 
 - min.growth: description forthcoming...
 
@@ -167,6 +167,32 @@ calc_production(
 
 You can also turn this off with 'none'. 
 
+### An example using the PB method
+
+The pb method allows for multiple options to set the production to biomass ratio:
+
+1) A single value. This will use the same value for each bootstrap sample. The variability is derived entirely from resampling the sample units (e.g. surbers).
+
+2) a character string for a distribution from which to sample excluding the `n=`, such as `rnorm(mean = 5, sd = 0.5)`. The function will automatically sample `bootNum` values.
+
+3) a numeric vector the same length as `bootNum`. This is a more explicit option to set all the values of pb that will be used. In the future, if the length $\neq$ `bootNum` an error will be returned for the taxa. 
+
+```{r modify taxaInfo, include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+
+acentrellaInfo$method = "pb"
+acentrellaInfo$pb = "runif(min = 3, max = 8)"
+
+calc_production(
+  taxaSampleListMass = acentrellaMass,
+  infoCols = c(1:3),
+  taxaInfo = acentrellaInfo,
+  bootNum = 10,
+  wrap = TRUE,
+  taxaSummary = 'short'
+)
+
+```
+
 ## Applying this to multiple taxa
 
 The current internal code to do this with just `calc_production` is still buggy. But you can run production by splitting the full sampleInfo into a list by taxa and using `apply` or functions from the (`purrr` package)[https://purrr.tidyverse.org/]
@@ -179,7 +205,7 @@ library(magrittr)
 library(purrr)
 
 # The sampleInfo is already a list by taxonID
-str(wbtData[['sampleInfo']])
+str(wbtData[['sampleInfo']], list.len = 5)
 
 # if you have a large data frame with all taxa the code below shows how to do this:
 ## install a package to split into a named_list
@@ -209,7 +235,7 @@ fullProduction = sampleInfoListMass %>%
                                       )
                      )
 
-str(fullProduction)
+str(fullProduction, list.len = 5)
 
 ```
 

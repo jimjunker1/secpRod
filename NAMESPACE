@@ -2,11 +2,13 @@
 
 export("%>%")
 export(calc_prod_igr)
+export(calc_prod_pb)
 export(calc_prod_sf)
 export(calc_production)
 export(convert_length_to_mass)
 export(igr_prod.sample)
 export(my_boot.comp)
+export(pb_prod.sample)
 export(plot_cohorts)
 export(prep_boots)
 export(sf_prod.sample)

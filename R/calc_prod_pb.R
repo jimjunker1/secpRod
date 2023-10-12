@@ -1,5 +1,5 @@
 #' @description
-#' This function calculates secondary production with the size-frequency method.
+#' This function calculates secondary production with the Production:Biomass method.
 #' @title calc_prod_sf
 #' @param taxaSampleListMass description
 #' @param taxaInfo data frame of taxonomic information for calculating production
@@ -9,7 +9,6 @@
 #' @param wrap logical. Should the dates wrap to create a full year?
 #' @param massValue string. What is the mass value and units of the production
 #' @param massLabel string. What label should the output units be. It is possible this will default to 'massValue' in the future.
-#' @param bootList list. This is the bootstrapped samples passed from `calc_production()`
 #' @param ... additional arguments to be passed to the function
 #' @returns returns a list of 2 objects:
 #' @returns P.boots: the boostrapped estimates of production, abundance, and biomass.
@@ -17,7 +16,7 @@
 #' @import stats
 #' @export
 
-calc_prod_sf <- function(taxaSampleListMass= NULL,
+calc_prod_pb <- function(taxaSampleListMass= NULL,
                          taxaInfo = NULL,
                          bootNum = NULL,
                          dateDf = NULL,
@@ -43,9 +42,33 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
   )
 
   # calculate the production from the full samples
-  taxaCPI <- mean(c(taxaInfo$min.cpi, taxaInfo$max.cpi))
-  funcList = c(funcList, list(cpi = taxaCPI))
-  P.samp = do.call(sf_prod.sample, args = funcList)
+  if(is.numeric(taxaInfo$pb)){
+    if(length(taxaInfo$pb) == 1){
+      taxaPB = unlist(taxaInfo$pb)
+    } else{
+      taxaPB = mean(taxaInfo$pb, na.rm = TRUE)
+    }
+  } else if(is.character(taxaInfo$pb)){
+    taxaPB = tryCatch(
+      {
+        pbDist_begin = gsub("(^.*))$", "\\1", unlist(taxaInfo$pb))
+        pbDist_end = gsub("^.*(\\)$)", "\\1", unlist(taxaInfo$pb))
+        pbDist_n = paste0(", n = 1")
+        pbDist_expr = str2expression(paste0(pbDist_begin,pbDist_n,pbDist_end))
+        eval(pbDist_expr)
+      },
+      error = function(cond){
+        message()
+        return(NA_real_)
+      },
+      warning = function(cond){
+        message(paste0("pbBoots for",speciesName," returned an error."))
+      }
+    )
+  }
+
+  funcList = c(funcList, list(pb = taxaPB))
+  P.samp = do.call(pb_prod.sample, args = funcList)
   if(P.samp$P.ann.samp == 0){
     if(taxaSummary == "none"){
       taxaSummary <- NULL
@@ -54,10 +77,8 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
       taxaSummary <- list(
         summaryType = "full",
         taxonID = taxaInfo$taxonID,
-        method = "sf",
+        method = "pb",
         P.ann.samp = 0,
-        P.uncorr.samp = 0,
-        cpi = NA_real_,
         pb = NA_real_,
         meanN = 0,
         meanB = 0,
@@ -72,9 +93,8 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
       taxaSummary <- list(
         summaryType = "short",
         taxonID = taxaInfo$taxonID,
-        method = "sf",
+        method = "pb",
         P.ann.samp = 0,
-        cpi = NA_real_,
         pb = NA_real_,
         meanN = 0,
         meanB = 0,
@@ -86,14 +106,37 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
                                     taxaSummary = taxaSummary)))
   }
 
-  cpiBoots = sample(seq.int(from = as.integer(taxaInfo$min.cpi), to = as.integer(taxaInfo$max.cpi), by = 1), as.integer(bootNum), replace = TRUE)
+  # calculate the production from the full samples
+  if(is.numeric(taxaInfo$pb)){
+    if(length(taxaInfo$pb) == 1){
+      pbBoots = rep(unlist(taxaInfo$pb), as.integer(bootNum))
+    } else if(length(taxaInfo$pb) == bootNum){
+      pbBoots = unlist(taxaInfo$pb)
+    }} else if(is.character(taxaInfo$pb)){
+      pbBoots = tryCatch(
+        {
+          pbDist_begin = gsub("(^.*))$", "\\1", unlist(taxaInfo$pb))
+          pbDist_end = gsub("^.*(\\)$)", "\\1", unlist(taxaInfo$pb))
+          pbDist_n = paste0(", n = ",as.integer(bootNum))
+          pbDist_expr = str2expression(paste0(pbDist_begin,pbDist_n,pbDist_end))
+          eval(pbDist_expr)
+        },
+        error = function(cond){
+          message()
+          return(NA_real_)
+        },
+        warning = function(cond){
+          message(paste0("pbBoots for",speciesName," returned an error."))
+        }
+      )
+  }
 
-  P.boots = mapply(FUN = sf_prod.sample,
+  P.boots = mapply(FUN = pb_prod.sample,
                    df = bootList,
                    sizesDf = lapply(1:bootNum, function(x) funcList$sizesDf),
                    massValue = massValue,
                    massLabel = massLabel,
-                   cpi = cpiBoots,
+                   pb = pbBoots,
                    full = FALSE)
   #### create SAMPLE information to export as summary ####
   # summarise sample sizes across dates
@@ -148,10 +191,8 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
     taxaSummary <- list(
       summaryType = "full",
       taxonID = taxaInfo$taxonID,
-      method = "sf",
+      method = "pb",
       P.ann.samp = P.samp$P.ann.samp,
-      P.uncorr.samp = P.samp$P.uncorr.samp,
-      cpi = taxaCPI,
       pb = pb,
       meanN = mean(unlist(datesInfo$n_m2_mean)),
       meanB = mean(unlist(datesInfo[[eval(paste0(massLabel, "_mean"))]])),
@@ -166,9 +207,8 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
     taxaSummary <- list(
       summaryType = "short",
       taxonID = taxaInfo$taxonID,
-      method = "sf",
+      method = "pb",
       P.ann.samp = P.samp$P.ann.samp,
-      cpi = taxaCPI,
       pb = pb,
       meanN = mean(unlist(datesInfo$n_m2_mean)),
       meanB = mean(unlist(datesInfo[[eval(paste0(massLabel, "_mean"))]])),
@@ -176,14 +216,6 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
       datesInfo = datesInfo
     )
   }
-  #   assign(taxaInfo$taxonID, list())
-  # # add taxainformation
-  #   assign(taxaInfo$taxonID,
-  #          within(eval(as.symbol(taxaInfo$taxonID)),{
-  #            taxaInfo <- taxaInfo
-  #            }
-  #            )
-  #          )
 
   return(assign(speciesName, list(P.boots = P.boots,
               taxaSummary = taxaSummary)))
