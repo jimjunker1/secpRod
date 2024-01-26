@@ -8,8 +8,8 @@
 <meta name="description" content="secpRod">
 <title>simple-example • secpRod</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="simple-example">
 <meta property="og:description" content="secpRod">
@@ -111,7 +111,6 @@ massForm</p></li>
 <li><p>method: character string for the method to use. Must be one of
 the following: ‘sf’ (this will be updated as methods are
 finalized.)</p></li>
-<li><p>g.a: description forthcoming…</p></li>
 <li><p>growthForm: description forthcoming…</p></li>
 <li><p>min.cpi: integer of the minimum estimated cohort production
 interval for adjusting annual production estimates using the
@@ -234,13 +233,13 @@ like, as:</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; $P.boots</span></span>
 <span><span class="co">#&gt;            [,1]     [,2]     [,3]     [,4]     [,5]     [,6]     [,7]    </span></span>
-<span><span class="co">#&gt; P.ann.samp 6869.114 6571.029 5465.437 8218.019 7559.479 8156.427 7673.529</span></span>
-<span><span class="co">#&gt; B.ann.samp 225.787  252.3075 203.1347 286.2645 260.4142 280.3628 254.6813</span></span>
-<span><span class="co">#&gt; N.ann.samp 614.2261 595.9969 548.049  722.5488 668.679  754.8418 704.5064</span></span>
+<span><span class="co">#&gt; P.ann.samp 7751.687 7687.255 5892.929 6842.595 7298.684 6530.872 7072.409</span></span>
+<span><span class="co">#&gt; B.ann.samp 272.0853 267.7282 225.7148 238.9676 245.8283 224.9851 253.243 </span></span>
+<span><span class="co">#&gt; N.ann.samp 726.3898 714.8079 499.9184 648.6187 664.776  570.5782 699.3129</span></span>
 <span><span class="co">#&gt;            [,8]     [,9]     [,10]   </span></span>
-<span><span class="co">#&gt; P.ann.samp 7652.198 6576.996 7578.99 </span></span>
-<span><span class="co">#&gt; B.ann.samp 256.7521 243.9232 242.4733</span></span>
-<span><span class="co">#&gt; N.ann.samp 678.2274 547.1668 665.9942</span></span>
+<span><span class="co">#&gt; P.ann.samp 6706.693 8549.089 8041.984</span></span>
+<span><span class="co">#&gt; B.ann.samp 251.7482 301.6921 293.6175</span></span>
+<span><span class="co">#&gt; N.ann.samp 700.7222 816.0524 676.3594</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $taxaSummary</span></span>
 <span><span class="co">#&gt; $taxaSummary$summaryType</span></span>
@@ -447,13 +446,13 @@ this</p></li>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; $P.boots</span></span>
 <span><span class="co">#&gt;            [,1]     [,2]     [,3]     [,4]     [,5]     [,6]     [,7]    </span></span>
-<span><span class="co">#&gt; P.ann.samp 8395.293 8554.91  7012.238 6807.808 8050.458 6962.826 7286.042</span></span>
-<span><span class="co">#&gt; B.ann.samp 275.3048 287.978  244.4346 224.6612 255.5596 239.5527 240.4993</span></span>
-<span><span class="co">#&gt; N.ann.samp 760.9786 731.6526 591.6747 589.0904 724.9105 560.4549 672.8164</span></span>
+<span><span class="co">#&gt; P.ann.samp 7341.126 7573.794 8785.24  6275.602 8003.851 7556.216 6487.305</span></span>
+<span><span class="co">#&gt; B.ann.samp 272.4065 273.7529 306.6087 217.1473 279.2912 248.1941 236.523 </span></span>
+<span><span class="co">#&gt; N.ann.samp 655.5265 746.3957 788.5062 593.369  702.4655 642.1815 615.0963</span></span>
 <span><span class="co">#&gt;            [,8]     [,9]     [,10]   </span></span>
-<span><span class="co">#&gt; P.ann.samp 8728.193 6458.511 6775.627</span></span>
-<span><span class="co">#&gt; B.ann.samp 304.2502 216.4316 224.2558</span></span>
-<span><span class="co">#&gt; N.ann.samp 766.7011 520.3181 577.5342</span></span>
+<span><span class="co">#&gt; P.ann.samp 7779.842 6432.279 7262.36 </span></span>
+<span><span class="co">#&gt; B.ann.samp 278.172  225.1041 227.986 </span></span>
+<span><span class="co">#&gt; N.ann.samp 700.0634 586.0404 584.2212</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $taxaSummary</span></span>
 <span><span class="co">#&gt; $taxaSummary$summaryType</span></span>
@@ -531,13 +530,13 @@ the future, if the length <span class="math inline">\(\neq\)</span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; $P.boots</span></span>
 <span><span class="co">#&gt;            [,1]     [,2]     [,3]     [,4]     [,5]     [,6]     [,7]    </span></span>
-<span><span class="co">#&gt; P.ann.samp 1608.542 1838.457 1534.821 1309.136 1587.087 1566.138 1710.616</span></span>
-<span><span class="co">#&gt; B.ann.samp 260.7936 239.9563 286.3415 238.2675 247.2314 239.921  261.3686</span></span>
-<span><span class="co">#&gt; N.ann.samp 710.8075 639.1119 741.8294 613.631  723.2108 584.3747 648.5802</span></span>
+<span><span class="co">#&gt; P.ann.samp 939.0189 1242.761 1090.848 2217.401 1410.143 1062.151 1314.732</span></span>
+<span><span class="co">#&gt; B.ann.samp 271.6635 271.7794 288.0218 303.0611 251.1913 275.4218 261.9283</span></span>
+<span><span class="co">#&gt; N.ann.samp 717.7197 705.3788 770.8691 759.5411 661.1686 706.237  663.7985</span></span>
 <span><span class="co">#&gt;            [,8]     [,9]     [,10]   </span></span>
-<span><span class="co">#&gt; P.ann.samp 898.4826 1501.268 1192.004</span></span>
-<span><span class="co">#&gt; B.ann.samp 280.2358 263.4548 266.0217</span></span>
-<span><span class="co">#&gt; N.ann.samp 792.8398 677.1961 659.4883</span></span>
+<span><span class="co">#&gt; P.ann.samp 1487.064 1197.955 959.2924</span></span>
+<span><span class="co">#&gt; B.ann.samp 201.6912 250.0814 239.4976</span></span>
+<span><span class="co">#&gt; N.ann.samp 552.0043 680.1135 609.6016</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $taxaSummary</span></span>
 <span><span class="co">#&gt; $taxaSummary$summaryType</span></span>
@@ -550,10 +549,10 @@ the future, if the length <span class="math inline">\(\neq\)</span>
 <span><span class="co">#&gt; [1] "pb"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $taxaSummary$P.ann.samp</span></span>
-<span><span class="co">#&gt; [1] 1038.814</span></span>
+<span><span class="co">#&gt; [1] 762.5516</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $taxaSummary$pb</span></span>
-<span><span class="co">#&gt; [1] 4.092808</span></span>
+<span><span class="co">#&gt; [1] 3.004365</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $taxaSummary$meanN</span></span>
 <span><span class="co">#&gt; [1] 657.723</span></span>
@@ -587,7 +586,7 @@ the future, if the length <span class="math inline">\(\neq\)</span>
 by splitting the full sampleInfo into a list by taxa and using
 <code>apply</code> or functions from the (<code>purrr</code> package)[<a href="https://purrr.tidyverse.org/" class="external-link uri">https://purrr.tidyverse.org/</a>]</p>
 <p>The code below shows how to accomplish this. Again, only size
-frequency is accepted currently.</p>
+frequency and pb are accepted currently.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># load needed packages</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span></span>
@@ -667,11 +666,11 @@ frequency is accepted currently.</p>
 <span><span class="co">#&gt; List of 32</span></span>
 <span><span class="co">#&gt;  $ Acentrella sp.    :List of 2</span></span>
 <span><span class="co">#&gt;   ..$ P.boots    :List of 30</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 7594</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 265</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 677</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 7310</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 262</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 7976</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 278</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 742</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 7122</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 251</span></span>
 <span><span class="co">#&gt;   .. .. [list output truncated]</span></span>
 <span><span class="co">#&gt;   .. ..- attr(*, "dim")= int [1:2] 3 10</span></span>
 <span><span class="co">#&gt;   .. ..- attr(*, "dimnames")=List of 2</span></span>
@@ -686,11 +685,11 @@ frequency is accepted currently.</p>
 <span><span class="co">#&gt;   .. .. [list output truncated]</span></span>
 <span><span class="co">#&gt;  $ Ameletus spp.     :List of 2</span></span>
 <span><span class="co">#&gt;   ..$ P.boots    :List of 30</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 715</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 41.7</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 39.9</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 736</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 38.3</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 449</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 24.3</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 19.2</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 543</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 30.9</span></span>
 <span><span class="co">#&gt;   .. .. [list output truncated]</span></span>
 <span><span class="co">#&gt;   .. ..- attr(*, "dim")= int [1:2] 3 10</span></span>
 <span><span class="co">#&gt;   .. ..- attr(*, "dimnames")=List of 2</span></span>
@@ -705,11 +704,11 @@ frequency is accepted currently.</p>
 <span><span class="co">#&gt;   .. .. [list output truncated]</span></span>
 <span><span class="co">#&gt;  $ Attenella spp.    :List of 2</span></span>
 <span><span class="co">#&gt;   ..$ P.boots    :List of 30</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 2193</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 105</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 66</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 2614</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 114</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 2627</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 115</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 71.7</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 2036</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 86.9</span></span>
 <span><span class="co">#&gt;   .. .. [list output truncated]</span></span>
 <span><span class="co">#&gt;   .. ..- attr(*, "dim")= int [1:2] 3 10</span></span>
 <span><span class="co">#&gt;   .. ..- attr(*, "dimnames")=List of 2</span></span>
@@ -724,11 +723,11 @@ frequency is accepted currently.</p>
 <span><span class="co">#&gt;   .. .. [list output truncated]</span></span>
 <span><span class="co">#&gt;  $ Baetis spp.       :List of 2</span></span>
 <span><span class="co">#&gt;   ..$ P.boots    :List of 30</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 4170</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 147</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 275</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 3941</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 142</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 3763</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 129</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 237</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 3882</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 153</span></span>
 <span><span class="co">#&gt;   .. .. [list output truncated]</span></span>
 <span><span class="co">#&gt;   .. ..- attr(*, "dim")= int [1:2] 3 10</span></span>
 <span><span class="co">#&gt;   .. ..- attr(*, "dimnames")=List of 2</span></span>
@@ -743,11 +742,11 @@ frequency is accepted currently.</p>
 <span><span class="co">#&gt;   .. .. [list output truncated]</span></span>
 <span><span class="co">#&gt;  $ Barbaetis spp.    :List of 2</span></span>
 <span><span class="co">#&gt;   ..$ P.boots    :List of 30</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 1773</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 73.4</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 86.7</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 1270</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 45</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 1412</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 51.5</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 61.2</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 1589</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 62.5</span></span>
 <span><span class="co">#&gt;   .. .. [list output truncated]</span></span>
 <span><span class="co">#&gt;   .. ..- attr(*, "dim")= int [1:2] 3 10</span></span>
 <span><span class="co">#&gt;   .. ..- attr(*, "dimnames")=List of 2</span></span>
