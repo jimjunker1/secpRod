@@ -29,7 +29,7 @@ plot_cohorts = function(taxaSampleListMass = NULL, param = c('length','mass'), m
 
   # remove any length classes with all zeros
   allZeros = taxaSampleListMass %>%
-    group_by(.data$lengthClass) %>%
+    group_by(lengthClass) %>%
     dplyr::summarise(n = sum(.data$n_m2, na.rm = TRUE)) %>%
     dplyr::filter(.data$n > 0) %>%
     dplyr::select(.data$lengthClass) %>%
@@ -160,7 +160,7 @@ plot_cohorts = function(taxaSampleListMass = NULL, param = c('length','mass'), m
     mtext("Proportion", side = 2, outer = TRUE, cex = 0.7, line = 2.2,
           col = "grey20",las=0)
   }
-  mtext(eval(taxonID), size = 3, outer = TRUE)
+  mtext(eval(taxonID), side = 3, outer = TRUE)
   }
   # debugonce(pfun)
   return(pfun())

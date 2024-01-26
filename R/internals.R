@@ -106,7 +106,14 @@ dateCoercible  <- function(x, addformat = NULL, exactformat = NULL){
 #'
 cleanAggDf = function(df,...){
   good_cols = !grepl("Group\\.\\d{1}|repID", names(df), ignore.case = TRUE)
+  # if(sum(good_cols) > 1){
   Filter(function(x)!all(is.na(x)), df[good_cols])
+  # } else{
+    # if(all(is.na(unlist(df[good_cols])))){
+      # warning("Warning: All values are NA")
+      # return(df[good_cols])
+    # }
+  # }
 }
 
 #'

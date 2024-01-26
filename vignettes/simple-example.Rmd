@@ -50,8 +50,6 @@ This data object is a list with two (2) elements:
 
 - method: character string for the method to use. Must be one of the following: 'sf' (this will be updated as methods are finalized.)
 
-- g.a: description forthcoming...
-
 - growthForm: description forthcoming...
 
 - min.cpi: integer of the minimum estimated cohort production interval for adjusting annual production estimates using the size-frequency method
@@ -197,7 +195,7 @@ calc_production(
 
 The current internal code to do this with just `calc_production` is still buggy. But you can run production by splitting the full sampleInfo into a list by taxa and using `apply` or functions from the (`purrr` package)[https://purrr.tidyverse.org/]
 
-The code below shows how to accomplish this. Again, only size frequency is accepted currently. 
+The code below shows how to accomplish this. Again, only size frequency and pb are accepted currently. 
 
 ```{r multi species, include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
 # load needed packages
