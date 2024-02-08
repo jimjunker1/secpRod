@@ -11,7 +11,11 @@ prep_boots <- function(df = NULL,
                        bootNum = bootNum) {
   ### tests ###
   samp_num <- unlist(aggregate(df$repID, by = list(df$dateID), FUN = function(x) length(unique(x)))$x)
-  if (var(samp_num) != 0) warning("Warning: sample numbers are not equal among dates")
+  if(is.na(var(samp_num))){
+    warning("Warning: only one sample is present with individuals.")
+    } else if (var(samp_num) != 0){
+    warning("Warning: sample numbers are not equal among dates")
+    }
 
   # allocate vectors
   bootList <- vector(mode = "list", length = bootNum)
