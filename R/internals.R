@@ -118,6 +118,14 @@ cleanAggDf = function(df,...){
 #'
 #'
 estimate_ann_stats = function(df, var = NULL, wrap = TRUE,...){
+  if(nrow(df) == 0){
+    varMeanName = paste0(var,"_mean")
+    varSDName = paste0(var,"_sd")
+    x = list()
+    x[[varMeanName]] <- 0
+    x[[varSDName]] <- NA_real_
+    return(x)
+  }
   # sum across lengthClass
   varDateSum <- setNames(aggregate(df[var], by = list(df$dateID, df$repID), sum, na.rm = TRUE), nm = c("dateID", "repID", paste0(var,"_sum")))
   # take means of all dates across reps
