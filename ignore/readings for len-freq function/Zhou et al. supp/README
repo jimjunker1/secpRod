@@ -1,0 +1,79 @@
+# ========================================================================================
+# Summary of data and R program to implement MM algorithm method for Lloyd-Jones et al.
+# with an application to blue swimmer crab Portunus armatus. A local species of crab to
+# Queensland, Australia that had a sudden decline in catch in the years 2012/2013
+# Author: Luke Lloyd-Jones
+# Date: 12/03/2016
+# Date last updated: 12/03/2016
+# ========================================================================================
+Data
+====
+
+data/bsc/
+  Folder contains two data sets one measure by scientists and using trawl fishing gear
+  (bsc_lfd_trawl.txt), which is described in 
+  
+  Sumpton, W., Potter, M., and Smith, G. (1994). Parasitism of the commercial sand
+  crab Portunus pelagicus (l.) by the rhizocephalan Sacculina granifera boschma, 1973
+  in Moreton Bay, Queensland, Australia. Marine and Freshwater Research 45, 169–175.
+  
+  and a second from fishers using pots (bsc_lfd_pot.txt) to catch blue swimmer crabs. 
+  
+  Descriptions of columns headers - Initial column in just row numbers with no header
+    bsc_lfd_pot.txt
+      Crabber             - Name of fisher
+      Date                - Date crab was caught
+      Region              - Region of fishery where crab was caught
+      Year                - Year crab was caught
+      NoofPotsMeasured    - Number of pots used to fish in this region 
+      TimeLastBaited      - Time on hours past that the pot was baited
+      Sex                 - Sex of the crab - 1 for males and 2 for females
+      Carapacewidth       - Width of the crab from tip to tip of spiny growths in mm
+      
+    bsc_lfd_trawl.txt
+      Species             - Crab species. Name has been updated to armatus from pelagicus
+      Area                - Region of fishery where crab was caught
+      Shot.number         - Trawl pass in that region
+      Date                - Date crab was caught
+      Depth..m.           - Depth at which trawl was conducted in metres
+      Sample.Percentage   - Percentage of sample taken
+      Sex                 - Sex of the crab - 1 for males and 2 for females
+      Maturity            - Binary measure of whether crab had reached maturity
+      Egg.Mass.Stage      - Count measure of stage of egg mass for female crabs
+      Sacculina.Stage     - Count measure of sacculina stage
+      Molt.stage          - Count measure of moulting stage
+      Weight..g.          - Weight of crab in grams
+      Carapace.width      - Width of the crab from tip to tip of spiny growths in mm
+
+R program
+=========
+
+Program requires the R programming language and the setting of the path structure. The
+setting of the path structure is outlined in the code itself and should hopefully 
+self explanatory. 
+
+The file mtdgm_main.R contains all necessary settings to recreate results in Lloyd-Jones
+et al. ``Mixture of time dependent growth models with an application to blue swimmer 
+crab length-frequency data"
+
+
+mtdgm_bsc/
+  mtdgm_main.R                  - Contains the R script for accessing and running the 
+                                  program
+  mtdgm_log_likelihood_func.R   - Function for updating the likelihood for each month                 
+  mtdgm_mean_length_func.R      - Function for calculating the mean length dependent on 
+                                  the parameters of the VBGM at current iteration. See 
+                                  paper for more details
+  mtdgm_mean_length_func_gomp.R - Function for calculating the mean length under the 
+                                  Gompertz growth model
+  mtdgm_pi_calc_func.R          - Function for updating the mixing proportions for each 
+                                  month
+  mtdgm_plot_func.R             - Function that generates plot of length frequency 
+                                  distributions and fitted mixture along with estimated
+                                  seasonal curve and variance function
+  mtdgm_seas_integral_func.R    - Calculates the integral for the seasonal curve given psi
+  mtdgm_seas_root_func.R        - Calculates the roots of the seasonal function when 
+                                  the seasonal curve goes below 0
+  mtdgm_var_ricker_func.R       - Returns the variance as a function of mean length under
+                                  the Ricker function
+                                  

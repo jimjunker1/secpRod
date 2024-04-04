@@ -1,0 +1,121 @@
+
+#Define a wrapper function to run the sample biomass & abundance calcs on all taxa and all habitats for a given site and year:
+  sampinfo.site.yr <- function(DATA, site, first.date, last.date, habitat, TAXA){
+
+    if (habitat == "COBBLE" | habitat == "DEPOSITIONAL" | habitat =="TALUS.CLIFF"){
+      data3 <- DATA[DATA$SITE == site & DATA$JULIAN >= DATA$JULIAN[DATA$DATE == first.date][1] & DATA$JULIAN <= DATA$JULIAN[DATA$DATE == last.date][1] & DATA$HABITAT == habitat,]
+      data3 <- data3[!is.na(apply(data3[,7:(dim(data3)[2])], 1, sum)),]		#Remove rows with NA's (missing data)
+      row.names(data3) <- NULL							#Reset row names to be sequential
+      taxa.levels <- levels(factor(data3$TAXON))				#Pull out the names of all taxa represented in the selected data
+    }
+    else if (habitat == "ALL"){
+      data3 <- DATA[DATA$SITE == site & DATA$JULIAN >= DATA$JULIAN[DATA$DATE == first.date][1] & DATA$JULIAN <= DATA$JULIAN[DATA$DATE == last.date][1],]
+      data3 <- data3[!is.na(apply(data3[,7:(dim(data3)[2])], 1, sum)),]		#Remove rows with NA's (missing data)
+      row.names(data3) <- NULL							#Reset row names to be sequential
+      taxa.levels <- levels(factor(data3$TAXON))				#Pull out the names of all taxa represented in the selected data
+    }
+    else print("Error: invalid habitat")
+
+    for (a in 1:length(taxa.levels)){
+      if (!is.element(taxa.levels[a], TAXA$TAXON)){
+        tax.info <- TAXA[1,]
+        tax.info[1] <- taxa.levels[a]
+        tax.info[2:dim(tax.info)[2]] <- NA
+      }
+      else {
+        tax.info <- TAXA[TAXA$TAXON == taxa.levels[a],]
+      }
+      if (is.na(tax.info$LM.a) | is.na(tax.info$LM.b) | is.na(tax.info$LM.p.ash)){
+        print(paste("Error: length-mass parameters are not specified for this taxon: ", taxa.levels[a]))
+        if (habitat == "COBBLE" | habitat == "DEPOSITIONAL" | habitat =="TALUS.CLIFF"){
+          out <- pb.prod(DATA=DATA, site=site, first.date=first.date, last.date=last.date, habitat=habitat,
+                   taxon=as.character(tax.info$TAXON), LM.a=1, LM.b=1, LM.p.ash=1, p.b=1,
+                   temp.corr=1, boot.num=1)
+          out$Bdatesampinfo[,4:5] <- NA
+        }
+        if (habitat == "ALL"){
+          out.cob <- pb.prod(DATA=DATA, site=site, first.date=first.date, last.date=last.date, habitat="COBBLE",
+                       taxon=as.character(tax.info$TAXON), LM.a=1, LM.b=1, LM.p.ash=1, p.b=1,
+                       temp.corr=1, boot.num=1)
+          out.cob$Bdatesampinfo[,4:5] <- NA
+          out.dep <- pb.prod(DATA=DATA, site=site, first.date=first.date, last.date=last.date, habitat="DEPOSITIONAL",
+                       taxon=as.character(tax.info$TAXON), LM.a=1, LM.b=1, LM.p.ash=1, p.b=1,
+                       temp.corr=1, boot.num=1)
+          out.dep$Bdatesampinfo[,4:5] <- NA
+          out.tal <- pb.prod(DATA=DATA, site=site, first.date=first.date, last.date=last.date, habitat="TALUS.CLIFF",
+                       taxon=as.character(tax.info$TAXON), LM.a=1, LM.b=1, LM.p.ash=1, p.b=1,
+                       temp.corr=1, boot.num=1)
+          out.tal$Bdatesampinfo[,4:5] <- NA
+        }
+      }
+
+      else if (habitat == "COBBLE" | habitat == "DEPOSITIONAL" | habitat =="TALUS.CLIFF"){
+        out <- pb.prod(DATA=DATA, site=site, first.date=first.date, last.date=last.date, habitat=habitat,
+                 taxon=as.character(tax.info$TAXON), LM.a=tax.info$LM.a, LM.b=tax.info$LM.b, LM.p.ash=tax.info$LM.p.ash, p.b=1,
+                 temp.corr=1, boot.num=1)
+      }
+      else if (habitat == "ALL"){
+        out.cob <- pb.prod(DATA=DATA, site=site, first.date=first.date, last.date=last.date, habitat="COBBLE",
+                     taxon=as.character(tax.info$TAXON), LM.a=tax.info$LM.a, LM.b=tax.info$LM.b, LM.p.ash=tax.info$LM.p.ash, p.b=1,
+                     temp.corr=1, boot.num=1)
+        out.dep <- pb.prod(DATA=DATA, site=site, first.date=first.date, last.date=last.date, habitat="DEPOSITIONAL",
+                     taxon=as.character(tax.info$TAXON), LM.a=tax.info$LM.a, LM.b=tax.info$LM.b, LM.p.ash=tax.info$LM.p.ash, p.b=1,
+                     temp.corr=1, boot.num=1)
+        out.tal <- pb.prod(DATA=DATA, site=site, first.date=first.date, last.date=last.date, habitat="TALUS.CLIFF",
+                     taxon=as.character(tax.info$TAXON), LM.a=tax.info$LM.a, LM.b=tax.info$LM.b, LM.p.ash=tax.info$LM.p.ash, p.b=1,
+                     temp.corr=1, boot.num=1)
+      }
+
+      if (habitat == "COBBLE" & dim(tax.info)[1] != 0){
+        if (a == 1){
+          sampinfo <- data.frame(HABITAT="COBBLE", TAXON=as.character(tax.info$TAXON), out$Bdatesampinfo, out$Ndatesampinfo[,4:5])
+        }
+        else{
+          rows.to.add <- data.frame(HABITAT="COBBLE", TAXON=as.character(tax.info$TAXON), out$Bdatesampinfo, out$Ndatesampinfo[,4:5])
+          sampinfo <- rbind(sampinfo, rows.to.add)
+        }
+      }
+      else if (habitat == "DEPOSITIONAL" & dim(tax.info)[1] != 0){
+        if (a == 1){
+          sampinfo <- data.frame(HABITAT="DEPOSITIONAL", TAXON=as.character(tax.info$TAXON), out$Bdatesampinfo, out$Ndatesampinfo[,4:5])
+        }
+        else{
+          rows.to.add <- data.frame(HABITAT="DEPOSITIONAL", TAXON=as.character(tax.info$TAXON), out$Bdatesampinfo, out$Ndatesampinfo[,4:5])
+          sampinfo <- rbind(sampinfo, rows.to.add)
+        }
+      }
+      else if (habitat == "TALUS.CLIFF" & dim(tax.info)[1] != 0){
+        if (a == 1){
+          sampinfo <- data.frame(HABITAT="TALUS.CLIFF", TAXON=as.character(tax.info$TAXON), out$Bdatesampinfo, out$Ndatesampinfo[,4:5])
+        }
+        else{
+          rows.to.add <- data.frame(HABITAT="TALUS.CLIFF", TAXON=as.character(tax.info$TAXON), out$Bdatesampinfo, out$Ndatesampinfo[,4:5])
+          sampinfo <- rbind(sampinfo, rows.to.add)
+        }
+      }
+      else if (habitat == "ALL" & dim(tax.info)[1] != 0){
+        if (a == 1){
+          sampinfo.cob <- data.frame(HABITAT="COBBLE", TAXON=as.character(tax.info$TAXON), out.cob$Bdatesampinfo, out.cob$Ndatesampinfo[,4:5])
+          sampinfo.dep <- data.frame(HABITAT="DEPOSITIONAL", TAXON=as.character(tax.info$TAXON), out.dep$Bdatesampinfo, out.dep$Ndatesampinfo[,4:5])
+          sampinfo.tal <- data.frame(HABITAT="TALUS.CLIFF", TAXON=as.character(tax.info$TAXON), out.tal$Bdatesampinfo, out.tal$Ndatesampinfo[,4:5])
+        }
+        else{
+          rows.to.add.cob <- data.frame(HABITAT="COBBLE", TAXON=as.character(tax.info$TAXON), out.cob$Bdatesampinfo, out.cob$Ndatesampinfo[,4:5])
+          rows.to.add.dep <- data.frame(HABITAT="DEPOSITIONAL", TAXON=as.character(tax.info$TAXON), out.dep$Bdatesampinfo, out.dep$Ndatesampinfo[,4:5])
+          rows.to.add.tal <- data.frame(HABITAT="TALUS.CLIFF", TAXON=as.character(tax.info$TAXON), out.tal$Bdatesampinfo, out.tal$Ndatesampinfo[,4:5])
+          sampinfo.cob <- rbind(sampinfo.cob, rows.to.add.cob)
+          sampinfo.dep <- rbind(sampinfo.dep, rows.to.add.dep)
+          sampinfo.tal <- rbind(sampinfo.tal, rows.to.add.tal)
+        }
+      }
+    }
+    if (habitat == "ALL" & dim(tax.info)[1] != 0){
+      sampinfo <- rbind(sampinfo.cob, sampinfo.dep, sampinfo.tal)
+      names(sampinfo) <- c(names(sampinfo.cob)[1:5], "Mean_B", "Stdev_B", "Mean_N", "Stdev_N")
+    }
+    else if ((habitat == "COBBLE" | habitat == "DEPOSITIONAL" | habitat == "TALUS.CLIFF") & dim(tax.info)[1] != 0){
+      names(sampinfo) <- c(names(sampinfo)[1:5], "Mean_B", "Stdev_B", "Mean_N", "Stdev_N")
+    }
+    sampinfo
+  }
+

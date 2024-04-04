@@ -1,0 +1,264 @@
+jkn.res <- matrix(0, nrow = 15065, ncol = 10)
+# Set up a table to store results#
+for (i in seq(1, dim(jkn.res)[1]))#
+{#
+  fil.name <- paste0("~/Desktop/combined/out_comb/sim_res", i)#
+  if (file.exists(fil.name))#
+  {#
+    res_i        <- read.table(fil.name, header = F, fill = T)#
+    jkn.res[i, ] <- as.numeric(res_i[1, 1:10])#
+  }#
+  print(i)#
+}
+head(jkn.res)
+miss <- which(jkn.res[, 1] == 0)
+miss
+jkn.res.2 <- jkn.res[-miss, ]
+colMeans(jkn.res.2)
+jkn.menas <- colMeans(jkn.res.2)
+se.calc <- function(x) { (length(x) - 1) * (mean((x - mean(x))^2)}#
+se.est <- apply(jkn.res.2, 2 se.calc)
+se.calc <- function(x) { (length(x) - 1) * ( mean((x - mean(x))^2))}
+se.est <- apply(jkn.res.2, 2 se.calc)
+se.est  <- apply(jkn.res.2, 2, se.calc(x))
+se.est  <- apply(jkn.res.2, 2, se.calc)
+se.est
+x <- jkn.res.2[, 1]
+mean(x)
+(x - mean(x))
+(x - mean(x))^2
+( mean((x - mean(x))^2))
+length(x)
+(length(x) - 1) * ( mean((x - mean(x))^2))
+sd(x)
+se.est  <- apply(jkn.res.2, 2, se.calc)
+se.est
+round(se.est, 3)
+jkn.means
+jkn.means <- colMeans(jkn.res.2)
+jkn.means
+rbind(jkn.means, se.est)
+rbind(round(jkn.means, 3), round(jse.est, 4))
+rbind(round(jkn.means, 3), round(se.est, 4))
+sd(x)
+0.0002535663 * 15000
+rbind(round(jkn.means, 3), round(se.est, 5))
+jkn.res.2[, 6]
+rbind(round(jkn.means, 3), round(se.est, 5))
+jkn.res <- matrix(0, nrow = 8845,  ncol = 10)
+for (i in seq(1, dim(jkn.res)[1]))#
+{#
+  #fil.name <- paste0("~/Desktop/combined/out_comb/sim_res", i)#
+  #fil.name <- paste0("~/Desktop/out_fem/sim_res", i)#
+  fil.name <- paste0("~/Desktop/out_male/sim_res", i)#
+  if (file.exists(fil.name))#
+  {#
+    res_i        <- read.table(fil.name, header = F, fill = T)#
+    jkn.res[i, ] <- as.numeric(res_i[1, 1:10])#
+  }#
+  print(i)#
+}
+head(jkn.res)
+miss <- which(jkn.res[, 1] == 0)
+miss
+jkn.res.2 <- jkn.res[-miss, ]
+jkn.means <- colMeans(jkn.res.2)
+se.calc <- function(x) { (length(x) - 1) * ( mean((x - mean(x))^2))}
+se.est  <- apply(jkn.res.2, 2, se.calc)
+round(se.est, 3)
+jkn.res.2
+jkn.means
+summary(jkn.res.2)
+se.calc <- function(x) { (length(x) - 1) * ( mean((x - mean(x))^2))}
+jkn.res.2 <- jkn.res[-miss, ]
+jkn.means <- colMeans(jkn.res.2)
+jkn.means
+se.est  <- apply(jkn.res.2, 2, se.calc)
+se.est
+sd(jkn.res.2[, 2])
+x <- jkn.res.2[, 2]
+length(x)
+(length(x) - 1)
+( mean((x - mean(x))^2))
+se.calc <- function(x) { sqrt((length(x) - 1) * ( mean((x - mean(x))^2)))}
+jkn.res <- matrix(0, nrow = 15065, ncol = 10)
+for (i in seq(1, dim(jkn.res)[1]))#
+{#
+  #fil.name <- paste0("~/Desktop/combined/out_comb/sim_res", i)#
+  #fil.name <- paste0("~/Desktop/out_fem/sim_res", i)#
+  fil.name <- paste0("~/Desktop/out_male/sim_res", i)#
+  if (file.exists(fil.name))#
+  {#
+    res_i        <- read.table(fil.name, header = F, fill = T)#
+    jkn.res[i, ] <- as.numeric(res_i[1, 1:10])#
+  }#
+  print(i)#
+}
+jkn.res <- matrix(0, nrow = 15065, ncol = 10)
+for (i in seq(1, dim(jkn.res)[1]))#
+{#
+  fil.name <- paste0("~/Desktop/combined/out_comb/sim_res", i)#
+  #fil.name <- paste0("~/Desktop/out_fem/sim_res", i)#
+  #fil.name <- paste0("~/Desktop/out_male/sim_res", i)#
+  if (file.exists(fil.name))#
+  {#
+    res_i        <- read.table(fil.name, header = F, fill = T)#
+    jkn.res[i, ] <- as.numeric(res_i[1, 1:10])#
+  }#
+  print(i)#
+}
+jkn.res.comb <- jkn.res
+head(jkn.res)#
+miss <- which(jkn.res[, 1] == 0)#
+jkn.res.2 <- jkn.res[-miss, ]#
+jkn.means <- colMeans(jkn.res.2)#
+x <- jkn.res.2[, 2]#
+se.calc <- function(x) { sqrt((length(x) - 1) * ( mean((x - mean(x))^2)))}#
+se.est  <- apply(jkn.res.2, 2, se.calc)#
+round(se.est, 3)#
+rbind(round(jkn.means, 3), round(se.est, 5))
+library(knitr)
+kable(round(se.est, 5), format = "latex")
+kable(matrix(round(se.est, 5), nrow = 1, ncol = 11, format = "latex")
+)
+kable(matrix(round(se.est, 5), nrow = 1, ncol = 11), format = "latex")
+rbind(round(jkn.means, 3), round(se.est, 5))
+jkn.res <- matrix(0, nrow = 8845,  ncol = 10)
+# Set up a table to store results#
+for (i in seq(1, dim(jkn.res)[1]))#
+{#
+  fil.name <- paste0("~/Desktop/combined/out_comb/sim_res", i)#
+  #fil.name <- paste0("~/Desktop/out_fem/sim_res", i)#
+  #fil.name <- paste0("~/Desktop/out_male/sim_res", i)#
+  if (file.exists(fil.name))#
+  {#
+    res_i        <- read.table(fil.name, header = F, fill = T)#
+    jkn.res[i, ] <- as.numeric(res_i[1, 1:10])#
+  }#
+  print(i)#
+}
+jkn.res <- matrix(0, nrow = 8845,  ncol = 10)
+i = 1
+fil.name <- paste0("~/Desktop/out_male/sim_res", i)
+res_i        <- read.table(fil.name, header = F, fill = T)
+res_i
+jkn.res <- matrix(0, nrow = 8845,  ncol = 10)
+for (i in seq(1, dim(jkn.res)[1]))#
+{#
+  #fil.name <- paste0("~/Desktop/combined/out_comb/sim_res", i)#
+  #fil.name <- paste0("~/Desktop/out_fem/sim_res", i)#
+  fil.name <- paste0("~/Desktop/out_male/sim_res", i)#
+  if (file.exists(fil.name))#
+  {#
+    res_i        <- read.table(fil.name, header = F, fill = T)#
+    jkn.res[i, ] <- as.numeric(res_i[1, 1:10])#
+  }#
+  print(i)#
+}
+head(jkn.res)
+jkn.res.mal <- jkn.res#
+miss <- which(jkn.res[, 1] == 0)#
+jkn.res.2 <- jkn.res[-miss, ]#
+jkn.means <- colMeans(jkn.res.2)#
+se.est  <- apply(jkn.res.2, 2, se.calc)#
+round(se.est, 3)#
+rbind(round(jkn.means, 3), round(se.est, 5))
+hist(jkn.res.2[, 2])
+jkn.res[-which(jkn.res[, 2] > 198 | jkn.res[, 2] > 194), ]
+jkn.res[, 2] > 198
+jkn.res[-which(jkn.res[, 2] > 198 | jkn.res[, 2] < 194), ]
+jkn.res <- jkn.res[-which(jkn.res[, 2] > 198 | jkn.res[, 2] < 194), ]
+jkn.res.2 <- jkn.res[-miss, ]
+jkn.res.2
+jkn.res <- jkn.res[-which(jkn.res[, 2] > 198 | jkn.res[, 2] < 194), ]
+miss <- which(jkn.res[, 1] == 0)
+miss
+jkn.res.2 <- jkn.res[-which(jkn.res[, 2] > 198 | jkn.res[, 2] < 194), ]
+jkn.means <- colMeans(jkn.res.2)
+jkn.means
+jkn.res.2 <- jkn.res[-which(jkn.res[, 2] > 198 | jkn.res[, 2] < 194), ]
+jkn.res.2
+jkn.res <- jkn.res.mal
+jkn.res.2 <- jkn.res[-which(jkn.res[, 2] > 198 | jkn.res[, 2] < 194), ]
+miss <- which(jkn.res[, 1] == 0)
+miss
+jkn.means <- colMeans(jkn.res.2)
+jkn.means
+se.est  <- apply(jkn.res.2, 2, se.calc)
+round(se.est, 3)
+rbind(round(jkn.means, 3), round(se.est, 5))
+hist(jkn.res.2[, 2])
+jkn.res.2 <- jkn.res[-which(jkn.res[, 2] > 198 | jkn.res[, 2] < 195), ]
+jkn.means <- colMeans(jkn.res.2)
+se.est  <- apply(jkn.res.2, 2, se.calc)
+round(se.est, 3)
+rbind(round(jkn.means, 3), round(se.est, 5))
+jkn.res <- matrix(0, nrow = 6220,  ncol = 10)
+for (i in seq(1, dim(jkn.res)[1]))#
+{#
+  #fil.name <- paste0("~/Desktop/combined/out_comb/sim_res", i)#
+  fil.name <- paste0("~/Desktop/out_fem/sim_res", i)#
+  #fil.name <- paste0("~/Desktop/out_male/sim_res", i)#
+  if (file.exists(fil.name))#
+  {#
+    res_i        <- read.table(fil.name, header = F, fill = T)#
+    jkn.res[i, ] <- as.numeric(res_i[1, 1:10])#
+  }#
+  print(i)#
+}
+head(jkn.res)
+jkn.res.fem <- jkn.res
+miss <- which(jkn.res[, 1] == 0)
+miss
+jkn.res.2 <- jkn.res[-miss, ]
+jkn.means <- colMeans(jkn.res.2)
+jkn.means
+se.est  <- apply(jkn.res.2, 2, se.calc)
+rbind(round(jkn.means, 3), round(se.est, 5))
+# ==============================================================================#
+# Author: Luke Lloyd-Jones#
+# Date started: 07/01/2016#
+# Date updated: 07/01/2016    #
+# Script to plot the von Bertalanffy growth curves for BSC results                                                  #
+# ==============================================================================#
+library(ggplot2)#
+library("reshape2")#
+# Estimates from model k, theta_1, theta_2, mu_inf#
+est.comb <- c(0.715, 0.315, 0.016,  179.4)#
+est.male <- c(0.565, 0.308, -0.473, 196.2)#
+est.fem  <- c(0.787, 0.0574, 0.435, 161.6)#
+# Set up a grid of time maybe three years#
+t <- seq(0.05, 6, 0.05)#
+# Length function#
+gvbgm <- function(theta, t)#
+{#
+	l0 <- 50#
+    k0 <- theta[1]#
+    str.time <- 0.05#
+    end.time <- t#
+    theta.1  <- theta[2]#
+    theta.2  <- theta[3]#
+    mu_inf   <- theta[4]#
+	zt <- k0 * (end.time - str.time) + #
+           (theta.1 / (2 * pi)) * (sin(2 * pi * end.time) - sin(2 * pi * str.time)) - #
+           (theta.2 / (2 * pi)) * (cos(2 * pi * end.time) - cos(2 * pi * str.time))#
+    lt <- l0 + (mu_inf - l0) * (1 - exp(-zt))#
+    return(lt)#
+}#
+# For each of the parameter sets calculate the mean curve over the time frame#
+# Combined#
+Combined <- gvbgm(est.comb, t)#
+# Male#
+Male <- gvbgm(est.male, t)#
+# Female#
+Female  <- gvbgm(est.fem, t)#
+# Make a data frame for interfacing with ggplot#
+mean.crvs <- data.frame(t, Combined, Male, Female)#
+# Melt it#
+mean.crvs.mlt <- melt(mean.crvs, id = "t")#
+# Plot it#
+ggplot(data = mean.crvs.mlt,#
+       aes(x = t, y = value, colour = variable)) +#
+       geom_line(size = 1) + ylim(c(40, 200)) + ylab("Length (mm)") + #
+       labs(colour = "Analysis") + #
+       xlab("Time (years)")

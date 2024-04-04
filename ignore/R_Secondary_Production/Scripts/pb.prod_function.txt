@@ -1,0 +1,89 @@
+
+#Define P/B production bootstrap function:
+  pb.prod <- function(DATA, site, first.date, last.date, habitat, taxon, LM.a, LM.b, LM.p.ash, p.b, temp.corr=1, boot.num){
+    #Select all data (across all taxa) for the specified site, dates, & habitat (this allows us to get all possible dates & sample numbers for taxa not occuring in all samples on all dates):
+    data1 <- DATA[DATA$SITE == site & DATA$JULIAN >= DATA$JULIAN[DATA$DATE == first.date][1] & DATA$JULIAN <= DATA$JULIAN[DATA$DATE == last.date][1] & DATA$HABITAT == habitat,]
+    data1 <- data1[!is.na(apply(data1[,7:(dim(data1)[2])], 1, sum)),]		#Remove rows with NA's (missing data)
+    row.names(data1) <- NULL							#Must reset row names to be sequential
+
+    #Select only the subset of the data (site, dates, habitat, taxon) to calculate production for:
+    data2 <- DATA[DATA$SITE == site & DATA$JULIAN >= DATA$JULIAN[DATA$DATE == first.date][1] & DATA$JULIAN <= DATA$JULIAN[DATA$DATE == last.date][1] & DATA$HABITAT == habitat & DATA$TAXON == taxon,]
+    data2 <- data2[!is.na(apply(data2[,7:(dim(data2)[2])], 1, sum)),]		#Remove rows with NA's (missing data)
+    row.names(data2) <- NULL							#Must reset row names to be sequential
+
+    #Create a vector of sampling dates (in Julian units):
+    t <- sort(union(data1$JULIAN, NULL))
+
+    #Create a vector of durations (day) between successive sampling intervals:
+    t.int <- diff(t)
+
+    #Create the appropriate samples of all "zeroes" for those dates and samples in which the taxon was not found:
+    for (d in 1:length(t)){
+      all.samps <- as.numeric(levels(factor(data1$SAMPLE[data1$JULIAN == t[d]])))
+      act.samps <- as.numeric(levels(factor(data2$SAMPLE[data2$JULIAN == t[d]])))
+      zeroes <- setdiff(all.samps, act.samps)
+        if (length(all.samps) > length(act.samps)){
+          for (z in 1:length(zeroes)){
+            to.add <- data.frame(matrix(c(site, zeroes[z], t[d], NA, habitat, taxon, rep(0, (dim(data2)[2]-6))), 1, dim(data2)[2]))
+            names(to.add) <- names(data2)
+            if (nrow(data2) == 0){
+              data2 <- to.add
+            }
+            else data2 <- rbind(data2, to.add)
+          }
+        }
+    }
+    for (i in c(2,3,7:dim(data2)[2])){
+      data2[,i] <- as.numeric(as.character(data2[,i]))				#Must force the appropriate columns to be numeric
+    }
+
+    #Create a dataframe of sizes:
+    mm <- as.numeric(substr(names(data2)[7:(dim(data2)[2])], 2, 6))
+    AFDM <- (1-(LM.p.ash/100))*LM.a*(mm^LM.b)
+    sizes <- data.frame(mm, AFDM)
+
+    #Apply temperature correction to p.b value:
+    p.b <- p.b*temp.corr
+
+    #Calculate SAMPLE annual production for each size class:
+    N <- matrix(0, length(t), length(sizes$mm))
+    Bdatesampinfo <- Ndatesampinfo <- data.frame(matrix(0, length(t), 5))
+    names(Bdatesampinfo) <- names(Ndatesampinfo) <- c("DATE","JULIAN","N","Mean","Stdev")
+    for (d in 1:length(t)){
+      rows <- data2[as.numeric(row.names(data2))[data2$JULIAN == t[d]],(7:dim(data2)[2])]
+      N[d,] <- apply(rows, 2, mean)											#For each date, compute the mean abundance from the selected samples for each size class
+      Ndatesampinfo[d,3:5] <- c(length(apply(rows, 1, sum)), mean(apply(rows, 1, sum)),sd(apply(rows, 1, sum)))		#For each date, also compute the total abundance (over all size classes) for each sample, and calculate the number of samples, mean, and standard deviation of the samples on that date
+      rows.B <- t(t(rows)*sizes$AFDM)											#Same as rows (above) but biomass instead of abundance for each size class and sample
+      Bdatesampinfo[d,3:5] <- c(length(apply(rows.B, 1, sum)), mean(apply(rows.B, 1, sum)),sd(apply(rows.B, 1, sum)))	#For each date, also compute the total biomass (over all size classes) for each sample, and calculate the number of samples, mean, and standard deviation of the samples on that date
+    }
+    Bdatesampinfo[,1:2] <- Ndatesampinfo[,1:2] <- get.dates(DATA=DATA, site=site, habitat=habitat, first.date=first.date, last.date=last.date)
+    int.N <- (N[1:(length(t)-1),] + N[2:length(t),])/2		#Calculate interval abundance (take the mean of successive dates)
+    int.B <- t(t(int.N)*sizes$AFDM)				#Calculate interval biomass (interval abundance * mass for each size class)
+    Bsampest <- mean(apply(int.B, 1, sum))			#Sum all size classes to calculate biomass for each interval, and then take the mean of all intervals to calculate average annual biomass
+    Psampest <- Bsampest*p.b					#Calculate production by multiplying biomass times P/B value
+
+    #Generate bootstrap production vectors for each interval:
+    Bintboots <- Nintboots <- matrix(NA, boot.num, length(t.int))
+    Bdateboots <- Ndateboots <- matrix(NA, boot.num, length(t))
+    for (b in 1:boot.num){
+      N <- matrix(0, length(t), length(sizes$mm))
+      for (d in 1:length(t)){
+        num.samps <- length(as.numeric(row.names(data2))[data2$JULIAN == t[d]])					#Set the number of samples that exist for this date
+        row.nums <- sample(as.numeric(row.names(data2))[data2$JULIAN == t[d]], size=num.samps, replace=T)	#For each date, select (with replacement) <num.samps> entire samples (where each sample selected includes the data for all size classes, and <num.samps> is the total number of samples that exist for that date)
+        rows <- data2[row.nums,(7:dim(data2)[2])]
+        N[d,] <- apply(rows, 2, mean)										#and then compute the mean abundance from the selected samples for each size class
+      }
+      int.N <- (N[1:(length(t)-1),] + N[2:length(t),])/2	#Calculate interval abundance (take the mean of successive dates)
+      int.B <- t(t(int.N)*sizes$AFDM)				#Calculate interval biomass (interval abundance * mass for each size class)
+      B <- t(t(N)*sizes$AFDM)					#Also calculate biomass (sample date abundance * mass for each size class)
+      Bintboots[b,] <- apply(int.B, 1, sum)			#Sum all size classes to calculate biomass for each interval
+      Nintboots[b,] <- apply(int.N, 1, sum)			#Sum all size classes to calculate abundance for each interval
+      Bdateboots[b,] <- apply(B, 1, sum)			#Calculate bootstrap matrix of biomass estimates on each sample date
+      Ndateboots[b,] <- apply(N, 1, sum)			#Calculate bootstrap matrix of abundance estimates on each sample date
+    }
+    Bboots <- apply(Bintboots, 1, mean)				#Calculate bootstrap vector of annual biomass by taking the mean of all intervals
+    Nboots <- apply(Nintboots, 1, mean)				#Calculate bootstrap vector of annual abundance by taking the mean of all intervals
+    Pboots <- Bboots*p.b					#Calculate bootstrap vector of annual production by multiplying bootstrap vector of annual biomass times P/B value
+    list(totdays=sum(t.int), pb=p.b, Psampest=Psampest, Pbootest=c(Mean=mean(Pboots), quantile(Pboots, c(0.025, 0.5, 0.975))), Pboots=Pboots, Bboots=Bboots, Nboots=Nboots, julians=t, intdays=t.int, Bdatesampinfo=Bdatesampinfo, Ndatesampinfo=Ndatesampinfo, Bdateboots=Bdateboots, Ndateboots=Ndateboots)
+  }
+

@@ -1,0 +1,27 @@
+
+#Define a function to calculate a habitat-weighted estimate of production (or biomass or abundance):
+  hab.weight <- function(dat.cob, dat.dep, dat.tal, wt.cob, wt.dep, wt.tal){
+    if (length(wt.cob) != 1 | length(wt.dep) != 1 | length(wt.tal) != 1){
+      print("Error: weights must be single values")
+    }
+    else if (is.null(dim(dat.cob)) | is.null(dim(dat.dep)) | is.null(dim(dat.tal))){							#If any of the data are not arrays,
+      if (length(dat.cob) != length(dat.dep) | length(dat.cob) != length(dat.tal) | length(dat.dep) != length(dat.tal)){		#If any of the vectors differ in length,
+        print("Error: vectors of data differ in length")
+      }
+      else if (length(dat.cob) == length(dat.dep) & length(dat.cob) == length(dat.tal) & length(dat.dep) == length(dat.tal)){		#If all the vectors are the same length,
+        (dat.cob*wt.cob)+(dat.dep*wt.dep)+(dat.tal*wt.tal)
+      }
+    }
+    else if (sum(dim(dat.cob)==dim(dat.dep)) != 2 | sum(dim(dat.cob)==dim(dat.tal)) != 2 | sum(dim(dat.dep)==dim(dat.tal)) != 2){	#If any of the arrays are not of the same dimension, 
+      print("Error: arrays of data differ in dimension")
+    }
+    else if (sum(dim(dat.cob)==dim(dat.dep)) == 2 & sum(dim(dat.cob)==dim(dat.tal)) == 2 & sum(dim(dat.dep)==dim(dat.tal)) == 2){	#If all the arrays are the same dimension, 
+      if (sum(names(dat.cob)==names(dat.dep)) != length(names(dat.cob)) | sum(names(dat.cob)==names(dat.tal)) != length(names(dat.cob)) | sum(names(dat.dep)==names(dat.tal)) != length(names(dat.dep))){	#If the names of any of the arrays do not match,
+        print("Warning: array names do not match")
+      }
+      (dat.cob*wt.cob)+(dat.dep*wt.dep)+(dat.tal*wt.tal)
+    }
+  }
+
+
+
