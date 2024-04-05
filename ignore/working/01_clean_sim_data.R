@@ -94,15 +94,17 @@ plot_cohorts(WBTtaxaSampleListMass, param = 'length', massClass = 'afdm_mg')
 
 x_Linf = WBTtaxaSampleListMass %>%
   dplyr::select(taxonID, dateID, lengthClass, afdm_mg, n_m2) %>%
-  dplyr::filter(n_m2 > 0,
-                between(lengthClass,2,7)
-                ) %>%
+  dplyr::filter(between(lengthClass,2,7)) %>%
   group_by(lengthClass) %>%
   summarise(count = sum(n_m2))
 
 x_Linf %>%
   ggplot()+
   geom_point(aes(x = lengthClass, y = log(count)))
+
+## build a function to detect cohorts
+
+
 
 
 # debugonce(calc_Linf)
@@ -143,7 +145,7 @@ restructure_cohorts = function(df,...){
 
   df_adj = df %>%
     ungroup %>%
-    mutate(dateID_adj = yday(dateID)-minYDAY) %>%
+    mutate(dateID_adj = yday(dateID)-(minYDAY-1)) %>%
     mutate(yday_adj = case_when(dateID_adj < 0 ~ dateID_adj+365,
                                   .default = dateID_adj)) %>%
     arrange(yday_adj)
@@ -155,7 +157,7 @@ y = restructure_cohorts(x)
 
 y %>% ggplot()+
   geom_histogram(aes(x = lengthClass, after_stat(..density..)), binwidth = 1)+
-  facet_wrap(~yday_adj, dir = 'v' )
+  facet_wrap(~yday_adj, dir = 'v', ncol = 1 )
 
 min(x$lengthClass)
 x %>% filter(lengthClass == min(.$lengthClass)) %>% ungroup %>% select(yday) %>% unique() %>% min()
