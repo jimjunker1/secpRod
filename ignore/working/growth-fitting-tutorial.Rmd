@@ -648,7 +648,7 @@ process_and_estimate_growth <- function(data, start_year, end_year, start_day_ye
   
   # Here, integrate the model fitting and estimation process using 'data_year1' and 'data_year2'
   # Note: This section is left abstract as the actual model fitting process (e.g., using 'nlme' or similar packages) 
-  # will depend on the specifics of the model and is beyond the scope of this optimization.
+
   
   # Placeholder for model fitting and estimation
   # fit_model(data_year1, data_year2)
