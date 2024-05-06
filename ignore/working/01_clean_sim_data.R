@@ -5,7 +5,7 @@ gmean = function(...){
   meanLog_x = mean(log_x)
   exp(meanLog_x)
 }
-
+theme_set(theme_minimal())
 # load the necessary functions
 ## functions are loaded in package script.
 # source("./R/internals.R")
@@ -130,8 +130,10 @@ x =  WBTtaxaSampleListMass %>%
   mutate(dateID = as.Date(dateID))
 
 
-restructure_cohorts = function(df,...){
+restructure_cohorts = function(df,window= 3,...){
   minL = min(df$lengthClass)
+  maxL = max(df$lengthClass)+1
+
   minDATE = df %>% ungroup %>%
     filter(lengthClass == minL) %>%
     select(dateID) %>%
@@ -140,22 +142,125 @@ restructure_cohorts = function(df,...){
   minYEAR = year(minDATE$dateID)
   minYDAY = yday(minDATE$dateID)
 
+  # create a data frame of
+  df_bind = expand.grid(c(minL-1, maxL),
+                        unique(df$dateID)) %>%
+    data.frame %>%
+    setNames(c('lengthClass','dateID')) %>%
+    mutate(n = 0)
+
   # adjust dates to start at first
   # observation of smallest class
 
   df_adj = df %>%
+    group_by(dateID) %>%
+    dplyr::count(lengthClass) %>%
+    bind_rows(df_bind) %>%
     ungroup %>%
     mutate(dateID_adj = yday(dateID)-(minYDAY-1)) %>%
     mutate(yday_adj = case_when(dateID_adj < 0 ~ dateID_adj+365,
                                   .default = dateID_adj)) %>%
-    arrange(yday_adj)
+    select( dateID, yday_adj, lengthClass, n) %>%
+    group_by(dateID, yday_adj) %>%
+    pivot_wider(names_from = lengthClass, values_from = n, values_fill = 0) %>%
+    pivot_longer(-c(dateID,yday_adj), names_to = 'lengthClass', values_to = 'n') %>%
+    mutate(across(c(lengthClass, n), as.numeric)) %>%
+    dplyr::arrange(yday_adj, lengthClass, .by_group = TRUE) %>%
+    mutate(n_ma = round(zoo::rollapply(n, window, mean, fill = 0, align = 'right')),
+           rel_n = (n/n_ma)-1)
 
   return(df_adj)
 }
 # debugonce(restructure_cohorts)
-y = restructure_cohorts(x)
+y = restructure_cohorts(x, window = 3)
 
-y %>% ggplot()+
+detect_cohorts = function(df,...){
+  #
+  df_mat = df %>% ungroup %>%
+    mutate(pres = ifelse(rel_n > 0, 1,0)) %>%
+    select(yday_adj, lengthClass, pres) %>%
+    group_by(yday_adj) %>%
+    pivot_wider(names_from = lengthClass, values_from = pres) %>%
+    mutate(across(where(is.numeric), ~replace_na(.x,0))) %>%
+    arrange(yday_adj) %>%
+    column_to_rownames('yday_adj')
+
+
+  df_c = df_mat
+
+  for(i in 1:nrow(df_c)){
+    c = 1
+    z = 0
+    if(i == 1){
+      df_c[1,1] = 1
+      for(j in 2:ncol(df_c)){
+        if(df_c[i,j] == 1 & z < 3){
+          df_c[i,j] <- c
+        } else if(df_c[i,j] == 0){
+          z = z+1
+          df_c[i,j] <- 0
+        } else if(df_c[i,j] == 1 & z >= 3){
+          c = c+1
+          df_c[i,j] <- c
+        }
+      }
+    } else{
+      for(j in 1:ncol(df_c)){
+        if(df_c[i,j] == 1){
+          df_c[i,j] <- c
+        } else if(df_c[i,j] == 0 & z < 3){
+          z = z+1
+          df_c[i,j] <- 0
+        } else if(df_c[i,j] == 1 & z >= 3){
+          c = c+1
+          df_c[i,j] <- c
+        }
+    }
+    }
+  }
+return(df_c)
+
+}
+debugonce(detect_cohorts)
+a = detect_cohorts(y )
+
+
+y_mat = y %>% ungroup %>%
+  mutate(pres = ifelse(rel_n > 0, 1,0)) %>%
+  select(yday_adj, lengthClass, pres) %>%
+  group_by(yday_adj) %>%
+  pivot_wider( names_from = lengthClass, values_from = pres) %>%
+  mutate(across(where(is.numeric), ~replace_na(.x,0)))
+
+
+y %>% uncount(n) %>% ggplot()+
+  geom_histogram(aes(x = lengthClass, after_stat(..density..)), binwidth = 1)+
+  facet_wrap(~yday_adj, dir = 'v', ncol = 1 )
+
+y %>%
+  # mutate(rel_n = ifelse(rel_n <0, 0,rel_n)) %>%
+  ggplot()+
+  geom_col(aes(x = lengthClass, y = rel_n))+
+  facet_wrap(~yday_adj)
+
+y %>%
+  group_by(taxonID, dateID, yday_adj, lengthClass, afdm_mg) %>%
+  summarise(n = n()) %>%
+  pivot_wider( names_from = c(lengthClass, afdm_mg), values_from = n, values_fill = 0) %>%
+  pivot_longer(-c(taxonID,dateID,yday_adj), names_to = 'variable', values_to = 'n') %>%
+  separate_wider_delim(variable, delim = '_', names = c('lengthClass','afdm_mg')) %>%
+  group_by(dateID, yday_adj) %>%
+  mutate(across(all_of(c('lengthClass', 'afdm_mg')), as.numeric)) %>%
+  dplyr::arrange(yday_adj, lengthClass, .by_group = TRUE) %>%
+  mutate(n_ma = round(zoo::rollapply(n, 2, mean, fill = 0)),
+         rel_n = (n/n_ma)-1) ->z
+
+z_mat = z %>% arrange(yday_adj) %>%
+  mutate(pres = ifelse(n >0, 1,0))
+
+
+
+z %>% uncount(weights = n_ma) %>% ggplot()+
   geom_histogram(aes(x = lengthClass, after_stat(..density..)), binwidth = 1)+
   facet_wrap(~yday_adj, dir = 'v', ncol = 1 )
 
