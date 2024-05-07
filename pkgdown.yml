@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   cohort-detection: cohort-detection.html
   simple-example: simple-example.html
-last_built: 2024-05-06T22:50Z
+last_built: 2024-05-07T15:47Z
 urls:
   reference: https://jimjunker1.github.io/secpRod/reference
   article: https://jimjunker1.github.io/secpRod/articles
