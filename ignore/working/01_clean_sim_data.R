@@ -90,6 +90,7 @@ wbtTaxaInfo <- readRDS("./ignore/data/WBT_ab.rds") %>% bind_rows(.id = 'taxonID'
 WBTtaxaSampleListMass = convert_length_to_mass(taxaSampleList = wbtLenFreq[[5]], infoCols = c(2:3), taxaInfo = wbtTaxaInfo) %>% dplyr::filter(lengthClass <= 6)
 # plot the length frequency data
 plot_cohorts(WBTtaxaSampleListMass, param = 'length', massClass = 'afdm_mg')
+dev.off()
 ## estimate Linf from N-Length data
 
 x_Linf = WBTtaxaSampleListMass %>%
@@ -100,12 +101,9 @@ x_Linf = WBTtaxaSampleListMass %>%
 
 x_Linf %>%
   ggplot()+
-  geom_point(aes(x = lengthClass, y = log(count)))
-
-## build a function to detect cohorts
-
-
-
+  geom_point(aes(x = lengthClass, y = log(count)))+
+  scale_y_continuous(name = 'log(count)', limits = c(0,NA))+
+  scale_x_continuous(name = 'lengthClass', limits = c(0,NA))
 
 # debugonce(calc_Linf)
 Linf = calc_Linf(x_Linf)
@@ -174,6 +172,7 @@ restructure_cohorts = function(df,window= 3,...){
 # debugonce(restructure_cohorts)
 y = restructure_cohorts(x, window = 3)
 
+## build a function to detect cohorts
 detect_cohorts = function(df,...){
   #
   df_mat = df %>% ungroup %>%
