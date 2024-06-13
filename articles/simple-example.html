@@ -81,22 +81,59 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>Currently, the only method for analysis fully implemented is
-size-frequency. This quick tutorial will outline steps to calculate
-secondary production for whole communities. First, load the package with
-<code><a href="https://jimjunker1.github.io/secpRod/">library(secpRod)</a></code>.</p>
-<p>The package comes with a data set of macroinvertebrate community data
-from <span class="citation">(<strong>junker2014?</strong>)</span> that
-can be accessed with <code>data("wbtData")</code></p>
-<p>This data object is a list with two (2) elements:</p>
+<p>Currently, the analysis is fully implemented for the size-frequency
+and production:biomass ratio methods. This quick tutorial will outline
+steps to calculate secondary production for whole communities. First,
+load the package with <code><a href="https://jimjunker1.github.io/secpRod/">library(secpRod)</a></code>.</p>
+<p>The package comes with a number of data sets of macroinvertebrate
+species and community data:</p>
 <ol style="list-style-type: decimal">
-<li><p>sampleInfo: a list with 32 data frames. One (1) for each
-taxonomic entity</p></li>
-<li><p>taxaInfo: a data frame with 32 rows and 13 columns. Each row
-represents the taxonomic information for a single taxonomic entity and
-the columns contain information for calculation of production. These
-include, but are not limited to:</p></li>
+<li><p>simulated data set of a single univoltine species accessed with
+<code>data("univoltine")</code></p></li>
+<li><p>a full community data set from <span class="citation">(<strong>junker2014?</strong>)</span> that can be
+accessed with <code>data("wbtData")</code></p></li>
 </ol>
+<p>The simulated data set is a single data frame of artificially sampled
+size-frequency data through time.</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"univoltine"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">#clean this data set to align </span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">univoltine</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 5</span></span></span>
+<span><span class="co">#&gt;   taxonID dateID     repID lengthClass  n_m2</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> sppA    2023-01-31 1             0.5     0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> sppA    2023-01-31 1             1       0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> sppA    2023-01-31 1             1.5     0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> sppA    2023-01-31 1             2       0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> sppA    2023-01-31 1             2.5     0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> sppA    2023-01-31 1             3       0</span></span></code></pre></div>
+<p>For this simple example, we can create the required ‘taxaInfo’
+object:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># clean simulated data to workable form</span></span>
+<span></span>
+<span><span class="va">taxaInfo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  taxonID <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sppA"</span><span class="op">)</span>,</span>
+<span>  massForm <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"afdm_mg~(a*lengthClass^b)*percAsh"</span><span class="op">)</span>,</span>
+<span>  a <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.0025</span><span class="op">)</span>,</span>
+<span>  b <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.692</span><span class="op">)</span>,</span>
+<span>  percAsh <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.958</span><span class="op">)</span>,</span>
+<span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sf"</span><span class="op">)</span>,</span>
+<span>  g.a <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span><span class="op">)</span>,</span>
+<span>  growthForm <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"log(g_d) = 1 - 0.25*log(afdm_mg) - "</span><span class="op">)</span>,</span>
+<span>  min.cpi <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">335</span><span class="op">)</span>,</span>
+<span>  max.cpi <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">365</span><span class="op">)</span>,</span>
+<span>  pb <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"runif(min = 3, max = 8)"</span><span class="op">)</span>,</span>
+<span>  min.growth <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.001</span><span class="op">)</span>,</span>
+<span>  notes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"This is here for your use. No information will be used, but this column will be maintained in some summaries. See *** for more information."</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>This object represents the taxonomic information for calculating
+production. Each row contains information for a single species/taxon (in
+this case the only row because species == 1 ). The columns contain
+information for calculation of production. These include, but are not
+limited to:</p>
 <ul>
 <li><p>taxonID: a character string that matches the name of taxonID from
 sampleInfo</p></li>
@@ -135,6 +172,15 @@ until the <code>min.growth</code> feature is implemented.</p></li>
 <li><p>notes: notes for researcher use. This column will be maintained
 in output summaries.</p></li>
 </ul>
+<p>This ‘wbtData’ object is a list with two (2) elements:</p>
+<ol style="list-style-type: decimal">
+<li><p>sampleInfo: a list with 32 data frames. One (1) for each
+taxonomic entity</p></li>
+<li><p>taxaInfo: a data frame with 32 rows and 13 columns. Each row
+represents the taxonomic information for a single taxonomic entity and
+the columns contain information for calculation of production as
+described above.</p></li>
+</ol>
 </div>
 <div class="section level2">
 <h2 id="examples">Examples<a class="anchor" aria-label="anchor" href="#examples"></a>
@@ -144,7 +190,7 @@ in output summaries.</p></li>
 </h3>
 <p>A quick walkthrough of the calculation of secondary production for a
 single species.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## isolate a single species data frame from sampleInfo object</span></span>
 <span></span>
 <span><span class="va">acentrella</span> <span class="op">&lt;-</span> <span class="va">wbtData</span><span class="op">[[</span><span class="st">'sampleInfo'</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">'Acentrella sp.'</span><span class="op">]</span><span class="op">]</span></span>
@@ -171,7 +217,7 @@ patterns. Here we use the <code><a href="../reference/convert_length_to_mass.htm
 function, which adds a column of the individual masses based on the
 length-to-mass formula and coefficients in taxaInfo.</p>
 <p>We can take a look at what this looks like:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">acentrellaInfo</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">taxaInfo</span>, <span class="va">taxonID</span> <span class="op">==</span> <span class="st">"Acentrella sp."</span><span class="op">)</span></span>
 <span><span class="va">acentrellaInfo</span></span>
@@ -183,7 +229,7 @@ length-to-mass formula and coefficients in taxaInfo.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 3 more variables: pb &lt;dbl&gt;, min.growth &lt;dbl&gt;, notes &lt;chr&gt;</span></span></span></code></pre></div>
 <p>Information on its use can be viewed with
 <code>?convert_lenght_to_mass</code></p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">acentrellaMass</span> <span class="op">=</span> <span class="fu"><a href="../reference/convert_length_to_mass.html">convert_length_to_mass</a></span><span class="op">(</span>taxaSampleList <span class="op">=</span> <span class="va">acentrella</span>,</span>
 <span>                                         taxaInfo <span class="op">=</span> <span class="va">wbtData</span><span class="op">[[</span><span class="st">'taxaInfo'</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
@@ -201,7 +247,7 @@ length-to-mass formula and coefficients in taxaInfo.</p>
 <p>From here you can view the size frequency histograms using the
 <code><a href="../reference/plot_cohorts.html">plot_cohorts()</a></code> function. Check out the function options
 with <code><a href="../reference/plot_cohorts.html">?plot_cohorts</a></code>.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/plot_cohorts.html">plot_cohorts</a></span><span class="op">(</span>taxaSampleListMass <span class="op">=</span> <span class="va">acentrellaMass</span>,</span>
 <span>             param <span class="op">=</span> <span class="st">'length'</span>,</span>
@@ -221,7 +267,7 @@ that will estimate community production.</p>
 <p>To apply it to our single species example, we input the sample
 information and taxa information along with how many bootstraps we would
 like, as:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/calc_production.html">calc_production</a></span><span class="op">(</span></span>
 <span>  taxaSampleListMass <span class="op">=</span> <span class="va">acentrellaMass</span>,</span>
@@ -434,7 +480,7 @@ annual biomass, and annual abundance.</p></li>
 above the full can be a lot. The ‘short’ is a paired down version of
 this</p></li>
 </ol>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/calc_production.html">calc_production</a></span><span class="op">(</span></span>
 <span>  taxaSampleListMass <span class="op">=</span> <span class="va">acentrellaMass</span>,</span>
@@ -515,7 +561,7 @@ a more explicit option to set all the values of pb that will be used. In
 the future, if the length <span class="math inline">\(\neq\)</span>
 <code>bootNum</code> an error will be returned for the taxa.</p></li>
 </ol>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">acentrellaInfo</span><span class="op">$</span><span class="va">method</span> <span class="op">=</span> <span class="st">"pb"</span></span>
 <span><span class="va">acentrellaInfo</span><span class="op">$</span><span class="va">pb</span> <span class="op">=</span> <span class="st">"runif(min = 3, max = 8)"</span></span>
@@ -587,7 +633,7 @@ by splitting the full sampleInfo into a list by taxa and using
 <code>apply</code> or functions from the (<code>purrr</code> package)[<a href="https://purrr.tidyverse.org/" class="external-link uri">https://purrr.tidyverse.org/</a>]</p>
 <p>The code below shows how to accomplish this. Again, only size
 frequency and pb are accepted currently.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># load needed packages</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://purrr.tidyverse.org/" class="external-link">purrr</a></span><span class="op">)</span></span>
@@ -632,8 +678,9 @@ frequency and pb are accepted currently.</p>
 <span><span class="co">#&gt;  ..$ dateID     : 'POSIXct' num(0) </span></span>
 <span><span class="co">#&gt;  - attr(*, "tzone")= chr "UTC"</span></span>
 <span><span class="co">#&gt;  ..$ lengthClass: num(0) </span></span>
-<span><span class="co">#&gt;  ..$ n_m2       : num(0)</span></span>
-<span></span>
+<span><span class="co">#&gt;  ..$ n_m2       : num(0)</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="co"># if you have a large data frame with all taxa the code below shows how to do this:</span></span>
 <span><span class="co">## install a package to split into a named_list</span></span>
 <span><span class="co"># devtools::install_github('jimjunker1/junkR')</span></span>
