@@ -14,7 +14,9 @@ csl: ecology.csl
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE
 )
 ```
 
@@ -28,15 +30,46 @@ load("wbtData.rda")
 
 ## Introduction 
 
-Currently, the only method for analysis fully implemented is size-frequency. This quick tutorial will outline steps to calculate secondary production for whole communities. First, load the package with `library(secpRod)`.
+Currently, the analysis is fully implemented for the size-frequency and production:biomass ratio methods. This quick tutorial will outline steps to calculate secondary production for whole communities. First, load the package with `library(secpRod)`.
 
-The package comes with a data set of macroinvertebrate community data from @junker2014 that can be accessed with `data("wbtData")`
+The package comes with a number of data sets of macroinvertebrate species and community data:
 
-This data object is a list with two (2) elements:
+1) simulated data set of a single univoltine species accessed with `data("univoltine")`
 
-1) sampleInfo: a list with 32 data frames. One (1) for each taxonomic entity
+2) a full community data set from @junker2014 that can be accessed with `data("wbtData")`
 
-2) taxaInfo: a data frame with 32 rows and 13 columns. Each row represents the taxonomic information for a single taxonomic entity and the columns contain information for calculation of production. These include, but are not limited to:
+The simulated data set is a single data frame of artificially sampled size-frequency data through time.
+
+```{r echo = TRUE}
+data("univoltine")
+
+#clean this data set to align 
+head(univoltine)
+```
+
+For this simple example, we can create the required 'taxaInfo' object:
+
+```{r echo=TRUE}
+# clean simulated data to workable form
+
+taxaInfo <- data.frame(
+  taxonID = c("sppA"),
+  massForm = c("afdm_mg~(a*lengthClass^b)*percAsh"),
+  a = c(0.0025),
+  b = c(2.692),
+  percAsh = c(0.958),
+  method = c("sf"),
+  g.a = c(NA),
+  growthForm = c("log(g_d) = 1 - 0.25*log(afdm_mg) - "),
+  min.cpi = c(335),
+  max.cpi = c(365),
+  pb = c("runif(min = 3, max = 8)"),
+  min.growth = c(0.001),
+  notes = c("This is here for your use. No information will be used, but this column will be maintained in some summaries. See *** for more information.")
+)
+```
+
+This object represents the taxonomic information for calculating production. Each row contains information for a single species/taxon (in this case the only row because species == 1 ). The columns contain information for calculation of production. These include, but are not limited to:
 
 - taxonID: a character string that matches the name of taxonID from sampleInfo
 
@@ -61,6 +94,12 @@ This data object is a list with two (2) elements:
 - min.growth: description forthcoming...
 
 - notes: notes for researcher use. This column will be maintained in output summaries.
+
+This 'wbtData' object is a list with two (2) elements:
+
+1) sampleInfo: a list with 32 data frames. One (1) for each taxonomic entity
+
+2) taxaInfo: a data frame with 32 rows and 13 columns. Each row represents the taxonomic information for a single taxonomic entity and the columns contain information for calculation of production as described above.
 
 ## Examples
 

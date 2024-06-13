@@ -1,0 +1,14 @@
+---
+title: "A simple example"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(secpRod)
+```

@@ -27,7 +27,7 @@ taxaInfo <- data.frame(
   a = c(0.0025),
   b = c(2.692),
   percAsh = c(0.958),
-  method = c("pb"),
+  method = c("sf"),
   g.a = c(NA),
   growthForm = c("log(g_d) = 1 - 0.25*log(afdm_mg) - "),
   min.cpi = c(335),
@@ -55,7 +55,8 @@ taxaSampleListMass = convert_length_to_mass(taxaSampleList = data.frame(flatten(
 # debugonce(plot_cohorts)
 plot_cohorts(taxaSampleListMass, param = 'length', massClass = 'afdm_mg')
 
-# debugonce(calc_production);debugonce(calc_prod_pb);debugonce(pb_prod.sample)
+debugonce(calc_production)
+#;debugonce(calc_prod_pb);debugonce(pb_prod.sample)
 # debugonce(cleanAggDf)
 tic();x = calc_production(taxaSampleListMass = taxaSampleListMass, infoCols = c(2:3), taxaInfo = taxaInfo, bootNum = 10, taxaSummary = 'short', wrap = TRUE);toc()
 
