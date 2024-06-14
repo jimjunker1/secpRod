@@ -1,3 +1,0 @@
-1) change plot function to work with non-integers and low densities. Convert to relative abundances by actual values then plot heights based on relative densities rather than rounding.
-
-2)
