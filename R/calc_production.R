@@ -16,9 +16,10 @@ calc_production = function(taxaSampleListMass = NULL,
                            bootNum = 1e2,
                            wrap = 1L,
                            taxaSummary = 'full',
+                           envData = NULL,
                            ...){
   ### tests ###
-
+  # if('igr' %in% taxaInfo$method & is.null(envData)) stop("Error: use of the igr method requires ")
   ### end tests ###
   # prep size-abundance boots
   bootList = prep_boots(df = taxaSampleListMass,
@@ -43,7 +44,7 @@ calc_production = function(taxaSampleListMass = NULL,
     bootNum = bootNum,
     taxaSummary = taxaSummary,
     wrap = wrap,
-    bootList = bootList
+    bootList = bootList,
   )
 
 ## calculated production based on methods

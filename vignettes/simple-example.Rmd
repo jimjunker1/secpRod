@@ -60,7 +60,7 @@ taxaInfo <- data.frame(
   percAsh = c(0.958),
   method = c("sf"),
   g.a = c(NA),
-  growthForm = c("log(g_d) = 1 - 0.25*log(afdm_mg) - "),
+  growthForm = c("log(g_d) = 1 - 0.25*log(afdm_mg) - 0.2*tempC"),
   min.cpi = c(335),
   max.cpi = c(365),
   pb = c("runif(min = 3, max = 8)"),
@@ -141,7 +141,7 @@ acentrellaInfo
 
 ```
 
-Information on its use can be viewed with `?convert_lenght_to_mass`
+Information on its use can be viewed with `?convert_length_to_mass`
 
 ```{r length to mass, include=TRUE, echo=TRUE}
 
@@ -229,6 +229,20 @@ calc_production(
 )
 
 ```
+
+### An example with the instantaneous growth method
+
+The IGR method adds flexbility, but also potential complexity. For this method, it is expected that you provide a growth rate, *g* ($d^{-1}$). This can be accomplished in multiple ways:
+
+1) a single value. This will use the same value for each bootstrap sample (e.g., 0.02 $d^{-1}$. The variability is derived entirely from resampling the sample units (e.g. surbers, hess samples, kick nets, etc.).
+
+2) a character string for a distribution from which to sample excluding the `n=`, such as `rlnorm(meanlog = log(0.05), sdlog = log(0.001))`. The function will automatically sample `bootNum` values. 
+
+3) a numeric vector with length equal to number of sampling periods. For `wrap = TRUE` the function will take the average of the first and last growth rates.
+
+4) a character string that can be parsed into a growth equation, e.g., 'g = -0.25*afdm_
+
+In the future, I would like to extend this to allow passing of 
 
 ## Applying this to multiple taxa
 

@@ -52,7 +52,7 @@ With this process we want to build a model that will output a posterior distribu
 
 ## Caveats {-}
 
-The estimation of growth rates with this approach is only aplicable within a cohort--it will not make sense to apply to data from different cohorts. Identifying cohort structure from macroinvertebrate data is *currently* more of an art than a science and will depend on a number of things:
+The estimation of growth rates with this approach is only applicable within a cohort--it will not make sense to apply to data from different cohorts. Identifying cohort structure from macroinvertebrate data is *currently* more of an art than a science and will depend on a number of things:
 
 - sampling frequency
 

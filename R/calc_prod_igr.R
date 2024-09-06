@@ -24,9 +24,17 @@ calc_prod_igr <- function(taxaSampleListMass= NULL,
                          taxaSummary = 'full',
                          wrap = TRUE,
                          massValue = NULL,
-                         massLabel = NULL,...) {
+                         massLabel = NULL,
+                         bootList = NULL,
+                         envData = NULL,
+                         ...) {
 
   ## tests ##
+  # check for environmental data
+
+  # check that the dates match
+
+  # check for parsed variables and their presence in envData
 
   ## end tests ##
   speciesName = unique(taxaSampleListMass$taxonID)
@@ -34,20 +42,23 @@ calc_prod_igr <- function(taxaSampleListMass= NULL,
   # ### make a list of key variables to pass to sample function
   funcList = list(
     df = taxaSampleListMass,
-    sizesDf = unique(taxaSampleListMass[, c("lengthClass", rev(names(taxaSampleListMass))[1])])
-
+    # sizesDf = unique(taxaSampleListMass[, c("lengthClass", rev(names(taxaSampleListMass))[1])])
+    sizesDf = unique(taxaSampleListMass[, c("lengthClass", eval(massValue))]),
+    massValue = massValue,
+    massLabel = massLabel,
+    envData = envData
   )
 
   # calculate the production from the full samples
   taxaCPI <- mean(c(taxaInfo$min.cpi, taxaInfo$max.cpi))
   funcList = c(funcList, list(cpi = taxaCPI))
-  P.samp = do.call(sf_prod.sample, args = funcList)
+  P.samp = do.call(igr_prod.sample, args = funcList)
 
   # prep boots
-  bootList = prep_boots(df = taxaSampleListMass,
-                         bootNum = bootNum)
+  # bootList = prep_boots(df = taxaSampleListMass,
+  #                        bootNum = bootNum)
 
-  P.boots = lapply(bootList, sf_prod.sample,
+  P.boots = lapply(bootList, igr_prod.sample,
                    sizesDf = funcList$sizesDf,
                    cpi = funcList$cpi,
                    full = FALSE)

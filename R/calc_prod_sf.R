@@ -25,7 +25,8 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
                          wrap = TRUE,
                          massValue = NULL,
                          massLabel = NULL,
-                         bootList = NULL,...) {
+                         bootList = NULL,
+                         ...) {
 
   ## tests ##
 
