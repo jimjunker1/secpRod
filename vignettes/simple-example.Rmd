@@ -5,7 +5,7 @@ vignette: >
   %\VignetteIndexEntry{simple-example}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-bibliography: refs.bib
+bibliography: secpRod-refs.bib
 link-citations: no
 link-color: grey
 csl: ecology.csl
@@ -141,7 +141,7 @@ acentrellaInfo
 
 ```
 
-Information on its use can be viewed with `?convert_lenght_to_mass`
+Information on its use can be viewed with `?convert_length_to_mass`
 
 ```{r length to mass, include=TRUE, echo=TRUE}
 
