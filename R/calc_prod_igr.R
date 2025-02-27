@@ -35,6 +35,10 @@ calc_prod_igr <- function(taxaSampleListMass= NULL,
   # check that the dates match
 
   # check for parsed variables and their presence in envData
+# - parse all the unique variables
+# - confirm if g_d is present, check for other contributed variables e.g., massValue, lengthClass,etc.
+# - check for novel variables, e.g., temperature, OM, etc. and their presence in envData
+
 
   ## end tests ##
   speciesName = unique(taxaSampleListMass$taxonID)
@@ -49,7 +53,13 @@ calc_prod_igr <- function(taxaSampleListMass= NULL,
     envData = envData
   )
 
-  # calculate the production from the full samples
+  # calculate the production from the full sample
+  if(is.numeric(taxaInfo$growthForm)){
+    if(length(taxaInfo$growthForm) == 1){
+      growthForm = unlist(taxaInfo$growthForm)
+    }
+  }
+
   taxaCPI <- mean(c(taxaInfo$min.cpi, taxaInfo$max.cpi))
   funcList = c(funcList, list(cpi = taxaCPI))
   P.samp = do.call(igr_prod.sample, args = funcList)

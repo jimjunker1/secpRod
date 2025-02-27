@@ -232,7 +232,7 @@ calc_production(
 
 ### An example with the instantaneous growth method
 
-The IGR method adds flexbility, but also potential complexity. For this method, it is expected that you provide a growth rate, *g* ($d^{-1}$). This can be accomplished in multiple ways:
+The IGR method adds flexbility, but also potential complexity. For this method, it is expected that you provide a growth rate, *g_d* ($d^{-1}$). This can be accomplished in multiple ways:
 
 1) a single value. This will use the same value for each bootstrap sample (e.g., 0.02 $d^{-1}$. The variability is derived entirely from resampling the sample units (e.g. surbers, hess samples, kick nets, etc.).
 
