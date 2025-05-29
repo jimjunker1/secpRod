@@ -347,7 +347,7 @@ M_{t} = (M_{0}^{1-\beta} + rt(1-\beta))^{\frac{1}{1-\beta}}(\#eq:eqn8)
 We fit this model in `brms` with the following model structure:
 
 $$ M_{ti} \sim Normal(\mu,\,\sigma)\, $$
-$$\mu = (M_{0}^{1-\beta} + rt(1-\beta))^{\frac{1}{1-\beta}$$
+$$\mu = (M_{0}^{1-\beta} + rt(1-\beta))^{\frac{1}{1-\beta}}$$
 $$M_{0} \sim Exponential(30)$$
 $$r \sim Exponential(3)$$
 $$\beta \sim Normal(0,1)$$
