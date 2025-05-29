@@ -11,6 +11,8 @@
 #' @param wrap logical. Should the dates wrap to create a full year?
 #' @param massValue string. What is the mass value and units of the production
 #' @param massLabel string. What label should the output units be. It is possible this will default to 'massValue' in the future.
+#' @param bootList list. This is the bootstrapped samples passed from `calc_production()`
+#' @param envData an optional data frame (or coercible) of additional variables that are called to feed into growth equations to estimate growth rates. The variable column names must match exactly the terms in the growth equation from taxaInfo.
 #' @param ... additional arguments to pass to the function
 #' @returns returns a list of 2 objects
 #' @importFrom dplyr count
@@ -68,9 +70,11 @@ calc_prod_igr <- function(taxaSampleListMass= NULL,
   # bootList = prep_boots(df = taxaSampleListMass,
   #                        bootNum = bootNum)
 
-  P.boots = lapply(bootList, igr_prod.sample,
-                   sizesDf = funcList$sizesDf,
-                   cpi = funcList$cpi,
+  P.boots = mapply(FUN = igr_prod.sample,
+                   df = bootList,
+                   sizesDf = lapply(1:bootNum, function(x) funcList$sizesDf),
+                   massValue = massValue,
+                   massLabel = massLabel,
                    full = FALSE)
 
   #### create SAMPLE information to export as summary ####
