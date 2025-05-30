@@ -830,3 +830,89 @@ predict_missingN = function(df,lengthVec = NULL,...){
 #
 # # debugonce(plot_cohorts)
 # plot_cohorts(taxaSampleListMass, param = 'mass', massClass = 'afdm_mg')
+
+
+##
+set.seed(42)
+
+# Simulation parameters
+N_per_time <- 100  # number of observations per time
+K <- 3             # number of cohorts
+T_time <- 5        # time points
+
+# True cohort parameters
+mu0_true <- c(20, 40, 60)  # initial means
+g_true <- c(1.5, 2.0, 2.5) # growth rates per cohort
+sigma_true <- c(2, 3, 4)   # standard deviations
+pi_true <- matrix(c(0.3, 0.5, 0.2,
+                    0.3, 0.4, 0.3,
+                    0.25,0.4, 0.35,
+                    0.2, 0.4, 0.4,
+                    0.2, 0.3, 0.5), nrow=T_time, byrow=TRUE) # cohort proportions per time
+
+# Generate data
+data_list <- lapply(1:T_time, function(t) {
+  z <- sample(1:K, size=N_per_time, replace=TRUE, prob=pi_true[t,])
+  lengths <- rnorm(N_per_time, mean=mu0_true[z] + g_true[z]*(t-1), sd=sigma_true[z])
+  data.frame(length=lengths, time=t, cohort=z)
+})
+
+df <- do.call(rbind, data_list)
+df$time <- as.integer(df$time)
+head(df)
+
+
+
+# Libraries
+library(ggplot2)
+library(dplyr)
+
+# Simulated cohort data
+set.seed(42)
+data <- expand.grid(
+  time = 1:20,  # Cohort timepoints
+  individuals = 1:100
+) %>%
+  mutate(
+    size = rnorm(n(), mean = time * 5 + 10, sd = 3)  # Size increases over time
+  )
+
+# Bin sizes for histograms
+data_binned <- data %>%
+  mutate(bin = cut(size, breaks = seq(0, 100, by = 5))) %>%
+  group_by(time, bin) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  mutate(
+    bin_mid = as.numeric(sub("\\((.+),.*", "\\1", bin)) + 2.5,
+    count_scaled = count / max(count)  # Scale heights for plotting
+  )
+
+# Simulate SD for error bars (optional)
+data_sd <- data %>%
+  group_by(time) %>%
+  summarise(mean_size = mean(size), sd_size = sd(size), .groups = "drop")
+
+# Plot
+# Load libraries
+library(ggplot2)
+library(dplyr)
+
+# Simulated data (100 individuals per timepoint)
+set.seed(42)
+data <- expand.grid(
+  time = 1:20,  # Timepoints
+  individuals = 1:100
+) %>%
+  mutate(size = rnorm(n(), mean = time * 4 + 10, sd = 3))
+
+# Plot: vertical distributions using violin plots
+ggplot(data, aes(x = time, y = size, group = time)) +
+  geom_violin(scale = "count", fill = "blue", alpha = 0.6, color = "black", width = 0.5) +
+  scale_y_continuous(name = "Size (mm)", expand = c(0,0)) +
+  scale_x_continuous(name = "Time", breaks = seq(1,20,2)) +
+  theme_minimal() +
+  theme(
+    panel.grid = element_blank()
+  )
+
+

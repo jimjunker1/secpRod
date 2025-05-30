@@ -4,6 +4,7 @@
 #' @param taxaSampleListMass a data.frame of long format returned from \code{convert_length_to_mass()} function
 #' @param param character. A string of 'length' or 'mass' that describes what measurement should be plotted
 #' @param massClass character. The column name of the mass measurement (e.g., afdm_mg, dm_mg, etc.)
+#' @param type character 'h' or 'v'. 'h'oriztonal or 'v'ertical oriented cohort plots.
 #' @param ... additional arguments passed to function
 #' @return returns a histogram of the plot of the relative frequency of size or mass classes for a single taxon for all sampling dates
 #' @importFrom magrittr %>%
@@ -16,9 +17,10 @@
 #' @importFrom graphics par
 #' @importFrom graphics plot.new
 #' @importFrom graphics segments
+#' @importFrom gghalves geom_half_violin
 #' @export
 
-plot_cohorts = function(taxaSampleListMass = NULL, param = c('length','mass'), massClass = 'afdm_mg',...){
+plot_cohorts = function(taxaSampleListMass = NULL, param = c('length','mass'), massClass = 'afdm_mg', type = c('h','v'),...){
   # require(purrr)
   #### Tests ####
   if(length(unique(taxaSampleListMass$taxonID)) > 1) stop("Error: The number of taxa is >1. Only pass single taxon at a time.")

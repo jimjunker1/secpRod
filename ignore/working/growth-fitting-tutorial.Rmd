@@ -46,9 +46,9 @@ gmean = function(...){
 
 # Introduction {-}
 
-This walkthrough provides a perspective on estimating growth rates from length-frequency data to account for variability in growth for species with identifiable cohorts. Estimates from these models can be used to build models of growth based on environmental variables at different scales, and can be helpful for estimating produciton at shorter temporal timescales when using instantaneous growth methods compared to the size frequency method for species that have indistinct, or undetectable, cohorts structure (*more on this in a future update*).
+This walkthrough provides a perspective on estimating growth rates from length-frequency data to account for variability in growth for species with identifiable cohorts. Estimates from these models can be used to build models of growth based on environmental variables at different scales, and can be helpful for estimating production at shorter temporal timescales when using instantaneous growth methods compared to the size-frequency method for species that have indistinct, or undetectable, cohorts structure (*more on this in a future update*).
 
-With this process we want to build a model that will output a posterior distribution of growth rates based on length-frequency data from two distinct sampling dates.
+With this process we want to build a model that will output a distribution of growth rates based on length-frequency data from two distinct sampling dates.
 
 ## Caveats {-}
 
@@ -70,7 +70,7 @@ For taxa with clearly distinguished cohorts, we would like a model that:
 
 2) doesn't allow for negative growth rates (zero is still an option)
 
-3) returns a probability distribution that can integrate into bootstrapping methods used in the package
+3) returns a probability distribution that can integrate into downstream production methods used in the package
 
 ## Workflow {-}
 
@@ -82,13 +82,13 @@ Steps to test our approach:
 
 3) Estimate growth rates from length-frequency data
 
-4) Compare posterior estimates of growth to our analytically calculated rates
+4) Compare the distribution of estimates of growth to our analytically calculated rates
 
 ### Simulate growth and length-frequency data {-}
 
 #### Gompertz model {-}
 
-First, we will simulate varying individual growth data with known parameters to create length-frequency distributions from which we will attempt to recover growth parameters. We will use a Gompertz growth model [] as:
+First, we will simulate varying individual growth data with known parameters to create length-frequency distributions from which we will attempt to recover growth parameters. We will use a Gompertz growth model [@winsor1932] as:
 
 \begin{equation}
 \frac{dM}{dt} = rM(ln \frac{K}{M}) (\#eq:eqn1)

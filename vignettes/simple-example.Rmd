@@ -160,6 +160,19 @@ plot_cohorts(taxaSampleListMass = acentrellaMass,
              param = 'length',
              massClass = 'afdm_mg')
 
+debugonce(plot_cohorts)
+
+acentrellaMass %>% 
+  filter(n_m2 > 0) %>% 
+  ggplot()+
+  geom_half_violin(aes(x = dateID, y = sqrt(afdm_mg), weight = n_m2, group = dateID))+
+  geom_point(data = acentrellaMass %>% summarise(afdm_mg = weighted.mean(afdm_mg, n_m2),.by = dateID),
+             aes(x = dateID, y = sqrt(afdm_mg), group = dateID))
+
+plot_cohorts(taxaSampleListMass = acentrellaMass,
+             param = 'length',
+             massClass = 'afdm_mg')
+
 ```
 
 These figures can be helpful for identifying cohort structures and getting ballpark cohort production intervals (CPI) for species when estimating production using the size frequency method. In the future, I hope to implement an approach to delineate cohorts and estimate growth parameters from size-frequency data, but this is a feature still under development.
