@@ -6,17 +6,20 @@
 #' @param massValue character string identifying the column name of the mass value
 #' @param massLabel character string identifying the column name of the mass value
 #' @param full logical. should the full summary be returned with mean and sd.
+#' @param envData data.frame of environmental data to predict
 #' @param ... additional arguments passed to function, including variables to predict growth rate from growth function
 #' @return list object with taxa summary of the sampled data
 #' @export
 igr_prod.sample <- function(df = NULL,
-                           sizesDf = NULL,
-                           massValue = NULL,
-                           massLabel = NULL,
-                           full = TRUE,
-                           ...) {
+                            sizesDf = NULL,
+                            massValue = NULL,
+                            massLabel = NULL,
+                            full = TRUE,
+                            envData = NULL,
+                            ...) {
 
   #### tests ####
+  # test for other variables in growth equation
   #### GUTS of function ####
   # calculate mean biomass and abundance across all dates
   df[[massLabel]] <- df$n_m2 * df[[massValue]]
