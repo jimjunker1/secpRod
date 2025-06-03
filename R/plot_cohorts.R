@@ -59,6 +59,10 @@ plot_cohorts = function(taxaSampleListMass = NULL, param = c('length','mass'), m
   # }
   plotDf = df[,c('dateID','lengthClass',eval(massClass), 'n_m2')]
 
+  if(is.Date(plotDf$dateID)){
+    plotDf$dateID = as.POSIXct(plotDf$dateID)
+  }
+
   if(type == 'v'){
     return(
     plotDf %>%

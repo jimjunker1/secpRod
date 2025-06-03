@@ -54,7 +54,7 @@ For this simple example, we can create the required 'taxaInfo' object:
 
 taxaInfo <- data.frame(
   taxonID = c("sppA"),
-  massForm = c("afdm_mg~(a*lengthClass^b)*percAsh"),
+  massForm = "afdm_mg~(a*lengthClass^b)*percAsh",
   a = c(0.0025),
   b = c(2.692),
   percAsh = c(0.958),
@@ -94,6 +94,21 @@ This object represents the taxonomic information for calculating production. Eac
 - min.growth: description forthcoming...
 
 - notes: notes for researcher use. This column will be maintained in output summaries.
+
+The univoltine example 
+
+```{r univoltine-plot, echo = FALSE}
+
+univoltine %>%
+  convert_length_to_mass(taxaSampleList = ., taxaInfo = taxaInfo) %>% 
+  plot_cohorts(taxaSampleListMass = .,
+             param = 'mass',
+             massClass = 'afdm_mg',
+             # choose a vertical violin plot
+             type = 'v')
+
+
+```
 
 This 'wbtData' object is a list with two (2) elements:
 
