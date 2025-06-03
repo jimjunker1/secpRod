@@ -71,8 +71,8 @@ convert_length_to_mass <- function(taxaSampleList = NULL, taxaInfo = NULL, reduc
   newRHS = sapply(charRHS, function(x) replace_formula_terms(x, termList = allVars))
   ## Recombine the LHS & RHS to a new function
   newMassFormula = as.formula(paste0(massUnits,"~",newRHS))
-  massUnits = lhs(newMassFormula)
-  massRHS = rhs(newMassFormula)
+  massUnits = formula.tools::lhs(newMassFormula)
+  massRHS = formula.tools::rhs(newMassFormula)
 
   # Mutate length to mass from parsed L-M equation
   if (reduce) {

@@ -158,7 +158,9 @@ From here you can view the size frequency histograms using the `plot_cohorts()` 
 
 plot_cohorts(taxaSampleListMass = acentrellaMass,
              param = 'length',
-             massClass = 'afdm_mg')
+             massClass = 'afdm_mg',
+             # choose a vertical violin plot
+             type = 'v')
 
 ```
 

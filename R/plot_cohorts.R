@@ -16,6 +16,7 @@
 #' @importFrom graphics par
 #' @importFrom graphics plot.new
 #' @importFrom graphics segments
+#' @importFrom gghalves geom_half_violin
 #' @export
 
 plot_cohorts = function(taxaSampleListMass = NULL, param = c('length','mass'), massClass = 'afdm_mg', type = c('h','v'),...){
@@ -24,7 +25,7 @@ plot_cohorts = function(taxaSampleListMass = NULL, param = c('length','mass'), m
   if(length(unique(taxaSampleListMass$taxonID)) > 1) stop("Error: The number of taxa is >1. Only pass single taxon at a time.")
   if(any(taxaSampleListMass$n_m2 <0)) stop("Error: some density values < 0. Only positive values accepted.")
   # if(relFreq && max(n_m2) >1) stop("Error: `relFreq` is TRUE and the density values exceed 1. Check if data are relative frequencies or set `relFreq` to FALSE.")
-  if(is.null(type) | length(type) > 1) type == 'v'
+  if(is.null(type) | length(type) > 1) type = 'v'
   #### End Tests ####
   taxonID = unique(taxaSampleListMass$taxonID)
 
@@ -32,9 +33,12 @@ plot_cohorts = function(taxaSampleListMass = NULL, param = c('length','mass'), m
   allZeros = taxaSampleListMass %>%
     group_by(lengthClass) %>%
     dplyr::summarise(n = sum(.data$n_m2, na.rm = TRUE)) %>%
-    dplyr::filter(.data$n > 0) %>%
-    dplyr::select(.data$lengthClass) %>%
+    dplyr::filter(n > 0) %>%
+    dplyr::select(lengthClass) %>%
     unlist
+    # dplyr::filter(.data$n > 0) %>%
+    # dplyr::select(.data$lengthClass) %>%
+    # unlist
 
   taxaSampleListMass = taxaSampleListMass %>% dplyr::filter(.data$lengthClass %in% allZeros)
 
@@ -45,6 +49,8 @@ plot_cohorts = function(taxaSampleListMass = NULL, param = c('length','mass'), m
     } else{
       df = taxaSampleListMass
     }
+
+
     # split by sampling dates and create length or mass vectors
   # if(param == 'length'){.
   #   plotDf = df[,c("dateID", "lengthClass", "n_m2")]
@@ -52,6 +58,23 @@ plot_cohorts = function(taxaSampleListMass = NULL, param = c('length','mass'), m
   #   plotDf = df[,c("dateID", eval(massClass),"n_m2")]
   # }
   plotDf = df[,c('dateID','lengthClass',eval(massClass), 'n_m2')]
+
+  if(type == 'v'){
+    return(
+    plotDf %>%
+    uncount(round(n_m2)) %>%
+    ggplot(aes(x = dateID, y = !!sym(massClass), group = dateID)) +
+    # geom_violin(stat = 'ydensity', fill = "blue", alpha = 0.6, color = "black", trim = TRUE)+
+    gghalves::geom_half_violin(scale = "width", fill = "blue", alpha = 0.6, color = "black", side = 'L', adjust = 4) +
+    scale_y_continuous(name = paste0("Mass (",massClass,")"), expand = c(0,0)) +
+    scale_x_datetime(name = "Time") +
+    theme_minimal() +
+    theme(
+      panel.grid = element_blank()
+    )
+    )}
+
+
   plotDf$n_m2 <- round(plotDf$n_m2)# this currently rounds to nearest integer. This is probably okay for data with high densities, but will need to change to account for low densities in next iteration.
   plotDfDateSplit = split(plotDf, as.factor(plotDf$dateID))
   plotDfDateSplitProps = lapply(plotDfDateSplit, function(x){

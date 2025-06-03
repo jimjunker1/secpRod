@@ -15,7 +15,8 @@ Imports:
   tidyr,
   dplyr,
   rlang,
-  purrr
+  purrr,
+  gghalves
 Suggests:
     knitr,
     plyr,
