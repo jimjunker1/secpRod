@@ -9,6 +9,7 @@
 #' @param wrap logical. Should the dates wrap to create a full year?
 #' @param massValue string. What is the mass value and units of the production
 #' @param massLabel string. What label should the output units be. It is possible this will default to 'massValue' in the future.
+#' @param bootList list. This is the bootstrapped samples passed from `calc_production()`
 #' @param ... additional arguments to be passed to the function
 #' @returns returns a list of 2 objects:
 #' @returns P.boots: the boostrapped estimates of production, abundance, and biomass.
@@ -129,7 +130,7 @@ calc_prod_pb <- function(taxaSampleListMass= NULL,
           message(paste0("pbBoots for",speciesName," returned an error."))
         }
       )
-  }
+    }
 
   P.boots = mapply(FUN = pb_prod.sample,
                    df = bootList,
@@ -218,6 +219,6 @@ calc_prod_pb <- function(taxaSampleListMass= NULL,
   }
 
   return(assign(speciesName, list(P.boots = P.boots,
-              taxaSummary = taxaSummary)))
+                                  taxaSummary = taxaSummary)))
 
 }

@@ -18,12 +18,13 @@
 #' @importFrom graphics segments
 #' @export
 
-plot_cohorts = function(taxaSampleListMass = NULL, param = c('length','mass'), massClass = 'afdm_mg',...){
+plot_cohorts = function(taxaSampleListMass = NULL, param = c('length','mass'), massClass = 'afdm_mg', type = c('h','v'),...){
   # require(purrr)
   #### Tests ####
   if(length(unique(taxaSampleListMass$taxonID)) > 1) stop("Error: The number of taxa is >1. Only pass single taxon at a time.")
   if(any(taxaSampleListMass$n_m2 <0)) stop("Error: some density values < 0. Only positive values accepted.")
   # if(relFreq && max(n_m2) >1) stop("Error: `relFreq` is TRUE and the density values exceed 1. Check if data are relative frequencies or set `relFreq` to FALSE.")
+  if(is.null(type) | length(type) > 1) type == 'v'
   #### End Tests ####
   taxonID = unique(taxaSampleListMass$taxonID)
 
