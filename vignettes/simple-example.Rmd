@@ -60,7 +60,7 @@ taxaInfo <- data.frame(
   percAsh = c(0.958),
   method = c("sf"),
   g.a = c(NA),
-  growthForm = c("log(g_d) = 1 - 0.25*log(afdm_mg) - "),
+  growthForm = "log(g_d)~0.05 - 0.25*log(afdm_mg) - 0.02*temp_C",
   min.cpi = c(335),
   max.cpi = c(365),
   pb = c("runif(min = 3, max = 8)"),

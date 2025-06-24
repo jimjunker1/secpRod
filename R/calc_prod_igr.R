@@ -38,7 +38,13 @@ calc_prod_igr <- function(taxaSampleListMass= NULL,
 
   # check for parsed variables and their presence in envData
   # - parse all the unique variables
+  ## input the growth formula
+  growthFormula <- as.formula(paste0(gsub(" ","",taxaSubInfo$growthForm)))
   # - confirm if g_d is present, check for other contributed variables e.g., massValue, lengthClass,etc.
+  ##
+  growthUnits <- formula.tools::lhs(growthFormula)
+  if(!grepl("g_d", growthUnits)){stop("Error: Currently, growth formula must contain `g_d` as growth rate variable name.")}
+
   # - check for novel variables, e.g., temperature, OM, etc. and their presence in envData
   # convert the length-to-mass formula to a formula
   massFormula <- as.formula(paste0(gsub(" ", "", taxaSubInfo$massForm)))
