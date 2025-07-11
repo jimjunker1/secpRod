@@ -1,0 +1,220 @@
+---
+title: "sampling-simulation"
+output: rmarkdown::html_vignette
+# output: bookdown::html_document2
+# pkgdown:
+#   as_is: true
+vignette: >
+  %\VignetteIndexEntry{sampling-simulation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+# bibliography: refs.bib
+link-citations: no
+link-color: grey
+header-includes:
+- \usepackage{lineno}
+- \usepackage{amsmath}
+- \numberwithin{equation}
+# csl: ecology.csl
+---
+
+```{r options, echo = FALSE, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE,
+  echo = FALSE
+)
+
+library(dplyr)
+library(tidyr)
+library(purrr)
+library(ggplot2)
+library(ggdist)
+library(knitr)
+library(kableExtra)
+```
+
+# Purpose
+
+This document outlines the process for simulating the sampling of populations for developing and testing models of secondary production. These processes were used to simulate data for the examples used in the model tutorials.
+
+# Simulation process
+
+The data generation process for each data set is based on a simulated grid based on a number of parameters that control the sampling area, distribution of individuals, growth and mortality parameters of the populations, etc. (Table 1).
+
+```{r parameter-table}
+pars = c('grid_size','mu_N_init','sigma_N_init','initial_mass','mu_ln','sigma_ln','mu_z','sigma_z','cpi_start','cpi_end','days','sample_interval','sample_start','sample_end','S')
+pars_desc = c("The grid dimension of the 'x' and 'y' direction. Total grid cells is $n^2$",
+             "The mean initial density of the grid cells. Values are randomly drawn from a $N(mu_{Ninit}, sigma_{Ninit})$",
+             "The standard deviation of initial density of grid cells. Values are randomly drawn from $N(mu_{Ninit}, sigma_{Ninit})$",
+             "The initial mass of all individuals.",
+             "The mean asymptotic mass of von Bertalanffy growth. Values for each individual are randomly draws from $Lognormal(mu_{ln}, sigma_{ln})$.",
+             "The standard deviation of asymptotic mass of von Bertalanffy growth. Values for each individual are randomly draws from $Lognormal(mu_{ln}, sigma_{ln})$.",
+             "The mean mortality rate for a negative exponential model. Values for each cell are randomly drawn from $N(mu_{z}, sigma_{z})$.",
+             "The standard devation in mortality rate for a negative exponential model. Values for each cell are randomly drawn from $N(mu_{z}, sigma_{z})$.",
+             "The lower end of the cohort production interval. This is used to modify the growth coefficient, $k$, in von Bertalanffy growth. Values for each individual are drawn $Uniform(cpi_{start}, cpi_{end})$.",
+             "The upper end of the cohort production interval.This is used to modify the growth coefficient, $k$, in von Bertalanffy growth. Values for each individual are drawn $Uniform(cpi_{start}, cpi_{end})$.",
+             "The number of days to simulate.",
+             "The interval in days between sampling events.",
+             "The start date (1:days) for the first sampling event.",
+             "The end date (sample_start:days) for the last sampling event.",
+             "The number of sample replicates to take at each sampling event. Samples are chosen without replacement within a sampling event.")
+
+data.frame(pars, pars_desc) %>% 
+  knitr::kable(., 'pipe', align = 'l', col.name = c('Parameters', 'Description')) %>% 
+  kable_classic(full_width = TRUE)
+  
+```
+
+## Single cohort
+
+We first simulate a single cohort from the following parameters. The individuals all have the same initial mass. Each individual grows based on a von Bertalanffy growth model with a randomly drawn asymptotic mass, $M_{inf}$, and the growth coefficient, $k$, is calculated by a randomly drawn lifespan (CPI) determined by user-defined inputs. Once an individual reaches $M_{inf}$ it transitions to and 'adult' and is no longer counted in samples. Mortality is governed in each grid cell by a randomly draw death rate, $z$, from a negative exponential model.
+
+```{r, echo = TRUE}
+# Parameters
+grid_size <- 20
+mu_N_init <- 500
+sigma_N_init <- 100
+initial_mass <- 0.0006
+mu_ln <- log(5^2 / sqrt(0.5^2 + 5^2)) # mean of ~5 mg in Normal(mu, sigma)
+sigma_ln <- sqrt(log(1 + (0.5^2 / 5^2))) #sd of ~0.5mg Normal(mu, sigma)
+mu_z <- 0.04
+sigma_z <- 0.01
+cpi_start <- 290
+cpi_end <- 310
+days <- 506
+sample_interval <- 30
+sample_start <- 1    
+sample_end <- 365    
+S <- 10  
+```
+
+Click below to see the code to simulate a single cohort.
+
+<details>
+
+```{r simulation-guts, echo = TRUE, eval = FALSE}
+## not run
+# Function to initialize a cohort
+init_cohort <- function(i, j, start_day) {
+  N_init <- max(1, round(rnorm(1, mu_N_init, sigma_N_init)))
+  M_inf <- rlnorm(N_init, meanlog = mu_ln, sdlog = sigma_ln)
+  k <- log(M_inf / initial_mass) / runif(N_init, cpi_start, cpi_end)
+  z <- rnorm(1, mu_z, sigma_z)
+  tibble(
+    x = i,
+    y = j,
+    id = 1:N_init,
+    mass = initial_mass,
+    M_inf = M_inf,
+    k = k,
+    alive = TRUE,
+    adult = FALSE,
+    z = z,
+    cohort_start = start_day
+  )
+}
+
+# Initialize first cohort on day 1
+grid_population <- map2_dfr(rep(1:grid_size, each = grid_size), rep(1:grid_size, times = grid_size), ~init_cohort(.x, .y, 1))
+
+# Daily update function for larval individuals only
+update_day <- function(pop, current_day) {
+  pop %>%
+    filter(alive & !adult) %>%
+    mutate(
+      time_since_start = current_day - cohort_start,
+      alive = runif(n()) > z,
+      mass = M_inf * (1 - exp(-k * time_since_start)),
+      adult = mass >= M_inf*0.98
+    ) %>%
+    filter(alive & !adult)  # remove those who died or became adult
+}
+
+# Run simulation with second cohort added at day 366
+simulation <- vector("list", length = days)
+simulation[[1]] <- grid_population
+
+set.seed(1312)
+for (d in 2:days) {
+  updated_pop <- update_day(simulation[[d - 1]], d - 1)
+
+  if (d == 366) {
+    new_cohort <- map2_dfr(rep(1:grid_size, each = grid_size), rep(1:grid_size, times = grid_size), ~init_cohort(.x, .y, 366))
+    updated_pop <- bind_rows(updated_pop, new_cohort)
+  }
+  simulation[[d]] <- updated_pop
+}
+
+# Combine for sampling
+all_days <- bind_rows(simulation, .id = "day") %>%
+  mutate(day = as.integer(day))
+
+# Sampling protocol (larvae only)
+sampling_results <- list()
+sampled_cells <- list()
+
+for (t in seq(sample_start, sample_end, by = sample_interval)) {
+  all_cells <- expand.grid(x = 1:grid_size, y = 1:grid_size)
+  if (length(sampled_cells) > 0) {
+    prev_sampled <- bind_rows(sampled_cells)
+    available_cells <- anti_join(all_cells, prev_sampled, by = c("x", "y"))
+  } else {
+    available_cells <- all_cells
+  }
+  sampled <- available_cells %>% sample_n(min(S, nrow(available_cells)))
+  sampled_cells[[length(sampled_cells) + 1]] <- sampled
+
+  sampled_data <- all_days %>%
+    filter(day == t) %>%
+    semi_join(sampled, by = c("x", "y")) %>%
+    group_by(x, y) %>%
+    summarise(
+      larval_density = n(),
+      mass_distribution = list(mass),
+      .groups = "drop"
+    ) %>%
+    mutate(day = t)
+
+  sampling_results[[length(sampling_results) + 1]] <- sampled_data
+}
+
+# Final output
+daily_sampling <- bind_rows(sampling_results)
+
+```
+
+</details>
+
+## Load, summarise, and visualize the simulated sampling data
+
+```{r load-sim-data}
+load("single_cohort_sim.RData")
+
+summary_stats <- daily_sampling %>%
+  unnest(mass_distribution) %>%
+  group_by(day) %>%
+  summarise(
+    mean_mass = mean(mass_distribution, na.rm = TRUE),
+    sd_mass = sd(mass_distribution, na.rm = TRUE),
+    mean_larval_density = mean(larval_density),
+    .groups = "drop"
+  )
+
+ggplot(summary_stats, aes(x = day)) +
+  stat_halfeye(data = daily_sampling, aes(x = day, y = larval_density),
+               color = 'green')+
+  stat_halfeye(data = daily_sampling %>% unnest(mass_distribution), aes(x = day, y = mass_distribution*100),
+               color = 'red')+
+  geom_line(aes(y = mean_larval_density), color = 'green') +
+  geom_line(aes(y = mean_mass * 100), color = 'red') +
+  scale_y_continuous(
+    name = "Larval Density",
+    sec.axis = sec_axis(~./100, name = "Mean Mass (mg)")
+  ) +
+  theme_minimal() +
+  labs(title = "Larval Density and Mean Mass over Time", x = "Day")
+```
+
