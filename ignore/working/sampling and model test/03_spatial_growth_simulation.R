@@ -16,8 +16,8 @@ mu_z <- 0.04
 sigma_z <- 0.01
 days <- 506
 sample_interval <- 30
-sample_start <- 100    # adjustable start day
-sample_end <- 465    # adjustable end day
+sample_start <- 1    # adjustable start day
+sample_end <- 365    # adjustable end day
 S <- 10  # number of cells to sample per event
 
 # Function to initialize a cohort
@@ -43,6 +43,15 @@ init_cohort <- function(i, j, start_day) {
 # Initialize first cohort on day 1
 grid_population <- map2_dfr(rep(1:grid_size, each = grid_size), rep(1:grid_size, times = grid_size), ~init_cohort(.x, .y, 1))
 
+grid_population %>%
+  summarise(n=n(), .by = c('x','y')) %>%
+  ggplot()+
+  geom_tile(aes(x = x, y = y, fill = n))+
+  scale_x_continuous(expand = c(0,0))+
+  scale_y_continuous(expand = c(0,0))+
+  viridis::scale_fill_viridis()
+
+
 # Daily update function for larval individuals only
 update_day <- function(pop, current_day) {
   pop %>%
@@ -60,6 +69,7 @@ update_day <- function(pop, current_day) {
 simulation <- vector("list", length = days)
 simulation[[1]] <- grid_population
 
+set.seed(1312)
 for (d in 2:days) {
   updated_pop <- update_day(simulation[[d - 1]], d - 1)
 
@@ -105,7 +115,8 @@ for (t in seq(sample_start, sample_end, by = sample_interval)) {
 
 # Final output
 daily_sampling <- bind_rows(sampling_results)
-
+save(daily_sampling, file = here::here("ignore/working/sampling and model test/single_cohort_sim.RData"))
+load(here::here("ignore/working/sampling and model test/single_cohort_sim.RData"))
 # Summarize samples over time
 summary_stats <- daily_sampling %>%
   unnest(mass_distribution) %>%
@@ -119,6 +130,10 @@ summary_stats <- daily_sampling %>%
 
 # Plot mean larval density and mass
 ggplot(summary_stats, aes(x = day)) +
+  stat_halfeye(data = daily_sampling, aes(x = day, y = larval_density),
+               color = 'green')+
+  stat_halfeye(data = daily_sampling %>% unnest(mass_distribution), aes(x = day, y = mass_distribution*100),
+               color = 'red')+
   geom_line(aes(y = mean_larval_density), color = 'green') +
   geom_line(aes(y = mean_mass * 100), color = 'red') +
   scale_y_continuous(

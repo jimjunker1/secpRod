@@ -1,0 +1,36 @@
+---
+title: "sampling-simulation"
+# output: rmarkdown::html_vignette
+output: bookdown::html_document2
+pkgdown:
+  as_is: true
+vignette: >
+  %\VignetteIndexEntry{sampling-simulation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+# bibliography: refs.bib
+link-citations: no
+link-color: grey
+header-includes:
+- \usepackage{lineno}
+- \usepackage{amsmath}
+- \numberwithin{equation}
+# csl: ecology.csl
+---
+
+```{r options, echo = FALSE, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE
+)
+
+```
+
+
+## Load the simulated sampling data
+
+```{r load-sim-data}
+
+load(')
