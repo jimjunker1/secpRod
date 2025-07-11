@@ -1,0 +1,27 @@
+---
+title: "Testing models of secondary production: simple to advanced"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Testing models of secondary production: simple to advanced}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+header-includes:
+- \usepackage{lineno}
+- \usepackage{amsmath}
+- \numberwithin{equation}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  echo = FALSE, 
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(secpRod)
+
+load('singleCohortSim.rda')
+
+```

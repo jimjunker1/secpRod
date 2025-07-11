@@ -1,11 +1,11 @@
 ---
-title: "sampling-simulation"
+title: "Simulating the sampling of populations"
 output: rmarkdown::html_vignette
 # output: bookdown::html_document2
 # pkgdown:
 #   as_is: true
 vignette: >
-  %\VignetteIndexEntry{sampling-simulation}
+  %\VignetteIndexEntry{Simulating the sampling of populations}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 # bibliography: refs.bib
@@ -27,6 +27,7 @@ knitr::opts_chunk$set(
   echo = FALSE
 )
 
+library(secpRod)
 library(dplyr)
 library(tidyr)
 library(purrr)
@@ -191,7 +192,7 @@ daily_sampling <- bind_rows(sampling_results)
 ## Load, summarise, and visualize the simulated sampling data
 
 ```{r load-sim-data}
-load("single_cohort_sim.RData")
+load("single_cohort_sim.rda")
 
 summary_stats <- daily_sampling %>%
   unnest(mass_distribution) %>%

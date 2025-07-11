@@ -9,3 +9,4 @@
 ^example_README.Rmd
 ^_config\.yml
 ^vignettes/articles$
+^data-raw$
