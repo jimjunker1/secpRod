@@ -1,0 +1,278 @@
+---
+title: "simple-example"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{simple-example}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+bibliography: secpRod-refs.bib
+link-citations: no
+link-color: grey
+csl: ecology.csl
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+```{r setup, echo=FALSE, include=TRUE}
+library(secpRod)
+# library(tidyverse)
+# load the example data set
+load("wbtData.rda")
+
+```
+
+## Introduction 
+
+Currently, the analysis is fully implemented for the size-frequency and production:biomass ratio methods. This quick tutorial will outline steps to calculate secondary production for whole communities. First, load the package with `library(secpRod)`.
+
+The package comes with a number of data sets of macroinvertebrate species and community data:
+
+1) simulated data set of a single univoltine species accessed with `data("univoltine")`
+
+2) a full community data set from @junker2014 that can be accessed with `data("wbtData")`
+
+The simulated data set is a single data frame of artificially sampled size-frequency data through time.
+
+```{r echo = TRUE}
+data("univoltine")
+
+#clean this data set to align 
+head(univoltine)
+```
+
+For this simple example, we can create the required 'taxaInfo' object:
+
+```{r echo=TRUE}
+# clean simulated data to workable form
+
+taxaInfo <- data.frame(
+  taxonID = c("sppA"),
+  massForm = c("afdm_mg~(a*lengthClass^b)*percAsh"),
+  a = c(0.0025),
+  b = c(2.692),
+  percAsh = c(0.958),
+  method = c("sf"),
+  g.a = c(NA),
+  growthForm = c("log(g_d) = 1 - 0.25*log(afdm_mg) - "),
+  min.cpi = c(335),
+  max.cpi = c(365),
+  pb = c("runif(min = 3, max = 8)"),
+  min.growth = c(0.001),
+  notes = c("This is here for your use. No information will be used, but this column will be maintained in some summaries. See *** for more information.")
+)
+```
+
+This object represents the taxonomic information for calculating production. Each row contains information for a single species/taxon (in this case the only row because species == 1 ). The columns contain information for calculation of production. These include, but are not limited to:
+
+- taxonID: a character string that matches the name of taxonID from sampleInfo
+
+- massForm: a character string that is coercible to a formula for the conversion from length to mass (e.g., `afdm_mg~(a*lengthClass^b)`)
+
+- a: numeric variable for the coefficients used in massForm
+
+- b: numeric variable for the coefficients used in massForm
+
+- percAsh: numeric integer 0--100
+
+- method: character string for the method to use. Must be one of the following: 'sf' (this will be updated as methods are finalized.)
+
+- growthForm: description forthcoming...
+
+- min.cpi: integer of the minimum estimated cohort production interval for adjusting annual production estimates using the size-frequency method
+
+- max.cpi: integer of the maximum estimated cohort production interval for adjusting annual production estimates using the size-frequency method
+
+- pb: numeric of the production to biomass (PB) ratio for the specific taxa. This can take three forms 1) a single value, 2) a vector of values the same length as `bootNum`, and 3) a string of a distribution to randomly sample, **not** including the `n =` (e.g., 'rnorm(mean = 5, sd = 0.5)', 'runif(min = 3, max = 8)'). The function will automatically sample the `bootNum` values. ***Fair warning***: We suggest you explicitly name the parameters in the function call string. Possible unwanted and unknown things may happen otherwise. The tests for this feature are still under development, it will not reject any nonsensical values (e.g, negative, NA, or Inf). If your distribution samples negative values you will get negative productions estimates--at least until the `min.growth` feature is implemented.
+
+- min.growth: description forthcoming...
+
+- notes: notes for researcher use. This column will be maintained in output summaries.
+
+This 'wbtData' object is a list with two (2) elements:
+
+1) sampleInfo: a list with 32 data frames. One (1) for each taxonomic entity
+
+2) taxaInfo: a data frame with 32 rows and 13 columns. Each row represents the taxonomic information for a single taxonomic entity and the columns contain information for calculation of production as described above.
+
+## Examples
+
+### Single-species walkthrough
+
+A quick walkthrough of the calculation of secondary production for a single species.
+
+```{r single species data prep, echo =TRUE, include=TRUE}
+## isolate a single species data frame from sampleInfo object
+
+acentrella <- wbtData[['sampleInfo']][['Acentrella sp.']]
+
+## let's take a look at the data set
+head(acentrella, 10)
+
+```
+
+The data contain all the replicates of density and body length distributions in long format.
+
+```{r acentrella LM form, echo=FALSE}
+
+taxaInfo = wbtData[['taxaInfo']]
+
+acentrellaInfo = subset(taxaInfo, taxonID == "Acentrella sp.")
+
+# accentrellaLMform = 
+
+
+```
+
+The first step is to convert length to mass for estimating biomass patterns. Here we use the `convert_length_to_mass()` function, which adds a column of the individual masses based on the length-to-mass formula and coefficients in taxaInfo.
+
+We can take a look at what this looks like:
+
+```{r accentrella view}
+
+acentrellaInfo = subset(taxaInfo, taxonID == "Acentrella sp.")
+acentrellaInfo
+
+```
+
+Information on its use can be viewed with `?convert_length_to_mass`
+
+```{r length to mass, include=TRUE, echo=TRUE}
+
+acentrellaMass = convert_length_to_mass(taxaSampleList = acentrella,
+                                         taxaInfo = wbtData[['taxaInfo']])
+
+head(acentrellaMass)
+
+```
+
+From here you can view the size frequency histograms using the `plot_cohorts()` function. Check out the function options with `?plot_cohorts`.
+
+```{r plot cohorts, include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+
+plot_cohorts(taxaSampleListMass = acentrellaMass,
+             param = 'length',
+             massClass = 'afdm_mg')
+
+```
+
+These figures can be helpful for identifying cohort structures and getting ballpark cohort production intervals (CPI) for species when estimating production using the size frequency method. In the future, I hope to implement an approach to delineate cohorts and estimate growth parameters from size-frequency data, but this is a feature still under development.
+
+The next step is to estimate production. Again, only size-frequency is fully operational but I will work to update the other methods soon!
+
+The function `calc_production()` is the workhorse function that will estimate community production. 
+
+To apply it to our single species example, we input the sample information and taxa information along with how many bootstraps we would like, as:
+
+```{r single species production,include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+
+calc_production(
+  taxaSampleListMass = acentrellaMass,
+  infoCols = c(1:3),
+  taxaInfo = acentrellaInfo,
+  bootNum = 10,
+  wrap = TRUE,
+  taxaSummary = 'full'
+)
+
+```
+
+This will output a lot of information though it has a simple structure:
+
+1) P.boots--vectors of bootstrapped estimates of annual production, annual biomass, and annual abundance. 
+
+2) taxaSummary--this comes in 'full' and 'short' versions. As you see above the full can be a lot. The 'short' is a paired down version of this 
+
+```{r single species short,include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+
+calc_production(
+  taxaSampleListMass = acentrellaMass,
+  infoCols = c(1:3),
+  taxaInfo = acentrellaInfo,
+  bootNum = 10,
+  wrap = TRUE,
+  taxaSummary = 'short'
+)
+
+```
+
+You can also turn this off with 'none'. 
+
+### An example using the PB method
+
+The pb method allows for multiple options to set the production to biomass ratio:
+
+1) A single value. This will use the same value for each bootstrap sample. The variability is derived entirely from resampling the sample units (e.g. surbers).
+
+2) a character string for a distribution from which to sample excluding the `n=`, such as `rnorm(mean = 5, sd = 0.5)`. The function will automatically sample `bootNum` values.
+
+3) a numeric vector the same length as `bootNum`. This is a more explicit option to set all the values of pb that will be used. In the future, if the length $\neq$ `bootNum` an error will be returned for the taxa. 
+
+```{r modify taxaInfo, include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+
+acentrellaInfo$method = "pb"
+acentrellaInfo$pb = "runif(min = 3, max = 8)"
+
+calc_production(
+  taxaSampleListMass = acentrellaMass,
+  infoCols = c(1:3),
+  taxaInfo = acentrellaInfo,
+  bootNum = 10,
+  wrap = TRUE,
+  taxaSummary = 'short'
+)
+
+```
+
+## Applying this to multiple taxa
+
+The current internal code to do this with just `calc_production` is still buggy. But you can run production by splitting the full sampleInfo into a list by taxa and using `apply` or functions from the (`purrr` package)[https://purrr.tidyverse.org/]
+
+The code below shows how to accomplish this. Again, only size frequency and pb are accepted currently. 
+
+```{r multi species, include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+# load needed packages
+library(magrittr)
+library(purrr)
+
+# The sampleInfo is already a list by taxonID
+str(wbtData[['sampleInfo']], list.len = 5)
+
+# if you have a large data frame with all taxa the code below shows how to do this:
+## install a package to split into a named_list
+# devtools::install_github('jimjunker1/junkR')
+# library(junkR)
+## Convert to data frame
+# sampleInfoDf = wbtData[['sampleInfo']] %>% bind_rows
+## Convert back to named list split by taxonID
+# sampleInfoList = sampleInfoDf %>% junkR::named_group_split(taxonID)
+
+sampleInfoList = wbtData[['sampleInfo']]
+
+sampleInfoListMass = sampleInfoList %>% 
+  purrr::map(
+    ~convert_length_to_mass(.x,
+                            taxaInfo = taxaInfo)
+  )
+
+fullProduction = sampleInfoListMass %>% 
+  purrr::map2(., list(taxaInfo),
+                     ~calc_production(.x,
+                                      infoCols = c(1:3),
+                                      taxaInfo = .y, 
+                                      bootNum = 10, 
+                                      wrap = TRUE,
+                                      taxaSummary = 'short'
+                                      )
+                     )
+
+str(fullProduction, list.len = 5)
+
+```
+

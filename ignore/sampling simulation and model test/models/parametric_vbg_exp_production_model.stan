@@ -5,13 +5,8 @@
 data {
   int<lower=2> T;                 // number of time points
   vector[T] time_obs;             // days sampled
-  int<lower=1> R;                     // number of replicate observations
-int<lower=1, upper=T> time_idx[R];  // time index for each replicate
-int<lower=0> count[R];              // observed individual count per replicate
-vector[count_sum] mass;            // concatenated individual masses
-int<lower=1> start_idx[T];         // index into mass[] for each time point
-int<lower=1> end_idx[T];           // allows ragged indexing for each time
-
+  vector[T] W_obs;               // observed mean mass
+  vector[T] N_obs;               // observed density
 }
 
 parameters {
