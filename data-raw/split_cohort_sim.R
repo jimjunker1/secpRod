@@ -1,4 +1,4 @@
-## code to prepare `single_cohort_sim` dataset goes here
+## code to prepare `split_cohort_sim` dataset goes here
 # Spatial growth and mortality simulation in R
 library(dplyr)
 library(tidyr)
@@ -19,8 +19,8 @@ cpi_start <- 290
 cpi_end <- 310
 days <- 506
 sample_interval <- 30
-sample_start <- 1    # adjustable start day
-sample_end <- 365    # adjustable end day
+sample_start <- 100    # adjustable start day
+sample_end <- 465    # adjustable end day
 S <- 10  # number of cells to sample per event
 
 # Function to initialize a cohort
@@ -47,15 +47,6 @@ init_cohort <- function(i, j, start_day) {
 set.seed(1312)
 
 grid_population <- map2_dfr(rep(1:grid_size, each = grid_size), rep(1:grid_size, times = grid_size), ~init_cohort(.x, .y, 1))
-
-# grid_population %>%
-#   summarise(n=n(), .by = c('x','y')) %>%
-#   ggplot()+
-#   geom_tile(aes(x = x, y = y, fill = n))+
-#   scale_x_continuous(expand = c(0,0))+
-#   scale_y_continuous(expand = c(0,0))+
-#   viridis::scale_fill_viridis()
-
 
 # Daily update function for larval individuals only
 update_day <- function(pop, current_day) {
@@ -120,14 +111,10 @@ for (t in seq(sample_start, sample_end, by = sample_interval)) {
 
 # Final output
 daily_sampling <- bind_rows(sampling_results)
-singleCohortSim <- daily_sampling
+splitCohortSim <- daily_sampling
 
-usethis::use_data(singleCohortSim, overwrite = TRUE)
+usethis::use_data(splitCohortSim, overwrite = TRUE)
 
-
-### Below was used to summarise and visualize the data sets ####
-
-# load(here::here("ignore/working/sampling and model test/single_cohort_sim.RData"))
 # # Summarize samples over time
 # summary_stats <- daily_sampling %>%
 #   unnest(massDistribution) %>%
@@ -162,5 +149,5 @@ usethis::use_data(singleCohortSim, overwrite = TRUE)
 #   theme_minimal() +
 #   labs(x = "Larval Mass (mg)", y = "Day", title = "Larval Mass Distributions Over Time")+
 #   coord_flip()
-#
+
 
