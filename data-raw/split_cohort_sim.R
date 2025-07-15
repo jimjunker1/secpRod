@@ -19,7 +19,7 @@ cpi_start <- 290
 cpi_end <- 310
 days <- 506
 sample_interval <- 30
-sample_start <- 100    # adjustable start day
+sample_start <- 101    # adjustable start day
 sample_end <- 465    # adjustable end day
 S <- 10  # number of cells to sample per event
 
@@ -56,7 +56,7 @@ update_day <- function(pop, current_day) {
       time_since_start = current_day - cohort_start,
       alive = runif(n()) > z,
       mass = M_inf * (1 - exp(-k * time_since_start)),
-      adult = mass >= M_inf*0.98
+      adult = mass >= M_inf
     ) %>%
     filter(alive & !adult)  # remove those who died or became adult
 }

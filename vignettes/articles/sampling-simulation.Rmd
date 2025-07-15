@@ -90,6 +90,7 @@ sample_interval <- 30
 sample_start <- 1    
 sample_end <- 365    
 S <- 10  
+
 ```
 
 Click below to see the code to simulate a single cohort.
@@ -192,25 +193,25 @@ daily_sampling <- bind_rows(sampling_results)
 ### Load, summarise, and visualize the simulated sampling data
 
 ```{r load-sim-data}
-load("singleCohortSim.rda")
+load("data/singleCohortSim.rda")
 
-summary_stats <- daily_sampling %>%
-  unnest(mass_distribution) %>%
+summaryStats <- singleCohortSim %>%
+  unnest(massDistribution) %>%
   group_by(day) %>%
   summarise(
-    mean_mass = mean(mass_distribution, na.rm = TRUE),
-    sd_mass = sd(mass_distribution, na.rm = TRUE),
-    mean_larval_density = mean(larval_density),
+    massMean = mean(massDistribution, na.rm = TRUE),
+    massSD = sd(massDistribution, na.rm = TRUE),
+    larvalDensityMean = mean(larvalDensity),
     .groups = "drop"
   )
 
-ggplot(summary_stats, aes(x = day)) +
-  stat_halfeye(data = daily_sampling, aes(x = day, y = larval_density),
+ggplot(summaryStats, aes(x = day)) +
+  stat_halfeye(data = singleCohortSim, aes(x = day, y = larvalDensity),
                color = 'green')+
-  stat_halfeye(data = daily_sampling %>% unnest(mass_distribution), aes(x = day, y = mass_distribution*100),
+  stat_halfeye(data = singleCohortSim %>% unnest(massDistribution), aes(x = day, y = massDistribution*100),
                color = 'red')+
-  geom_line(aes(y = mean_larval_density), color = 'green') +
-  geom_line(aes(y = mean_mass * 100), color = 'red') +
+  geom_line(aes(y = larvalDensityMean), color = 'green') +
+  geom_line(aes(y = massMean * 100), color = 'red') +
   scale_y_continuous(
     name = "Larval Density",
     sec.axis = sec_axis(~./100, name = "Mean Mass (mg)")
@@ -221,7 +222,7 @@ ggplot(summary_stats, aes(x = day)) +
 
 ## A split cohort
 
-This example explore the options to calculate production of a univoltine population when sampling starts in the middle of a cohort and ends by sampling a different cohort. This event may not be ideal, but is very common.
+This example explore the options to calculate production of a univoltine population when sampling starts in the middle of a cohort and ends by sampling a different cohort. This event may not be ideal, but is very common. We operate under the assumption that the life-history characteristics and environment, generally, are similar among cohorts. This may or may not be an acceptable assumption depending on the specific conditions.
 
 To see the code to produce the simulated data set click below
 
@@ -248,7 +249,7 @@ cpi_start <- 290
 cpi_end <- 310
 days <- 506
 sample_interval <- 30
-sample_start <- 100    # adjustable start day
+sample_start <- 101    # adjustable start day
 sample_end <- 465    # adjustable end day
 S <- 10  # number of cells to sample per event
 
@@ -347,29 +348,621 @@ daily_sampling <- bind_rows(sampling_results)
 ### Load, summarise, and visualize the simulated sampling data
 
 ```{r load-sim-data}
-load("splitCohortSim.rda")
+load("data/splitCohortSim.rda")
 
-summary_stats <- daily_sampling %>%
-  unnest(mass_distribution) %>%
+summary_stats <- splitCohortSim %>%
+  unnest(massDistribution) %>%
   group_by(day) %>%
   summarise(
-    mean_mass = mean(mass_distribution, na.rm = TRUE),
-    sd_mass = sd(mass_distribution, na.rm = TRUE),
-    mean_larval_density = mean(larval_density),
+    massMean = mean(massDistribution, na.rm = TRUE),
+    massSD= sd(massDistribution, na.rm = TRUE),
+    larvalDensityMean = mean(larvalDensity),
     .groups = "drop"
   )
 
 ggplot(summary_stats, aes(x = day)) +
-  stat_halfeye(data = daily_sampling, aes(x = day, y = larval_density),
+  stat_halfeye(data = splitCohortSim, aes(x = day, y = larvalDensity),
                color = 'green')+
-  stat_halfeye(data = daily_sampling %>% unnest(mass_distribution), aes(x = day, y = mass_distribution*100),
+  stat_halfeye(data = splitCohortSim %>% unnest(massDistribution), aes(x = day, y = massDistribution*100),
                color = 'red')+
-  geom_line(aes(y = mean_larval_density), color = 'green') +
-  geom_line(aes(y = mean_mass * 100), color = 'red') +
+  geom_path(aes(y = larvalDensityMean), color = 'green') +
+  geom_path(aes(y = massMean * 100), color = 'red') +
   scale_y_continuous(
     name = "Larval Density",
-    sec.axis = sec_axis(~./100, name = "Mean Mass (mg)")
+    sec.axis = sec_axis(~./100, name = "Mean Mass (mg)"),
+    
   ) +
   theme_minimal() +
-  labs(title = "Larval Density and Mean Mass over Time", x = "Day")
+  labs(title = "Larval Density and Mean Mass over Time", x = "Day")+
+  theme(axis.title.y.right = element_text(color = 'red'))
+```
+
+### Remapping a split cohort to a single analysis
+
+In order to perform a full cohort analysis on a cohort that is split in time, we can 'remap' the two cohorts into a new timescale that follows a consistent cohort progression. We can then calculate production through regular cohort methods. If we need to extract time-specific values, we can simply map the estimates back to the original time scale.
+
+We developed a quick algorithm to automate the determination of the beginning and ends of a *non-overlapping* cohort, `detect_cohort_bounds()`
+
+```{r detect-cohort-bounds}
+
+df <- splitCohortSim %>% mutate(repID = 1:n(), .by = c('day')) %>% 
+  select(dateID = day, repID, n_m2 = larvalDensity, massValue = massDistribution) %>% 
+  unnest(massValue)
+
+reconstruct_cohort_pseudotime <- function(df,
+                                          time_col = "dateID",
+                                          mass_col = "massValue",
+                                          mass_drop_thresh = 0.6,
+                                          t_start = 5,
+                                          models_to_fit = c("vonbert", "gompertz"),
+                                          use_grid_fallback = TRUE,
+                                          verbose = TRUE) {
+  library(dplyr)
+
+  # Step 1: Aggregate replicate-level masses to daily means
+  agg <- df %>%
+    group_by(.data[[time_col]]) %>%
+    summarise(mean_mass = mean(.data[[mass_col]], na.rm = TRUE), .groups = "drop") %>%
+    arrange(.data[[time_col]])
+
+  t <- agg[[time_col]]
+  W <- agg$mean_mass
+
+  # Step 2: Detect split cohort via drop in mean mass
+  dM <- lead(W) / W
+  drop_idx <- which(dM < mass_drop_thresh)[1]
+  if (is.na(drop_idx)) drop_idx <- floor(length(t) / 2)  # fallback if no sharp drop
+
+  cohort1 <- agg[1:drop_idx, ]
+  cohort2 <- agg[(drop_idx + 1):length(t), ]
+
+  # Step 3: Reorder cohorts so smallest mass cohort comes first
+  if (min(cohort1$mean_mass, na.rm = TRUE) > min(cohort2$mean_mass, na.rm = TRUE)) {
+    tmp <- cohort1
+    cohort1 <- cohort2
+    cohort2 <- tmp
+  }
+
+  cohort1$cohort <- 1
+  cohort2$cohort <- 2
+  df_ordered <- bind_rows(cohort1, cohort2) %>% arrange(cohort, .data[[time_col]])
+
+  # Step 4: Estimate time offset between cohorts
+  try_fit_growth_model <- function(formula, start, data) {
+    tryCatch(nls(formula, start = start, data = data,
+                 control = nls.control(maxiter = 500)), error = function(e) NULL)
+  }
+
+  fit_with_offset <- function(offset) {
+    t_all <- c(df_ordered[[time_col]][df_ordered$cohort == 1],
+               df_ordered[[time_col]][df_ordered$cohort == 2] + offset)
+    W_all <- df_ordered$mean_mass
+    df_tmp <- data.frame(t = t_all, W = W_all)
+
+    fits <- list()
+    aiccs <- c()
+
+    if ("vonbert" %in% models_to_fit) {
+      m <- try_fit_growth_model(
+        W ~ Winf * (1 - exp(-k * (t - t0))),
+        start = list(Winf = max(W), k = 0.01, t0 = min(t_all)),
+        data = df_tmp
+      )
+      if (!is.null(m)) {
+        fits$vonbert <- m
+        aiccs["vonbert"] <- AIC(m) + 2 * 3^2 / (length(t_all) - 3 - 1)
+      }
+    }
+
+    if ("gompertz" %in% models_to_fit) {
+      m <- try_fit_growth_model(
+        W ~ Winf * exp(-exp(-k * (t - t0))),
+        start = list(Winf = max(W), k = 0.01, t0 = mean(t_all)),
+        data = df_tmp
+      )
+      if (!is.null(m)) {
+        fits$gompertz <- m
+        aiccs["gompertz"] <- AIC(m) + 2 * 3^2 / (length(t_all) - 3 - 1)
+      }
+    }
+
+    list(fits = fits, aiccs = aiccs)
+  }
+
+  # Step 5: Optimize offset to minimize AICc across models
+  obj_fn <- function(offset) {
+    out <- fit_with_offset(offset)
+    sum(unlist(out$aiccs))
+  }
+
+  offset_opt <- tryCatch({
+    optim(par = 30, fn = obj_fn, method = "L-BFGS-B", lower = 1, upper = 150)$par
+  }, error = function(e) {
+    if (use_grid_fallback) {
+      grid <- seq(5, 150, by = 1)
+      grid_scores <- sapply(grid, obj_fn)
+      grid[which.min(grid_scores)]
+    } else {
+      stop("Optimization failed and grid fallback is disabled.")
+    }
+  })
+
+  # Step 6: Reconstruct time vector with best offset
+  df_ordered <- df_ordered %>%
+    mutate(
+      true_time = ifelse(cohort == 1,
+                         !!sym(time_col),
+                         !!sym(time_col) + offset_opt)
+    )
+
+  # Step 7: Fit models at optimal offset and invert
+  best_fits <- fit_with_offset(offset_opt)$fits
+  t_true <- df_ordered$true_time
+  W_true <- df_ordered$mean_mass
+  W_cap <- pmin(W_true, max(W_true) * 0.999)
+
+  cohort_ages <- list()
+  weights <- c()
+  for (model_name in names(best_fits)) {
+    m <- best_fits[[model_name]]
+    p <- coef(m)
+    age <- switch(model_name,
+                  vonbert = -log(1 - W_cap / p["Winf"]) / p["k"],
+                  gompertz = p["t0"] - log(-log(W_cap / p["Winf"])) / p["k"])
+    cohort_ages[[model_name]] <- age
+    weights[model_name] <- AIC(m) + 2 * 3^2 / (length(t_true) - 3 - 1)
+  }
+
+  # Normalize AICc weights
+  rel_weights <- exp(-0.5 * (weights - min(weights)))
+  rel_weights <- rel_weights / sum(rel_weights)
+
+  # Ensemble pseudotime
+  cohort_age_mat <- do.call(cbind, cohort_ages)
+  pseudo_time <- as.vector(cohort_age_mat %*% rel_weights)
+  pseudo_time_shifted <- round(pseudo_time - min(pseudo_time) + t_start)
+
+  df_final <- df_ordered %>%
+    mutate(pseudotime = pseudo_time_shifted) %>%
+    arrange(pseudotime)
+
+  if (verbose) {
+    cat("Offset estimated:", round(offset_opt), "days\n")
+    cat("Model weights:\n")
+    print(round(rel_weights, 3))
+  }
+
+  return(list(
+    df_remap = df_final %>% select(!!sym(time_col), mean_mass, pseudotime, true_time),
+    offset = offset_opt,
+    weights = rel_weights,
+    fits = best_fits
+  ))
+}
+
+
+plot_pseudotime_remap <- function(remap_result,
+                                  show_model_fits = TRUE,
+                                  show_legend = TRUE) {
+  library(ggplot2)
+
+  df <- remap_result$df_remap
+  fits <- remap_result$fits
+  weights <- remap_result$weights
+
+  p <- ggplot(df, aes(x = pseudotime, y = mean_mass)) +
+    geom_point(size = 2) +
+    labs(
+      x = "Pseudotime (days)",
+      y = "Mean mass (mg)",
+      title = "Remapped cohort trajectory with fitted growth models"
+    ) +
+    theme_minimal()
+
+  # Add model fits
+  if (show_model_fits && length(fits) > 0) {
+    x_pred <- seq(min(df$pseudotime), max(df$pseudotime), length.out = 200)
+
+    for (model_name in names(fits)) {
+      params <- coef(fits[[model_name]])
+      y_pred <- switch(model_name,
+                       vonbert = params["Winf"] * (1 - exp(-params["k"] * (x_pred))),
+                       gompertz = params["Winf"] * exp(-exp(-params["k"] * (x_pred - params["t0"]))))
+      fit_df <- data.frame(x = x_pred, y = y_pred, model = model_name)
+
+      p <- p + geom_line(data = fit_df, aes(x = x, y = y, color = model),
+                         size = 1, alpha = weights[model_name])
+    }
+  }
+
+  if (!show_legend) {
+    p <- p + theme(legend.position = "none")
+  }
+
+  return(p)
+}
+
+remap_out <- reconstruct_cohort_pseudotime(df)
+plot_pseudotime_remap(remap_out)
+
+
+
+```
+
+
+
+
+
+
+
+
+# Spare(d) words
+
+```{r spare(d)-words}
+df = df %>%
+  summarise(
+    massValue = mean(massValue, na.rm = TRUE),
+    .by = 'dateID'
+  )
+
+
+remap_cohort_by_growth <- function(df,
+                                   time_col = "dateID",
+                                   mass_col = "massValue",
+                                   models_to_fit = c("vonbert", "gompertz"),
+                                   pseudo_start = 1,
+                                   verbose = TRUE) {
+
+  df <- df %>% arrange(.data[[time_col]])
+  t <- df[[time_col]]
+  W <- df[[mass_col]]
+
+  # Helper to fit models
+  fit_growth_model <- function(formula, start, data) {
+    tryCatch(
+      nls(formula, start = start, data = data, control = nls.control(maxiter = 200)),
+      error = function(e) NULL
+    )
+  }
+
+  # Fit von Bertalanffy
+  vb_fit <- NULL
+  if ("vonbert" %in% models_to_fit) {
+    vb_fit <- fit_growth_model(
+      W ~ Winf * (1 - exp(-k * (t - t0))),
+      start = list(Winf = max(W), k = 0.01, t0 = min(t)),
+      data = data.frame(t = t, W = W)
+    )
+  }
+
+  # Fit Gompertz
+  gomp_fit <- NULL
+  if ("gompertz" %in% models_to_fit) {
+    gomp_fit <- fit_growth_model(
+      W ~ Winf * exp(-exp(-k * (t - t0))),
+      start = list(Winf = max(W), k = 0.01, t0 = mean(t)),
+      data = data.frame(t = t, W = W)
+    )
+  }
+
+  # Compute AICc
+  models <- list()
+  aiccs <- c()
+  if (!is.null(vb_fit)) {
+    models$vonbert <- vb_fit
+    aiccs["vonbert"] <- AIC(vb_fit) + 2 * 3^2 / (length(W) - 3 - 1)
+  }
+  if (!is.null(gomp_fit)) {
+    models$gompertz <- gomp_fit
+    aiccs["gompertz"] <- AIC(gomp_fit) + 2 * 3^2 / (length(W) - 3 - 1)
+  }
+
+  if (length(models) == 0) stop("No growth model fit successfully")
+
+  # Compute model weights
+  weights <- exp(-0.5 * (aiccs - min(aiccs)))
+  weights <- weights / sum(weights)
+
+  # Invert to cohort age
+  W_sanitized <- pmin(W, max(W) * 0.999)  # avoid log(0)
+
+  cohort_age_list <- list()
+
+  if (!is.null(vb_fit)) {
+    p <- coef(vb_fit)
+    cohort_age_list$vonbert <- -log(1 - W_sanitized / p["Winf"]) / p["k"]
+  }
+  if (!is.null(gomp_fit)) {
+    p <- coef(gomp_fit)
+    cohort_age_list$gompertz <- p["t0"] - log(-log(W_sanitized / p["Winf"])) / p["k"]
+  }
+
+  # Weighted average cohort age
+  cohort_age_matrix <- do.call(cbind, cohort_age_list)
+  weighted_age <- cohort_age_matrix %*% matrix(weights[names(cohort_age_list)], ncol = 1)
+  pseudo_day <- round(weighted_age - min(weighted_age, na.rm = TRUE) + pseudo_start)
+
+  df_remap <- df %>%
+    mutate(
+      cohort_age = as.vector(weighted_age),
+      pseudo_day = pseudo_day
+    ) %>%
+    arrange(pseudo_day)
+
+  if (verbose) {
+    cat("Model weights:\n")
+    print(round(weights, 3))
+  }
+
+  return(list(
+    df_remap = df_remap,
+    models = models,
+    weights = weights
+  ))
+}
+
+debugonce(remap_cohort_by_growth)
+
+result <- remap_cohort_by_growth(df)
+
+estimate_vbgf_age <- function(m, Winf, k, t0) {
+  -log(1 - pmin(m / Winf, 0.999)) / k
+}
+
+estimate_gompertz_age <- function(m, Winf, k, t0) {
+  t0 - log(-log(pmin(m / Winf, 0.999))) / k
+}
+
+fit_growth_model <- function(formula, start, data) {
+  tryCatch(
+    nls(formula, start = start, data = data, control = nls.control(maxiter = 200)),
+    error = function(e) NULL
+  )
+}
+
+
+multi_model_remap <- function(df, time_col = "dateID", mass_col = "massValue", pseudo_start = 1) {
+  df <- df %>% arrange(.data[[time_col]])
+  t <- df[[time_col]]
+  W <- df[[mass_col]]
+
+  ## Fit von Bertalanffy
+  vb_fit <- fit_growth_model(
+    W ~ Winf * (1 - exp(-k * (t - t0))),
+    start = list(Winf = max(W), k = 0.01, t0 = min(t)),
+    data = data.frame(t = t, W = W)
+  )
+
+  ## Fit Gompertz
+  gomp_fit <- fit_growth_model(
+    W ~ Winf * exp(-exp(-k * (t - t0))),
+    start = list(Winf = max(W), k = 0.01, t0 = mean(t)),
+    data = data.frame(t = t, W = W)
+  )
+
+  # Model weights via AICc
+  models <- list(vbgf = vb_fit, gompertz = gomp_fit)
+  aiccs <- sapply(models, function(m) if (!is.null(m)) AIC(m) + 2 * 3^2 / (length(W) - 3 - 1) else Inf)
+  weights <- exp(-0.5 * (aiccs - min(aiccs))) / sum(exp(-0.5 * (aiccs - min(aiccs))))
+
+  # Invert to cohort age
+  age_vbgf <- if (!is.null(vb_fit)) estimate_vbgf_age(W, coef(vb_fit)["Winf"], coef(vb_fit)["k"], coef(vb_fit)["t0"]) else NA
+  age_gomp <- if (!is.null(gomp_fit)) estimate_gompertz_age(W, coef(gomp_fit)["Winf"], coef(gomp_fit)["k"], coef(gomp_fit)["t0"]) else NA
+
+  # Weighted average age
+  cohort_age <- rowMeans(cbind(
+    if (!is.null(age_vbgf)) weights["vbgf"] * age_vbgf else NA,
+    if (!is.null(age_gomp)){weights["gompertz"] * age_gomp} else{NA}
+  ), na.rm = TRUE)
+
+  df_remap <- df %>%
+    mutate(
+      cohort_age = cohort_age,
+      pseudo_day = round(cohort_age - min(cohort_age, na.rm = TRUE) + pseudo_start)
+    ) %>%
+    arrange(pseudo_day)
+
+  return(list(
+    df_remap = df_remap,
+    models = models,
+    weights = weights
+  ))
+}
+
+x = multi_model_remap(df)
+detect_cohort_bounds_growth_driven <- function(taxaSampleList,
+                                               massValue = "massValue",
+                                               abunValue = "n_m2",
+                                               massDropThresh = 0.90,  # Mass must not drop >10%
+                                               densityJumpThresh = 2,
+                                               timeGapThresh = 70) {
+
+  df <- taxaSampleList %>%
+    arrange(dateID) %>%
+    summarise(across(all_of(c(massValue, abunValue)), mean), .by = "dateID") %>%
+    mutate(
+      mass_ratio = lead(!!sym(massValue)) / !!sym(massValue),
+      density_ratio = lead(!!sym(abunValue)) / !!sym(abunValue),
+      dt = lead(dateID) - dateID
+    )
+
+  break_indices <- which(
+    (df$mass_ratio < massDropThresh) |           # large drop in mass → new cohort
+    (df$density_ratio > densityJumpThresh) |     # large increase in density → recruitment
+    (df$dt > timeGapThresh)                      # large gap → likely cohort break
+  )
+
+  # Define cohort bounds
+  cohort_bounds <- list()
+  start_idx <- 1
+  for (i in seq_along(break_indices)) {
+    end_idx <- break_indices[i]
+    cohort_bounds[[i]] <- c(df$dateID[start_idx], df$dateID[end_idx])
+    start_idx <- end_idx + 1
+  }
+
+  # Final cohort
+  if (start_idx <= nrow(df)) {
+    cohort_bounds[[length(cohort_bounds) + 1]] <- c(df$dateID[start_idx], df$dateID[nrow(df)])
+  }
+
+  return(cohort_bounds)
+}
+debugonce(detect_cohort_bounds_growth_driven)
+bounds <- detect_cohort_bounds_growth_driven(
+  taxaSampleList = df,
+  massDropThresh = 0.9,
+  densityJumpThresh = 2,
+  timeGapThresh = 70
+)
+
+# detect_cohort_bounds <- function(taxaSampleList,
+#                                  massValue = "massValue",
+#                                  abunValue = "n_m2",
+#                                  z_thresh = 2.5,
+#                                  timeGapThresh = 70) {
+# 
+#   df <- taxaSampleList %>%
+#     arrange(dateID) %>%
+#     summarise(across(all_of(c(massValue, abunValue)), mean), .by = "dateID") %>%
+#     mutate(
+#       log_dM = c(NA, diff(log(!!sym(massValue)))),
+#       log_dN = c(NA, diff(log(!!sym(abunValue)))),
+#       dt = c(NA, diff(dateID)),
+#       z_mass = scale(log_dM),
+#       z_abun = scale(log_dN)
+#     )
+# 
+#   # Flag discontinuities using z-scores
+#   break_indices <- which(
+#     abs(df$z_mass) > z_thresh |
+#       abs(df$z_abun) > z_thresh |
+#       df$dt > timeGapThresh
+#   )
+# 
+#   # Define cohort bounds
+#   cohort_bounds <- list()
+#   start_idx <- 1
+#   for (i in seq_along(break_indices)) {
+#     end_idx <- break_indices[i]
+#     cohort_bounds[[i]] <- c(df$dateID[start_idx], df$dateID[end_idx])
+#     start_idx <- end_idx + 1
+#   }
+# 
+#   # Final segment
+#   if (start_idx <= nrow(df)) {
+#     cohort_bounds[[length(cohort_bounds) + 1]] <- c(df$dateID[start_idx], df$dateID[nrow(df)])
+#   }
+# 
+#   return(cohort_bounds)
+# }
+# 
+# bounds = detect_cohort_bounds(taxaSampleList = df, z_thresh = 2.5)
+
+# detect_cohort_bounds <- function(taxaSampleList = NULL, 
+#                                  massValue = NULL,
+#                                  abunValue = 'n_m2',
+#                                  massDropThresh = 0.5,
+#                                  abunJumpThresh = 2,
+#                                  timeGapThresh = NA) {
+# ### tests here ####
+#   
+# ### End tests ####
+#   
+#   df <- tibble(
+#     dateID = taxaSampleList$dateID,
+#     massValue = taxaSampleList[[massValue]],
+#     abunValue = taxaSampleList[[abunValue]],
+#     ) %>%
+#     arrange(dateID) %>%
+#     summarise(across(c(massValue, abunValue), mean), .by = 'dateID') %>% 
+#     mutate(
+#       dM = lead(massValue) / massValue,
+#       dN = lead(abunValue) / abunValue,
+#       dt = lead(dateID) - dateID
+#     )
+#   
+#   # Identify break points
+#   break_indices <- which(
+#     (df$dM <= (massDropThresh)) |
+#       (df$dN > abunJumpThresh) |
+#       (df$dt > timeGapThresh)
+#   )
+#   
+#   # Define cohort bounds
+#   cohort_bounds <- list()
+#   start_idx <- 1
+#   for (i in seq_along(break_indices)) {
+#     end_idx <- break_indices[i]
+#     cohort_bounds[[i]] <- c(df$dateID[start_idx], df$dateID[end_idx])
+#     start_idx <- end_idx + 1
+#   }
+#   
+#   # Final segment
+#   if (start_idx <= nrow(df)) {
+#     cohort_bounds[[length(break_indices) + 1]] <- c(df$dateID[start_idx], df$dateID[nrow(df)])
+#   }
+#   
+#   return(cohort_bounds)
+# }
+# 
+# bounds = detect_cohort_bounds(taxaSampleList = df,
+#                      massValue = 'massValue',
+#                      abunValue = 'n_m2',
+#                      massDropThresh = 0.5,
+#                      abunJumpThresh = 10,
+#                      timeGapThresh = 70)
+
+
+cohort_remap <- function(time_vec, cohort_bounds) {
+
+  remap_time <- numeric(length(time_vec))
+  cohort_labels <- numeric(length(time_vec))
+
+  for (i in seq_along(cohort_bounds)) {
+    bounds <- cohort_bounds[[i]]
+    in_cohort <- time_vec >= bounds[1] & time_vec <= bounds[2]
+
+    # Map to pseudo-time within cohort
+    remap_time[in_cohort] <- time_vec[in_cohort] - bounds[1] + 1
+    cohort_labels[in_cohort] <- i
+  }
+
+  tibble(
+    dateID = time_vec,
+    remap_time = remap_time,
+    cohort = cohort_labels
+  )
+}
+
+
+cohortRemap = cohort_remap(unique(df$dateID), bounds)
+
+df = df %>% merge(cohortRemap, by = 'dateID')
+
+summary_stats <- df %>%
+  group_by(remap_time) %>%
+  summarise(
+    massMean = mean(massValue, na.rm = TRUE),
+    massSD= sd(massValue, na.rm = TRUE),
+    larvalDensityMean = mean(n_m2),
+    .groups = "drop"
+  )
+
+ggplot(summary_stats, aes(x = remap_time)) +
+  stat_halfeye(data = df, aes(x = remap_time, y = n_m2),
+               color = 'green')+
+  stat_halfeye(data = df, aes(x = remap_time, y = massValue*100),
+               color = 'red')+
+  geom_path(aes(y = larvalDensityMean), color = 'green') +
+  geom_path(aes(y = massMean * 100), color = 'red') +
+  scale_y_continuous(
+    name = "Larval Density",
+    sec.axis = sec_axis(~./100, name = "Mean Mass (mg)"),
+    
+  ) +
+  theme_minimal() +
+  labs(title = "Larval Density and Mean Mass over Time", x = "Day")+
+  theme(axis.title.y.right = element_text(color = 'red'))
+
 ```
