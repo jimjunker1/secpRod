@@ -56,7 +56,7 @@ update_day <- function(pop, current_day) {
       time_since_start = current_day - cohort_start,
       alive = runif(n()) > z,
       mass = M_inf * (1 - exp(-k * time_since_start)),
-      adult = mass >= M_inf
+      adult = mass >= M_inf *0.9999
     ) %>%
     filter(alive & !adult)  # remove those who died or became adult
 }
