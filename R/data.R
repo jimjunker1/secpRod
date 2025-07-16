@@ -1,7 +1,3 @@
-#'
-#'
-#'
-#'
 #' Sample data for community secondary production analysis
 #'
 #' A collection of community macroinvertebrate data for estimating secondary production
@@ -19,9 +15,6 @@
 "wbtData"
 
 
-#'
-#'
-#'
 #' Sample data for community secondary production analysis
 #'
 #' A collection of community macroinvertebrate data for estimating secondary production
@@ -51,3 +44,34 @@
 #' }
 #' @source data-raw/single_cohort_sim.R
 "singleCohortSim"
+
+
+#' Sample data for community secondary production analysis
+#'
+#' A collection of community macroinvertebrate data for estimating secondary production
+#'
+#' @format `splitCohortSim`
+#' A single tibble data frame with a list-col simulating the sampling of a univoltine population with a split cohort:
+#' \describe{
+#'   \item{x}{integer. x location of sampled grid cell}
+#'   \item{y}{integer. y location of sampled grid cell}
+#'   \item{larvalDensity}{integer. The density of larvae in the grid cell}
+#'   \item{massDistribution}{numeric. list-col of the mass of each individual in the cell}
+#' }
+#' @source data-raw/single_cohort_sim.R
+"splitCohortSim"
+
+#' Sample data for community secondary production analysis
+#'
+#' A collection of community macroinvertebrate data for estimating secondary production
+#'
+#' @format `overlapCohortSim`
+#' A single tibble data frame with a list-col simulating the sampling of a univoltine population with a split cohort:
+#' \describe{
+#'   \item{x}{integer. x location of sampled grid cell}
+#'   \item{y}{integer. y location of sampled grid cell}
+#'   \item{larvalDensity}{integer. The density of larvae in the grid cell}
+#'   \item{massDistribution}{numeric. list-col of the mass of each individual in the cell}
+#' }
+#' @source data-raw/single_cohort_sim.R
+"overlapCohortSim"
