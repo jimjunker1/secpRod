@@ -29,7 +29,7 @@ plot_cohorts = function(taxaSampleListMass = NULL, param = c('length','mass'), m
 
   # remove any length classes with all zeros
   allZeros = taxaSampleListMass %>%
-    group_by(lengthClass) %>%
+    group_by(!!sym("lengthClass")) %>%
     dplyr::summarise(n = sum(.data$n_m2, na.rm = TRUE)) %>%
     dplyr::filter(.data$n > 0) %>%
     dplyr::select(.data$lengthClass) %>%

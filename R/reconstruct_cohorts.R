@@ -31,8 +31,10 @@
 #' @param offsetBounds integer vector of length = 2. The lower and upper bounds of the offset to test for fit
 #' @param fallbackGrid logical. If TRUE (default) a grid search procedure will be used if `optim()` fails.
 #' @import dplyr
+#' @importFrom stats coef
+#' @importFrom stats optim
 #' @export
-#'
+
 reconstruct_split_cohort <- function(df,
                                      timeCol = "dateID",
                                      massCol = "massValue",
@@ -41,6 +43,8 @@ reconstruct_split_cohort <- function(df,
                                      models = c("vbg", "gompertz", "logistic", "richards"),
                                      offsetBounds = c(10, 150),
                                      fallbackGrid = TRUE) {
+  # declare global vars
+  cohort <- mean_mass <- min_mass <- dateID <- D <- pseudotime <- NULL
   # Step 1a: Aggregate replicate-level masses to daily means
   agg <- df %>%
     group_by(.data[[timeCol]]) %>%
@@ -171,7 +175,8 @@ reconstruct_split_cohort <- function(df,
 
 fit_with_offset <- function(dfOrdered, offset, models = c("vbg", "gompertz", "logistic", "richards"), tStart = 5) {
   stopifnot("cohort" %in% names(dfOrdered))
-
+# declare global variables
+  cohort <- dateID <- pseudo_day <- NULL
   # Split cohorts
   youngest_dates <- dfOrdered %>%
     dplyr::filter(cohort == min(cohort)) %>%
@@ -253,11 +258,14 @@ fit_with_offset <- function(dfOrdered, offset, models = c("vbg", "gompertz", "lo
 #' @returns returns a ggplot object of the
 #' @import dplyr
 #' @import ggplot2
+#' @importFrom stats coef
 #' @seealso
 #'    [reconstruct_split_cohorts()] for documentation on the process used to reconstruct split cohorts
 #' @export
 plot_cohort_fit <- function(remappedCohort, models = "ensemble", labelPoints = TRUE) {
 
+  #declare variables
+  pseudotime <- fitted_mass <- observed_mass <- NULL
   df <- remappedCohort$df_remap
   W <- df$mean_mass
   t <- df$pseudotime
@@ -272,7 +280,7 @@ plot_cohort_fit <- function(remappedCohort, models = "ensemble", labelPoints = T
     observed_mass = W
   )
 
-  if (model == "ensemble") {
+  if (models == "ensemble") {
     preds <- matrix(NA, nrow = length(t), ncol = length(model_names))
     colnames(preds) <- model_names
 
@@ -290,16 +298,16 @@ plot_cohort_fit <- function(remappedCohort, models = "ensemble", labelPoints = T
     model_label <- "Model-averaged fit"
 
   } else {
-    if (!model %in% model_names) stop("Model not found in fits.")
-    p <- coef(fits[[model]])
+    if (!models %in% model_names) stop("Model not found in fits.")
+    p <- coef(fits[[models]])
     W_cap <- pmin(W, p['Winf'] * 0.999)
-    pred_df$fitted_mass <- switch(model,
+    pred_df$fitted_mass <- switch(models,
                                   vbg = p["Winf"] * (1 - exp(-p["k"] * (t - p["t0"]))),
                                   gompertz = p["Winf"] * exp(-exp(-p["k"] * (t - p["tStar"]))),
                                   logistic = p["Winf"] / (1 + exp(-p["k"]*(t - p["tStar"]))),
                                   richards = p["Winf"] * (1 + 1 / p["D"] * exp(-p["k"] * (t - p["tStar"])))^p["D"]
     )
-    model_label <- paste("Fitted:", model)
+    model_label <- paste("Fitted:", models)
   }
 
   ggplot(pred_df, aes(x = pseudotime)) +

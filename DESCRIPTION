@@ -25,7 +25,7 @@ Suggests:
     plyr,
     ggdist,
     rmarkdown
-License: GNU General Public License v3.0 + LICENSE
+License: MIT + file LICENSE
 VignetteBuilder: knitr
 Encoding: UTF-8
 LazyData: true

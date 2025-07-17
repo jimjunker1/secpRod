@@ -10,3 +10,4 @@
 ^_config\.yml
 ^vignettes/articles$
 ^data-raw$
+^LICENSE\.md$
