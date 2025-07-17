@@ -168,22 +168,22 @@ vers_count = function (..., condition = (function(x) TRUE))
 
 #'
 #'
-calc_Linf = function(df,...){
-  dataList = make_standata(log(count)~lengthClass, data = df)
-  modelCode = make_stancode(log(count)~lengthClass,
-                            family = gaussian(),
-                            prior = set_prior('normal(0,1)', class = 'b', ub = 0),
-                            data = df)
-
-  l_nLM = stan(model_code = modelCode, data = dataList,
-               chains = 4, iter = 2000, warmup = 1000,  thin = 1)
-
-  int = unlist(extract(l_nLM)['Intercept'])
-  b = unlist(extract(l_nLM)['b'])
-  Linf = mapply(FUN = function(a,b) a/(1-b), int, b)
-  ZK = sapply(b, function(b) b/(1-b))
-
-  return(list(model = l_nLM,
-              Linf = Linf,
-              ZK = ZK))
-}
+# calc_Linf = function(df,...){
+#   dataList = make_standata(log(count)~lengthClass, data = df)
+#   modelCode = make_stancode(log(count)~lengthClass,
+#                             family = gaussian(),
+#                             prior = set_prior('normal(0,1)', class = 'b', ub = 0),
+#                             data = df)
+#
+#   l_nLM = stan(model_code = modelCode, data = dataList,
+#                chains = 4, iter = 2000, warmup = 1000,  thin = 1)
+#
+#   int = unlist(extract(l_nLM)['Intercept'])
+#   b = unlist(extract(l_nLM)['b'])
+#   Linf = mapply(FUN = function(a,b) a/(1-b), int, b)
+#   ZK = sapply(b, function(b) b/(1-b))
+#
+#   return(list(model = l_nLM,
+#               Linf = Linf,
+#               ZK = ZK))
+# }

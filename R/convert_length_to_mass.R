@@ -7,6 +7,8 @@
 #' @returns taxaSampleList with the mass column added.
 #' @importFrom formula.tools rhs lhs
 #' @importFrom rlang :=
+#' @importFrom stats as.formula
+#' @importFrom stats setNames
 #' @export
 convert_length_to_mass <- function(taxaSampleList = NULL, taxaInfo = NULL, reduce = TRUE, ...) {
   if (is.null(taxaSampleList)) stop("No sample information provided.")
@@ -20,8 +22,8 @@ convert_length_to_mass <- function(taxaSampleList = NULL, taxaInfo = NULL, reduc
   if (any(is.null(taxaSubInfo))) stop(paste("No taxonomic information available for", taxonID, ". Check for correct spelling in sampleInfo and taxaInfo."))
 
   # convert the length-to-mass formula to a formula
-  massFormula <- as.formula(paste0(gsub(" ", "", taxaSubInfo$massForm)))
-  # if(!as.formula(massFormula)) stop("The length-to-mass formula, 'massForm', cannot be coercied into a formula class.")
+  massFormula <- stats::as.formula(paste0(gsub(" ", "", taxaSubInfo$massForm)))
+  # if(!stats::as.formula(massFormula)) stop("The length-to-mass formula, 'massForm', cannot be coercied into a formula class.")
   # get the mass units from the LHS of massFormula
   massUnits <- formula.tools::lhs(massFormula)
   # get the variables from the RHS of massFormula
@@ -66,11 +68,11 @@ convert_length_to_mass <- function(taxaSampleList = NULL, taxaInfo = NULL, reduc
 
   # fill in the named variables L-M equation with their taxon-specific values
   ## create a named list of all variables
-  allVars <- setNames(allVars, nm = taxaSubInfo[, names(taxaSubInfo) %in% allVars])
+  allVars <- stats::setNames(allVars, nm = taxaSubInfo[, names(taxaSubInfo) %in% allVars])
   ## parse and replace the RHS of the L-M function call
   newRHS = sapply(charRHS, function(x) replace_formula_terms(x, termList = allVars))
   ## Recombine the LHS & RHS to a new function
-  newMassFormula = as.formula(paste0(massUnits,"~",newRHS))
+  newMassFormula = stats::as.formula(paste0(massUnits,"~",newRHS))
   massUnits = lhs(newMassFormula)
   massRHS = rhs(newMassFormula)
 

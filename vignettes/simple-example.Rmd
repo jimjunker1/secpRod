@@ -1,8 +1,8 @@
 ---
-title: "simple-example"
+title: "A few simple examples"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{simple-example}
+  %\VignetteIndexEntry{A few simple examples}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 bibliography: secpRod-refs.bib
