@@ -9,6 +9,7 @@
 #' @param wrap logical. Should the dates wrap to create a full year?
 #' @param massValue string. What is the mass value and units of the production
 #' @param massLabel string. What label should the output units be. It is possible this will default to 'massValue' in the future.
+#' @param bootList list of bootstraps from [prep_boots()].
 #' @param ... additional arguments to be passed to the function
 #' @returns returns a list of 2 objects:
 #' @returns P.boots: the boostrapped estimates of production, abundance, and biomass.

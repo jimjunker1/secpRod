@@ -5,19 +5,23 @@ Version: 0.1.1
 Authors@R: 
     person("Jim", "Junker", , "james.junker@unt.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-9713-2330"))
-Description: A set of functions to move from raw data to estimates of animal population and community secondary production. These functions include the data manipulation steps, QA/QC, data visualisation, and estimation options to choose between estimation methods, population and community levels, and annual and/or interval estimates. Secondary production estimates and variability around estimates are calculated using a variation of the bootstrap approach outlined by Huryn and Benke in Lamberti and Castillo "Methods in Stream Ecology"
+Description: A set of functions to move from raw data to estimates of animal population 
+    and community secondary production. These functions include the data manipulation steps, 
+    QA/QC, data visualisation, and estimation options to choose between estimation methods, 
+    population and community levels, and annual and/or interval estimates. Secondary production 
+    estimates and variability around estimates are calculated using a variation of the bootstrap 
+    approach outlined by Huryn and Benke in Lamberti and Castillo "Methods in Stream Ecology".
 Imports:
   graphics,
   formula.tools,
-  mixtools,
   magrittr,
   tidyr,
   dplyr,
   rlang,
-  purrr,
   ggplot2
 Suggests:
     knitr,
+    purrr,
     plyr,
     rmarkdown
 License: GNU General Public License v3.0 + LICENSE

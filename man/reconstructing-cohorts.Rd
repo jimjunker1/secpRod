@@ -12,18 +12,18 @@ fit_with_offset(
   tStart = 5
 )
 
-plot_cohort_fit(remappedCohort, model = "ensemble", labelPoints = TRUE)
+plot_cohort_fit(remappedCohort, models = "ensemble", labelPoints = TRUE)
 }
 \arguments{
 \item{dfOrdered}{the reordered sampling data set from [reconstruct_split_cohort()] processes}
 
 \item{offset}{the offset (in days) between the final sample and first sample in two cohort portions to be joined}
 
+\item{models}{character. String vector of the names of models to fit to \eqn{M_t}. See `details` for more information.}
+
 \item{tStart}{data frame of date information with external predictors for each month. There should be a column name identical to all variables in the growth equation found in taxaInfo data.frame.}
 
 \item{remappedCohort}{the reordered object returned from [reconstruct_split_cohort()]}
-
-\item{model}{character. String of a specific model or 'ensemble' for an AIC weighted ensemble prediction. See `details` in [reconstruct_split_cohort()] for the available models.}
 
 \item{labelPoints}{logical. Should the points be labelled with the sampling date information}
 }

@@ -5,6 +5,7 @@
 #' @param df data.frame. A dataframe of the species size, mass, and frequency data.
 #' @param bootNum integer. The number of bootstrapped data sets that should be created.
 #' @importFrom tidyr pivot_wider
+#' @importFrom stats var
 #' @export
 
 prep_boots <- function(df = NULL,

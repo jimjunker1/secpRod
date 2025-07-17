@@ -156,7 +156,7 @@ reconstruct_split_cohort <- function(df,
 #' @title fit_with_offset
 #' @param dfOrdered the reordered sampling data set from [reconstruct_split_cohort()] processes
 #' @param offset the offset (in days) between the final sample and first sample in two cohort portions to be joined
-#'
+#' @param models character. String vector of the names of models to fit to estimate \eqn{t_0}. See `details` for more information.
 #' @param tStart data frame of date information with external predictors for each month. There should be a column name identical to all variables in the growth equation found in taxaInfo data.frame.
 #' @returns returns a list of three (3) objects:
 #' @returns fits: the growth model fits to reordered sampling dates
@@ -248,7 +248,7 @@ fit_with_offset <- function(dfOrdered, offset, models = c("vbg", "gompertz", "lo
 #' This is an internal function used in [reconstruct_split_cohort()] to fit growth functions to find the optimal cohort offset in a split cohort.
 #' @title plot_cohort_fit
 #' @param remappedCohort the reordered object returned from [reconstruct_split_cohort()]
-#' @param model character. String of a specific model or 'ensemble' for an AIC weighted ensemble prediction. See `details` in [reconstruct_split_cohort()] for the available models.
+#' @param models character. String vector of the names of models to fit to \eqn{M_t}. See `details` for more information.
 #' @param labelPoints logical. Should the points be labelled with the sampling date information
 #' @returns returns a ggplot object of the
 #' @import dplyr
@@ -256,7 +256,7 @@ fit_with_offset <- function(dfOrdered, offset, models = c("vbg", "gompertz", "lo
 #' @seealso
 #'    [reconstruct_split_cohorts()] for documentation on the process used to reconstruct split cohorts
 #' @export
-plot_cohort_fit <- function(remappedCohort, model = "ensemble", labelPoints = TRUE) {
+plot_cohort_fit <- function(remappedCohort, models = "ensemble", labelPoints = TRUE) {
 
   df <- remappedCohort$df_remap
   W <- df$mean_mass

@@ -5,6 +5,7 @@ vignette: >
   %\VignetteIndexEntry{A few simple examples}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteDepends{purrr}
 bibliography: secpRod-refs.bib
 link-citations: no
 link-color: grey
