@@ -8,19 +8,19 @@ library(ggdist)
 
 # Parameters
 grid_size <- 20
-mu_N_init <- 50
-sigma_N_init <- 7
+mu_N_init <- 100
+sigma_N_init <- 10
 initial_mass <- 0.0006
 mu_ln <- log(1.5^2 / sqrt(0.1^2 + 1.5^2))
 sigma_ln <- sqrt(log(1 + (0.1^2 / 1.5^2)))
 mu_z <- 0.035
 sigma_z <- 0.03
-cpi_start <- 250
-cpi_end <- 270
-days <- 506
+cpi_start <- 720
+cpi_end <- 740
+days <- 750
 sample_interval <- 30
-sample_start <- 100    # adjustable start day
-sample_end <- 465    # adjustable end day
+sample_start <- 368    # adjustable start day
+sample_end <- 720    # adjustable end day
 S <- 10  # number of cells to sample per event
 
 # Function to initialize a cohort
@@ -69,14 +69,14 @@ simulation[[1]] <- grid_population
 for (d in 2:days) {
   updated_pop <- update_day(simulation[[d - 1]], d - 1)
 
-  if (d == 189) {
-    new_cohort <- map2_dfr(rep(1:grid_size, each = grid_size), rep(1:grid_size, times = grid_size), ~init_cohort(.x, .y, 180))
+  if (d == 366) {
+    new_cohort <- map2_dfr(rep(1:grid_size, each = grid_size), rep(1:grid_size, times = grid_size), ~init_cohort(.x, .y, 366))
     updated_pop <- bind_rows(updated_pop, new_cohort)
   }
-  if (d == 339) {
-    new_cohort <- map2_dfr(rep(1:grid_size, each = grid_size), rep(1:grid_size, times = grid_size), ~init_cohort(.x, .y, 330))
-    updated_pop <- bind_rows(updated_pop, new_cohort)
-  }
+  # if (d == 339) {
+  #   new_cohort <- map2_dfr(rep(1:grid_size, each = grid_size), rep(1:grid_size, times = grid_size), ~init_cohort(.x, .y, 330))
+  #   updated_pop <- bind_rows(updated_pop, new_cohort)
+  # }
   # if (d == 300) {
   #   new_cohort <- map2_dfr(rep(1:grid_size, each = grid_size), rep(1:grid_size, times = grid_size), ~init_cohort(.x, .y, 300))
   #   updated_pop <- bind_rows(updated_pop, new_cohort)
