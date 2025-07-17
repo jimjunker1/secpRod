@@ -8,19 +8,19 @@ library(ggdist)
 
 # Parameters
 grid_size <- 20
-mu_N_init <- 200
-sigma_N_init <- 40
+mu_N_init <- 50
+sigma_N_init <- 7
 initial_mass <- 0.0006
-mu_ln <- log(5^2 / sqrt(0.5^2 + 5^2))
-sigma_ln <- sqrt(log(1 + (0.5^2 / 5^2)))
-mu_z <- 0.025
+mu_ln <- log(1.5^2 / sqrt(0.1^2 + 1.5^2))
+sigma_ln <- sqrt(log(1 + (0.1^2 / 1.5^2)))
+mu_z <- 0.035
 sigma_z <- 0.03
-cpi_start <- 150
-cpi_end <- 170
+cpi_start <- 250
+cpi_end <- 270
 days <- 506
 sample_interval <- 30
-sample_start <- 50    # adjustable start day
-sample_end <- 415    # adjustable end day
+sample_start <- 100    # adjustable start day
+sample_end <- 465    # adjustable end day
 S <- 10  # number of cells to sample per event
 
 # Function to initialize a cohort
@@ -69,30 +69,30 @@ simulation[[1]] <- grid_population
 for (d in 2:days) {
   updated_pop <- update_day(simulation[[d - 1]], d - 1)
 
-  if (d == 75) {
-    new_cohort <- map2_dfr(rep(1:grid_size, each = grid_size), rep(1:grid_size, times = grid_size), ~init_cohort(.x, .y, 75))
+  if (d == 189) {
+    new_cohort <- map2_dfr(rep(1:grid_size, each = grid_size), rep(1:grid_size, times = grid_size), ~init_cohort(.x, .y, 180))
     updated_pop <- bind_rows(updated_pop, new_cohort)
   }
-  if (d == 150) {
-    new_cohort <- map2_dfr(rep(1:grid_size, each = grid_size), rep(1:grid_size, times = grid_size), ~init_cohort(.x, .y, 150))
+  if (d == 339) {
+    new_cohort <- map2_dfr(rep(1:grid_size, each = grid_size), rep(1:grid_size, times = grid_size), ~init_cohort(.x, .y, 330))
     updated_pop <- bind_rows(updated_pop, new_cohort)
   }
-  if (d == 225) {
-    new_cohort <- map2_dfr(rep(1:grid_size, each = grid_size), rep(1:grid_size, times = grid_size), ~init_cohort(.x, .y, 225))
-    updated_pop <- bind_rows(updated_pop, new_cohort)
-  }
-  if (d == 300) {
-    new_cohort <- map2_dfr(rep(1:grid_size, each = grid_size), rep(1:grid_size, times = grid_size), ~init_cohort(.x, .y, 300))
-    updated_pop <- bind_rows(updated_pop, new_cohort)
-  }
-  if (d == 375) {
-    new_cohort <- map2_dfr(rep(1:grid_size, each = grid_size), rep(1:grid_size, times = grid_size), ~init_cohort(.x, .y, 375))
-    updated_pop <- bind_rows(updated_pop, new_cohort)
-  }
-  if (d == 450) {
-    new_cohort <- map2_dfr(rep(1:grid_size, each = grid_size), rep(1:grid_size, times = grid_size), ~init_cohort(.x, .y, 450))
-    updated_pop <- bind_rows(updated_pop, new_cohort)
-  }
+  # if (d == 300) {
+  #   new_cohort <- map2_dfr(rep(1:grid_size, each = grid_size), rep(1:grid_size, times = grid_size), ~init_cohort(.x, .y, 300))
+  #   updated_pop <- bind_rows(updated_pop, new_cohort)
+  # }
+  # if (d == 400) {
+  #   new_cohort <- map2_dfr(rep(1:grid_size, each = grid_size), rep(1:grid_size, times = grid_size), ~init_cohort(.x, .y, 400))
+  #   updated_pop <- bind_rows(updated_pop, new_cohort)
+  # }
+  # if (d == 500) {
+  #   new_cohort <- map2_dfr(rep(1:grid_size, each = grid_size), rep(1:grid_size, times = grid_size), ~init_cohort(.x, .y, 500))
+  #   updated_pop <- bind_rows(updated_pop, new_cohort)
+  # }
+  # if (d == 450) {
+  #   new_cohort <- map2_dfr(rep(1:grid_size, each = grid_size), rep(1:grid_size, times = grid_size), ~init_cohort(.x, .y, 450))
+  #   updated_pop <- bind_rows(updated_pop, new_cohort)
+  # }
   simulation[[d]] <- updated_pop
 }
 
@@ -135,40 +135,37 @@ overlapCohortSim <- daily_sampling
 
 usethis::use_data(overlapCohortSim, overwrite = TRUE)
 
-# Summarize samples over time
-summary_stats <- daily_sampling %>%
-  unnest(massDistribution) %>%
-  group_by(day) %>%
-  summarise(
-    mean_mass = mean(massDistribution, na.rm = TRUE),
-    sd_mass = sd(massDistribution, na.rm = TRUE),
-    mean_larvalDensity = mean(larvalDensity),
-    .groups = "drop"
-  )
-
-# Plot mean larval density and mass
-ggplot(summary_stats, aes(x = day)) +
-  stat_halfeye(data = daily_sampling, aes(x = day, y = larvalDensity),
-               color = 'green')+
-  stat_halfeye(data = daily_sampling %>% unnest(massDistribution), aes(x = day, y = massDistribution*100),
-               color = 'red')+
-  geom_line(aes(y = mean_larvalDensity), color = 'green') +
-  geom_line(aes(y = mean_mass * 100), color = 'red') +
-  scale_y_continuous(
-    name = "Larval Density",
-    sec.axis = sec_axis(~./100, name = "Mean Mass (mg)")
-  ) +
-  theme_minimal() +
-  labs(title = "Larval Density and Mean Mass over Time", x = "Day")
-
-# Ridge plot of larval mass distributions over time
-daily_sampling %>%
-  unnest(massDistribution) %>%
-  ggplot(aes(x = massDistribution, y = factor(day))) +
-  stat_halfeye(.width = 0.5, fill = 'gray70') +
-  theme_minimal() +
-  labs(x = "Larval Mass (mg)", y = "Day", title = "Larval Mass Distributions Over Time")+
-  coord_flip()
-
-
-
+# # Summarize samples over time
+# summary_stats <- daily_sampling %>%
+#   unnest(massDistribution) %>%
+#   group_by(day) %>%
+#   summarise(
+#     mean_mass = mean(massDistribution, na.rm = TRUE),
+#     sd_mass = sd(massDistribution, na.rm = TRUE),
+#     mean_larvalDensity = mean(larvalDensity),
+#     .groups = "drop"
+#   )
+#
+# # Plot mean larval density and mass
+# ggplot(summary_stats, aes(x = day)) +
+#   stat_halfeye(data = daily_sampling, aes(x = day, y = larvalDensity),
+#                color = 'green')+
+#   stat_halfeye(data = daily_sampling %>% unnest(massDistribution), aes(x = day, y = massDistribution*100),
+#                color = 'red')+
+#   geom_line(aes(y = mean_larvalDensity), color = 'green') +
+#   geom_line(aes(y = mean_mass * 100), color = 'red') +
+#   scale_y_continuous(
+#     name = "Larval Density",
+#     sec.axis = sec_axis(~./100, name = "Mean Mass (mg)")
+#   ) +
+#   theme_minimal() +
+#   labs(title = "Larval Density and Mean Mass over Time", x = "Day")
+#
+# # Ridge plot of larval mass distributions over time
+# daily_sampling %>%
+#   unnest(massDistribution) %>%
+#   ggplot(aes(x = massDistribution, y = factor(day))) +
+#   stat_halfeye(.width = 0.5, fill = 'gray70') +
+#   theme_minimal() +
+#   labs(x = "Larval Mass (mg)", y = "Day", title = "Larval Mass Distributions Over Time")+
+#   coord_flip()
