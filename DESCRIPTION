@@ -23,6 +23,7 @@ Suggests:
     knitr,
     purrr,
     plyr,
+    ggdist,
     rmarkdown
 License: GNU General Public License v3.0 + LICENSE
 VignetteBuilder: knitr

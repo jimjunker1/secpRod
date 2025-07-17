@@ -8,6 +8,7 @@ vignette: >
   %\VignetteIndexEntry{Simulating the sampling of populations}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteDepends{ggdist}
 # bibliography: refs.bib
 link-citations: no
 link-color: grey

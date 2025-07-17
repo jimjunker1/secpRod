@@ -34,6 +34,8 @@ calc_prod_pb(
 
 \item{massLabel}{string. What label should the output units be. It is possible this will default to 'massValue' in the future.}
 
+\item{bootList}{list of bootstraps from [prep_boots()].}
+
 \item{...}{additional arguments to be passed to the function}
 }
 \value{
