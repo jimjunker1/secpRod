@@ -125,14 +125,14 @@ grid_population <- map2_dfr(rep(1:grid_size, each = grid_size), rep(1:grid_size,
 # Daily update function for larval individuals only
 update_day <- function(pop, current_day) {
   pop %>%
-    filter(alive & !adult) %>%
-    mutate(
+    dplyr::filter(alive & !adult) %>%
+    dplyr::mutate(
       time_since_start = current_day - cohort_start,
       alive = runif(n()) > z,
       mass = M_inf * (1 - exp(-k * time_since_start)),
       adult = mass >= M_inf
     ) %>%
-    filter(alive & !adult)  # remove those who died or became adult
+    dplyr::filter(alive & !adult)  # remove those who died or became adult
 }
 
 # Run simulation with second cohort added at day 366
@@ -152,7 +152,7 @@ for (d in 2:days) {
 
 # Combine for sampling
 all_days <- bind_rows(simulation, .id = "day") %>%
-  mutate(day = as.integer(day))
+  dplyr::mutate(day = as.integer(day))
 
 # Sampling protocol (larvae only)
 sampling_results <- list()
@@ -170,7 +170,7 @@ for (t in seq(sample_start, sample_end, by = sample_interval)) {
   sampled_cells[[length(sampled_cells) + 1]] <- sampled
 
   sampled_data <- all_days %>%
-    filter(day == t) %>%
+    dplyr::filter(day == t) %>%
     semi_join(sampled, by = c("x", "y")) %>%
     group_by(x, y) %>%
     summarise(
@@ -178,7 +178,7 @@ for (t in seq(sample_start, sample_end, by = sample_interval)) {
       mass_distribution = list(mass),
       .groups = "drop"
     ) %>%
-    mutate(day = t)
+    dplyr::mutate(day = t)
 
   sampling_results[[length(sampling_results) + 1]] <- sampled_data
 }
@@ -281,14 +281,14 @@ grid_population <- map2_dfr(rep(1:grid_size, each = grid_size), rep(1:grid_size,
 # Daily update function for larval individuals only
 update_day <- function(pop, current_day) {
   pop %>%
-    filter(alive & !adult) %>%
-    mutate(
+    dplyr::filter(alive & !adult) %>%
+    dplyr::mutate(
       time_since_start = current_day - cohort_start,
       alive = runif(n()) > z,
       mass = M_inf * (1 - exp(-k * time_since_start)),
       adult = mass >= M_inf
     ) %>%
-    filter(alive & !adult)  # remove those who died or became adult
+    dplyr::filter(alive & !adult)  # remove those who died or became adult
 }
 
 # Run simulation with second cohort added at day 366
@@ -308,7 +308,7 @@ for (d in 2:days) {
 
 # Combine for sampling
 all_days <- bind_rows(simulation, .id = "day") %>%
-  mutate(day = as.integer(day))
+  dplyr::mutate(day = as.integer(day))
 
 # Sampling protocol (larvae only)
 sampling_results <- list()
@@ -326,7 +326,7 @@ for (t in seq(sample_start, sample_end, by = sample_interval)) {
   sampled_cells[[length(sampled_cells) + 1]] <- sampled
 
   sampled_data <- all_days %>%
-    filter(day == t) %>%
+    dplyr::filter(day == t) %>%
     semi_join(sampled, by = c("x", "y")) %>%
     group_by(x, y) %>%
     summarise(
@@ -334,7 +334,7 @@ for (t in seq(sample_start, sample_end, by = sample_interval)) {
       massDistribution = list(mass),
       .groups = "drop"
     ) %>%
-    mutate(day = t)
+    dplyr::mutate(day = t)
 
   sampling_results[[length(sampling_results) + 1]] <- sampled_data
 }
@@ -385,7 +385,7 @@ We developed a quick algorithm to automate the determination of the beginning an
 
 ```{r detect-cohort-bounds}
 
-df <- splitCohortSim %>% mutate(repID = 1:n(), .by = c('day')) %>% 
+df <- splitCohortSim %>% dplyr::mutate(repID = 1:n(), .by = c('day')) %>% 
   select(dateID = day, repID, n_m2 = larvalDensity, massValue = massDistribution) %>% 
   unnest(massValue)
 
@@ -416,18 +416,18 @@ gridExtra::grid.arrange(list(p1,p2,p3,p4), ncol = 2, nrow = 2)
 <!-- fit_with_offset <- function(df_ordered, offset, models_to_fit = c("vonbert", "gompertz"), t_start = 5) { -->
 <!--   stopifnot("cohort" %in% names(df_ordered)) -->
 
-<!--   youngest_dates <- df_ordered %>% filter(cohort == min(cohort)) %>% arrange(dateID) -->
+<!--   youngest_dates <- df_ordered %>% dplyr::filter(cohort == min(cohort)) %>% arrange(dateID) -->
 <!--   delta_young <- diff(youngest_dates$dateID) -->
 <!--   young_pseudotime <- c(0, cumsum(delta_young)) -->
 
-<!--   oldest_dates <- df_ordered %>% filter(cohort == max(cohort)) %>% arrange(dateID) -->
+<!--   oldest_dates <- df_ordered %>% dplyr::filter(cohort == max(cohort)) %>% arrange(dateID) -->
 <!--   delta_old <- diff(oldest_dates$dateID) -->
 <!--   start_old <- tail(young_pseudotime, 1) + delta_old[1]  # gap continuation -->
 <!--   old_pseudotime <- c(start_old, start_old + cumsum(delta_old[-1])) -->
 
 <!--   df_pseudo <- bind_rows( -->
-<!--     mutate(youngest_dates, pseudo_day = young_pseudotime), -->
-<!--     mutate(oldest_dates, pseudo_day = old_pseudotime) -->
+<!--     dplyr::mutate(youngest_dates, pseudo_day = young_pseudotime), -->
+<!--     dplyr::mutate(oldest_dates, pseudo_day = old_pseudotime) -->
 <!--   ) %>% arrange(pseudo_day) -->
 
 <!--   t_all <- df_pseudo$pseudo_day -->
@@ -555,7 +555,7 @@ gridExtra::grid.arrange(list(p1,p2,p3,p4), ncol = 2, nrow = 2)
 <!--   pseudo_time <- round(pseudo_time) -->
 
 <!--   df_remap <- df_pseudo %>% -->
-<!--     mutate(pseudotime = pseudo_time) %>% -->
+<!--     dplyr::mutate(pseudotime = pseudo_time) %>% -->
 <!--     arrange(pseudotime) -->
 
 <!--   return(list( -->
@@ -672,7 +672,7 @@ gridExtra::grid.arrange(list(p1,p2,p3,p4), ncol = 2, nrow = 2)
 
 <!--   # Step 6: Reconstruct time vector with best offset -->
 <!--   df_ordered <- df_ordered %>% -->
-<!--     mutate( -->
+<!--     dplyr::mutate( -->
 <!--       true_time = ifelse(cohort == 1, -->
 <!--                          !!sym(time_col), -->
 <!--                          !!sym(time_col) + offset_opt) -->
@@ -706,7 +706,7 @@ gridExtra::grid.arrange(list(p1,p2,p3,p4), ncol = 2, nrow = 2)
 <!--   pseudo_time_shifted <- round(pseudo_time - min(pseudo_time) + t_start) -->
 
 <!--   df_final <- df_ordered %>% -->
-<!--     mutate(pseudotime = pseudo_time_shifted) %>% -->
+<!--     dplyr::mutate(pseudotime = pseudo_time_shifted) %>% -->
 <!--     arrange(pseudotime) -->
 
 <!--   if (verbose) { -->
@@ -852,7 +852,7 @@ gridExtra::grid.arrange(list(p1,p2,p3,p4), ncol = 2, nrow = 2)
 <!--   pseudo_day <- round(weighted_age - min(weighted_age, na.rm = TRUE) + pseudo_start) -->
 
 <!--   df_remap <- df %>% -->
-<!--     mutate( -->
+<!--     dplyr::mutate( -->
 <!--       cohort_age = as.vector(weighted_age), -->
 <!--       pseudo_day = pseudo_day -->
 <!--     ) %>% -->
@@ -925,7 +925,7 @@ gridExtra::grid.arrange(list(p1,p2,p3,p4), ncol = 2, nrow = 2)
 <!--   ), na.rm = TRUE) -->
 
 <!--   df_remap <- df %>% -->
-<!--     mutate( -->
+<!--     dplyr::mutate( -->
 <!--       cohort_age = cohort_age, -->
 <!--       pseudo_day = round(cohort_age - min(cohort_age, na.rm = TRUE) + pseudo_start) -->
 <!--     ) %>% -->
@@ -949,7 +949,7 @@ gridExtra::grid.arrange(list(p1,p2,p3,p4), ncol = 2, nrow = 2)
 <!--   df <- taxaSampleList %>% -->
 <!--     arrange(dateID) %>% -->
 <!--     summarise(across(all_of(c(massValue, abunValue)), mean), .by = "dateID") %>% -->
-<!--     mutate( -->
+<!--     dplyr::mutate( -->
 <!--       mass_ratio = lead(!!sym(massValue)) / !!sym(massValue), -->
 <!--       density_ratio = lead(!!sym(abunValue)) / !!sym(abunValue), -->
 <!--       dt = lead(dateID) - dateID -->
@@ -994,7 +994,7 @@ gridExtra::grid.arrange(list(p1,p2,p3,p4), ncol = 2, nrow = 2)
 <!-- #   df <- taxaSampleList %>% -->
 <!-- #     arrange(dateID) %>% -->
 <!-- #     summarise(across(all_of(c(massValue, abunValue)), mean), .by = "dateID") %>% -->
-<!-- #     mutate( -->
+<!-- #     dplyr::mutate( -->
 <!-- #       log_dM = c(NA, diff(log(!!sym(massValue)))), -->
 <!-- #       log_dN = c(NA, diff(log(!!sym(abunValue)))), -->
 <!-- #       dt = c(NA, diff(dateID)), -->
@@ -1045,7 +1045,7 @@ gridExtra::grid.arrange(list(p1,p2,p3,p4), ncol = 2, nrow = 2)
 <!-- #     ) %>% -->
 <!-- #     arrange(dateID) %>% -->
 <!-- #     summarise(across(c(massValue, abunValue), mean), .by = 'dateID') %>%  -->
-<!-- #     mutate( -->
+<!-- #     dplyr::mutate( -->
 <!-- #       dM = lead(massValue) / massValue, -->
 <!-- #       dN = lead(abunValue) / abunValue, -->
 <!-- #       dt = lead(dateID) - dateID -->

@@ -128,7 +128,7 @@ reconstruct_split_cohort <- function(df,
 
     # align such that first pseudotime = abs(t0)
     cohort_ages[[model_name]] <- raw_age - min(raw_age) + abs(t0)
-    weights[model_name] <- AIC(fits[[model_name]]) + 2 * 3^2 / (length(t) - 3 - 1)
+    weights[model_name] <- stats::AIC(fits[[model_name]]) + 2 * 3^2 / (length(t) - 3 - 1)
   }
 
   # 6. Ensemble weights from AICc
@@ -163,6 +163,8 @@ reconstruct_split_cohort <- function(df,
 #' @returns aiccs: the Akaike Information Criterion for each model. This is used to build ensemble model estimates for remapped cohort 'times'
 #' @returns df_pseudo: a data.frame of the original date, standardized cohort 'times', and t0 corrected ages estimated from the growth models.
 #' @import dplyr
+#' @importFrom stats AIC
+#' @importFrom stats nls
 #' @seealso
 #'    [reconstruct_split_cohorts()] for documentation on the process used to reconstruct split cohorts
 #' @export
@@ -172,11 +174,11 @@ fit_with_offset <- function(dfOrdered, offset, models = c("vbg", "gompertz", "lo
 
   # Split cohorts
   youngest_dates <- dfOrdered %>%
-    filter(cohort == min(cohort)) %>%
+    dplyr::filter(cohort == min(cohort)) %>%
     arrange(dateID)
 
   oldest_dates <- dfOrdered %>%
-    filter(cohort == max(cohort)) %>%
+    dplyr::filter(cohort == max(cohort)) %>%
     arrange(dateID)
 
   # 1. Pseudotime for youngest cohort
@@ -193,8 +195,8 @@ fit_with_offset <- function(dfOrdered, offset, models = c("vbg", "gompertz", "lo
 
   # Combine
   df_pseudo <- bind_rows(
-    mutate(youngest_dates, pseudo_day = young_pseudotime),
-    mutate(oldest_dates, pseudo_day = old_pseudotime)
+    dplyr::mutate(youngest_dates, pseudo_day = young_pseudotime),
+    dplyr::mutate(oldest_dates, pseudo_day = old_pseudotime)
   ) %>% arrange(pseudo_day)
 
   t_all <- df_pseudo$pseudo_day
@@ -205,37 +207,37 @@ fit_with_offset <- function(dfOrdered, offset, models = c("vbg", "gompertz", "lo
 
   # von Bertalanffy
   if ("vbg" %in% models) {
-    m <- try(nls(W_all ~ Winf*(1-exp(-k*(t_all - t0))),
+    m <- try(stats::nls(W_all ~ Winf*(1-exp(-k*(t_all - t0))),
                  start=list(Winf=max(W_all),k=0.01,t0=tStart)), silent=TRUE)
-    if (inherits(m,"nls")) {fits$vbg<-m; aiccs["vbg"]<-AIC(m)+2*3^2/(length(t_all)-4)}
+    if (inherits(m,"nls")) {fits$vbg<-m; aiccs["vbg"]<-stats::AIC(m)+2*3^2/(length(t_all)-4)}
   }
 
   # Gompertz
   if ("gompertz" %in% models) {
-    m <- try(nls(W_all ~ Winf*exp(-exp(-k*(t_all - tStar))),
+    m <- try(stats::nls(W_all ~ Winf*exp(-exp(-k*(t_all - tStar))),
                  start=list(Winf=max(W_all),k=0.01,tStar=tStart)), silent=TRUE)
-    if (inherits(m,"nls")) {fits$gompertz<-m; aiccs["gompertz"]<-AIC(m)+2*3^2/(length(t_all)-4)}
+    if (inherits(m,"nls")) {fits$gompertz<-m; aiccs["gompertz"]<-stats::AIC(m)+2*3^2/(length(t_all)-4)}
   }
 
   # Logistic
   if ("logistic" %in% models) {
-    m <- try(nls(W_all ~ Winf / (1 + exp(-k*(t_all - tStar))),
+    m <- try(stats::nls(W_all ~ Winf / (1 + exp(-k*(t_all - tStar))),
                  start=list(Winf=max(W_all),k=0.03,tStar=tStart)), silent=TRUE)
-    if (inherits(m,"nls")) {fits$logistic<-m; aiccs["logistic"]<-AIC(m)+2*3^2/(length(t_all)-4)}
+    if (inherits(m,"nls")) {fits$logistic<-m; aiccs["logistic"]<-stats::AIC(m)+2*3^2/(length(t_all)-4)}
   }
 
   # Richards
   if ("richards" %in% models) {
-    m <- try(nls(W_all ~ Winf * (1 + 1/D * exp(-k * (t_all - tStar)))^-D,
+    m <- try(stats::nls(W_all ~ Winf * (1 + 1/D * exp(-k * (t_all - tStar)))^-D,
                  start = list(Winf = max(W_all), k = 0.03, tStar = tStart, D = 50)), silent = TRUE)
-    if(inherits(m, 'nls')) {fits$richards <- m; aiccs['richards']<-AIC(m) + 2*3^2/(length(t_all)-4)}
+    if(inherits(m, 'nls')) {fits$richards <- m; aiccs['richards']<-stats::AIC(m) + 2*3^2/(length(t_all)-4)}
   }
 
   # exponential
   # if ("exp"%in%models) {
-  #   m <- try(nls(W_all ~ k * (t_all - t0),
+  #   m <- try(stats::nls(W_all ~ k * (t_all - t0),
   #     start=list(k=0.01)), silent=TRUE)
-  #   if (inherits(m,"nls")) {fits$schnute<-m; aiccs["exp"]<-AIC(m)+2*2^2/(length(t_all)-3)}
+  #   if (inherits(m,"nls")) {fits$schnute<-m; aiccs["exp"]<-stats::AIC(m)+2*2^2/(length(t_all)-3)}
   # }
 
   return(list(fits=fits, aiccs=aiccs, df_pseudo=df_pseudo))

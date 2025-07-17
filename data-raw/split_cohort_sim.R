@@ -51,14 +51,14 @@ grid_population <- map2_dfr(rep(1:grid_size, each = grid_size), rep(1:grid_size,
 # Daily update function for larval individuals only
 update_day <- function(pop, current_day) {
   pop %>%
-    filter(alive & !adult) %>%
-    mutate(
+    dplyr::filter(alive & !adult) %>%
+    dplyr::mutate(
       time_since_start = current_day - cohort_start,
       alive = runif(n()) > z,
       mass = M_inf * (1 - exp(-k * time_since_start)),
       adult = mass >= M_inf *0.9999
     ) %>%
-    filter(alive & !adult)  # remove those who died or became adult
+    dplyr::filter(alive & !adult)  # remove those who died or became adult
 }
 
 # Run simulation with second cohort added at day 366
@@ -96,15 +96,15 @@ for (t in seq(sample_start, sample_end, by = sample_interval)) {
   sampled_cells[[length(sampled_cells) + 1]] <- sampled
 
   sampled_data <- all_days %>%
-    filter(day == t) %>%
+    dplyr::filter(day == t) %>%
     semi_join(sampled, by = c("x", "y")) %>%
     group_by(x, y) %>%
-    summarise(
+    dplyr::summarise(
       larvalDensity = n(),
       massDistribution = list(mass),
       .groups = "drop"
     ) %>%
-    mutate(day = t)
+    dplyr::mutate(day = t)
 
   sampling_results[[length(sampling_results) + 1]] <- sampled_data
 }
