@@ -22,6 +22,6 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(secpRod)
 
-load('singleCohortSim.rda')
+load('data/singleCohortSim.rda')
 
 ```

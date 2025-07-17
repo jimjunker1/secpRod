@@ -7,7 +7,7 @@
 #' The initiation of a sampling program can often start when the growth of a population cohort is already underway, leading to observing only large, late instars individuals during early sampling events.
 #' For univoltine species, this may be followed by a period of zero abundance (e.g., due to egg or adult stages) and subsequent sampling of early instars. To make inferences on cohort parameters
 #' and use some model-based procedures to estimate production, it is useful to 're-order' the sampling dates to create a continuous cohort progression. This makes some assumptions. For more details on these,
-#' see the \link[sampling simulation vignette](../docs/articles/sampling-simulation.html). This function reorders partial cohorts (e.g., late
+#' see the \link[sampling simulation vignette]{../docs/articles/sampling-simulation.html}. This function reorders partial cohorts (e.g., late
 #' instars at the beginning and early instars in later sampling in an annual regime. To do this, the model fits growth functions to remap split cohorts to a continuous progression in time. The difficult
 #' aspect of this is estimating the relative cohort age of different sampling events for correct ordering when there may be a long period between. Crucially, we don't observe the beginning or end of a full
 #' cohort, we only have information from our distinct sampling events. This function fits growth models to estimate the cohort ages of each sample and remap into cohort progression.
