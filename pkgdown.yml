@@ -3,8 +3,9 @@ pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
   articles/model-testing: model-testing.html
+  articles/sampling-simulation: sampling-simulation.html
   simple-example: simple-example.html
-last_built: 2025-07-18T23:24Z
+last_built: 2025-07-18T23:57Z
 urls:
   reference: https://jimjunker1.github.io/secpRod/reference
   article: https://jimjunker1.github.io/secpRod/articles
