@@ -75,7 +75,7 @@ data.frame(pars, pars_desc) %>%
 
 We first simulate a single cohort from the following parameters. The individuals all have the same initial mass. Each individual grows based on a von Bertalanffy growth model with a randomly drawn asymptotic mass, $M_{inf}$, and the growth coefficient, $k$, is calculated by a randomly drawn lifespan (CPI) determined by user-defined inputs. Once an individual reaches $M_{inf}$ it transitions to an 'adult' and is no longer counted in samples. Mortality is governed in each grid cell by a randomly draw death rate, $z$, from a negative exponential model.
 
-```{r, echo = TRUE}
+```{r, echo = TRUE, eval = FALSE}
 # Parameters
 grid_size <- 20
 mu_N_init <- 500
@@ -350,6 +350,7 @@ daily_sampling <- bind_rows(sampling_results)
 ### Load, summarise, and visualize the simulated sampling data
 
 ```{r load-split-sim-data}
+
 data("splitCohortSim", package = 'secpRod')
 
 summary_stats <- splitCohortSim %>%
@@ -381,6 +382,7 @@ ggplot(summary_stats, aes(x = day)) +
 df <- splitCohortSim %>% dplyr::mutate(repID = 1:n(), .by = c('day')) %>% 
   select(dateID = day, repID, n_m2 = larvalDensity, massValue = massDistribution) %>% 
   unnest(massValue)
+
 remappedCohort = reconstruct_split_cohort(df = df,
                                           timeCol = "dateID",
                                           massCol = "massValue",

@@ -46,7 +46,8 @@ reconstruct_split_cohort <- function(df = NULL,
   # Step 1a: Aggregate replicate-level masses to daily means
   agg <- df %>%
     group_by(.data[[timeCol]]) %>%
-    dplyr::summarise(mean_mass = mean(.data[[massCol]], na.rm = TRUE), .groups = "drop") %>%
+    dplyr::summarise(mean_mass = mean(.data[[massCol]], na.rm = TRUE)) %>%
+    ungroup %>%
     dplyr::arrange(.data[[timeCol]])
 
 print('agg')
@@ -176,7 +177,7 @@ print('remap')
 fit_with_offset <- function(dfOrdered = NULL, offset = NULL, models = c("vbg", "gompertz", "logistic", "richards"), tStart = 5) {
   stopifnot("cohort" %in% names(dfOrdered))
 # declare global variables
-  cohort <- dateID <- pseudo_day <- NULL
+  # cohort <- dateID <- pseudo_day <- NULL
   # Split cohorts
   youngest_dates <- dfOrdered %>%
     dplyr::filter(cohort == min(cohort)) %>%
