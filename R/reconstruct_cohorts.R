@@ -16,11 +16,9 @@
 #' depending on model which is used to estimate \eqn{t_0}), and growth rate, \eqn{k}. These  Current models available are:
 #'
 #'      "vbg" The 'regular' von Bertalanffy growth model: \deqn{M_{t} = M_{\inf} (1 -e^{-k \dot (t - t_0)})}
-#'      "gompertz" The Gompertz growth model: \deqn{M_t = M_\inf e^{e^{-k \dot (t - t*)}}}
-#'      "logistic" The logistic growth model: \deqn{M_t = M_\inf / (1 + e^{-k \dot (t - t*)})}
-#'      "richards" The Richards growth model: \deqn{M_t = M_\inf (1 + 1/D e^{-k \dot (t - t*)})^{-D}}
-#'
-#' These
+#'      "gompertz" The Gompertz growth model: \deqn{M_t = M_{\inf} e^{e^{-k \dot (t - t*)}}}
+#'      "logistic" The logistic growth model: \deqn{M_t = M_{\inf} / (1 + e^{-k \dot (t - t*)})}
+#'      "richards" The Richards growth model: \deqn{M_t = M_{\inf} (1 + 1/D e^{-k \dot (t - t*)})^{-D}}
 #'
 #' @param df a data.frame of the sample-level observed masses and densities
 #' @param timeCol character. String of the column name depicting the date of each sampling event.
