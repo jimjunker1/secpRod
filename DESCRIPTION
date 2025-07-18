@@ -1,7 +1,7 @@
 Package: secpRod
 Type: Package
 Title: Workflow Functions for estimating Secondary Production
-Version: 0.0.0.0100
+Version: 0.0.0.101
 Authors@R: 
     person("Jim", "Junker", , "james.junker@unt.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-9713-2330"))
