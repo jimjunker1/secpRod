@@ -377,24 +377,31 @@ ggplot(summary_stats, aes(x = day)) +
   theme_minimal() +
   labs(title = "Larval Density and Mean Mass over Time", x = "Day")+
   theme(axis.title.y.right = element_text(color = 'red'))
+
+df <- splitCohortSim %>% dplyr::mutate(repID = 1:n(), .by = c('day')) %>% 
+  select(dateID = day, repID, n_m2 = larvalDensity, massValue = massDistribution) %>% 
+  unnest(massValue)
+remappedCohort = reconstruct_split_cohort(df = df,
+                                          timeCol = "dateID",
+                                          massCol = "massValue",
+                                          massDropThresh = 0.6,
+                                          tStart = 5,
+                                          models = c("vbg", "gompertz", "logistic", "richards"),
+                                          offsetBounds = c(10, 150),
+                                          fallbackGrid = FALSE
+                                          )
 ```
 
 ### Remapping a split cohort to a single analysis
 
 In order to perform a full cohort analysis on a cohort that is split in time, we can 'remap' the two cohorts into a new timescale that follows a consistent cohort progression. We can then calculate production through regular cohort methods. If we need to extract time-specific values, we can simply map the estimates back to the original time scale.
 
-We developed a quick algorithm to automate the determination of the beginning and ends of a *non-overlapping* cohort, `detect_cohort_bounds()`
+We developed a quick algorithm to automate the determination of the beginning and ends of a *non-overlapping* cohort.
 
 This function reorders the sampling events to follow a continuous growth progression. This allows for the determination of model-based estimates of cohort production and associated growth statistics and also keeps the information to re-map the production outputs to the original sampling times.
 
-```{r detect-cohort-bounds, echo = TRUE}
+```{r detect-cohort-bounds}
 
-df <- splitCohortSim %>% dplyr::mutate(repID = 1:n(), .by = c('day')) %>% 
-  select(dateID = day, repID, n_m2 = larvalDensity, massValue = massDistribution) %>% 
-  unnest(massValue)
-
-debug(reconstruct_split_cohort)
-remappedCohort = reconstruct_split_cohort(df = df)
 remappedCohort
 
 ```

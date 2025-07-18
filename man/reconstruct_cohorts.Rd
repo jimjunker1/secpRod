@@ -7,7 +7,7 @@
 \title{reconstruct_split_cohort}
 \usage{
 reconstruct_split_cohort(
-  df,
+  df = NULL,
   timeCol = "dateID",
   massCol = "massValue",
   massDropThresh = 0.6,
@@ -18,8 +18,8 @@ reconstruct_split_cohort(
 )
 
 fit_with_offset(
-  dfOrdered,
-  offset,
+  dfOrdered = NULL,
+  offset = NULL,
   models = c("vbg", "gompertz", "logistic", "richards"),
   tStart = 5
 )
@@ -79,13 +79,13 @@ instars at the beginning and early instars in later sampling in an annual regime
 aspect of this is estimating the relative cohort age of different sampling events for correct ordering when there may be a long period between. Crucially, we don't observe the beginning or end of a full
 cohort, we only have information from our distinct sampling events. This function fits growth models to estimate the cohort ages of each sample and remap into cohort progression.
 
-Models are fit to mean cohort mass at each sampling event, \eqn{M_{t}} and return estimates for asymptotic mass, \eqn{M_\inf}, time at mass = 0, \eqn{t_0} (or time at growth inflection, \eqn{t*},
+Models are fit to mean cohort mass at each sampling event, \eqn{M_{t}} and return estimates for asymptotic mass, \eqn{M_{\infty}}, time at mass = 0, \eqn{t_0} (or time at growth inflection, \eqn{t*},
 depending on model which is used to estimate \eqn{t_0}), and growth rate, \eqn{k}. These  Current models available are:
 
-     "vbg" The 'regular' von Bertalanffy growth model: \deqn{M_{t} = M_{\inf} (1 -e^{-k \dot (t - t_0)})}
-     "gompertz" The Gompertz growth model: \deqn{M_t = M_{\inf} e^{e^{-k \dot (t - t*)}}}
-     "logistic" The logistic growth model: \deqn{M_t = M_{\inf} / (1 + e^{-k \dot (t - t*)})}
-     "richards" The Richards growth model: \deqn{M_t = M_{\inf} (1 + 1/D e^{-k \dot (t - t*)})^{-D}}
+     "vbg" The 'regular' von Bertalanffy growth model: \deqn{M_{t} = M_{\infty} (1 -e^{-k \cdot (t - t_0)})}
+     "gompertz" The Gompertz growth model: \deqn{M_t = M_{\infty} e^{e^{-k \cdot (t - t*)}}}
+     "logistic" The logistic growth model: \deqn{M_t = M_{\infty} / (1 + e^{-k \cdot (t - t*)})}
+     "richards" The Richards growth model: \deqn{M_t = M_{\infty} (1 + 1/D \cdot e^{-k \cdot (t - t*)})^{-D}}
 }
 \seealso{
 [reconstruct_split_cohorts()] for documentation on the process used to reconstruct split cohorts
