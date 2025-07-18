@@ -1,8 +1,9 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://jimjunker1.github.io/secpRod/404.html</loc></url>
 <url><loc>https://jimjunker1.github.io/secpRod/LICENSE-text.html</loc></url>
-<url><loc>https://jimjunker1.github.io/secpRod/articles/cohort-detection.html</loc></url>
+<url><loc>https://jimjunker1.github.io/secpRod/LICENSE.html</loc></url>
 <url><loc>https://jimjunker1.github.io/secpRod/articles/index.html</loc></url>
+<url><loc>https://jimjunker1.github.io/secpRod/articles/model-testing.html</loc></url>
 <url><loc>https://jimjunker1.github.io/secpRod/articles/simple-example.html</loc></url>
 <url><loc>https://jimjunker1.github.io/secpRod/authors.html</loc></url>
 <url><loc>https://jimjunker1.github.io/secpRod/index.html</loc></url>
@@ -16,12 +17,15 @@
 <url><loc>https://jimjunker1.github.io/secpRod/reference/igr_prod.sample.html</loc></url>
 <url><loc>https://jimjunker1.github.io/secpRod/reference/index.html</loc></url>
 <url><loc>https://jimjunker1.github.io/secpRod/reference/inv.logit.html</loc></url>
-<url><loc>https://jimjunker1.github.io/secpRod/reference/my_boot.comp.html</loc></url>
+<url><loc>https://jimjunker1.github.io/secpRod/reference/overlapCohortSim.html</loc></url>
 <url><loc>https://jimjunker1.github.io/secpRod/reference/pb_prod.sample.html</loc></url>
 <url><loc>https://jimjunker1.github.io/secpRod/reference/pipe.html</loc></url>
 <url><loc>https://jimjunker1.github.io/secpRod/reference/plot_cohorts.html</loc></url>
 <url><loc>https://jimjunker1.github.io/secpRod/reference/prep_boots.html</loc></url>
+<url><loc>https://jimjunker1.github.io/secpRod/reference/reconstruct_cohorts.html</loc></url>
 <url><loc>https://jimjunker1.github.io/secpRod/reference/sf_prod.sample.html</loc></url>
+<url><loc>https://jimjunker1.github.io/secpRod/reference/singleCohortSim.html</loc></url>
+<url><loc>https://jimjunker1.github.io/secpRod/reference/splitCohortSim.html</loc></url>
 <url><loc>https://jimjunker1.github.io/secpRod/reference/univoltine.html</loc></url>
 <url><loc>https://jimjunker1.github.io/secpRod/reference/wbtData.html</loc></url>
 </urlset>
