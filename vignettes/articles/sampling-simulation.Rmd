@@ -416,6 +416,7 @@ p4 = plot_cohort_fit(remappedCohort, models = "logistic")
 
 gridExtra::grid.arrange(p1,p2,p3,p4, ncol = 2, nrow = 2)
 
+
 ```
 
 
