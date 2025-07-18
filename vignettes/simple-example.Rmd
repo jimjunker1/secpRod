@@ -25,7 +25,7 @@ knitr::opts_chunk$set(
 library(secpRod)
 # library(tidyverse)
 # load the example data set
-load("wbtData.rda")
+data("wbtData", package = 'secpRod')
 
 ```
 
@@ -42,7 +42,7 @@ The package comes with a number of data sets of macroinvertebrate species and co
 The simulated data set is a single data frame of artificially sampled size-frequency data through time.
 
 ```{r echo = TRUE}
-data("univoltine")
+data("univoltine", package = 'secpRod')
 
 #clean this data set to align 
 head(univoltine)

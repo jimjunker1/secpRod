@@ -195,7 +195,7 @@ daily_sampling <- bind_rows(sampling_results)
 ### Load, summarise, and visualize the simulated sampling data
 
 ```{r load-single-sim-data}
-load("data/singleCohortSim.rda")
+data("singleCohortSim", package = 'secpRod')
 
 summaryStats <- singleCohortSim %>%
   unnest(massDistribution) %>%
@@ -350,7 +350,7 @@ daily_sampling <- bind_rows(sampling_results)
 ### Load, summarise, and visualize the simulated sampling data
 
 ```{r load-split-sim-data}
-load("data/splitCohortSim.rda")
+data("splitCohortSim", package = 'secpRod')
 
 summary_stats <- splitCohortSim %>%
   unnest(massDistribution) %>%
