@@ -48,7 +48,7 @@ reconstruct_split_cohort <- function(df,
     group_by(.data[[timeCol]]) %>%
     dplyr::summarise(mean_mass = mean(.data[[massCol]], na.rm = TRUE), .groups = "drop") %>%
     dplyr::arrange(.data[[timeCol]])
-
+print('agg')
   t <- agg[[timeCol]]
   W <- agg$mean_mass
 
@@ -59,7 +59,7 @@ reconstruct_split_cohort <- function(df,
 
   cohort1 <- agg[1:drop_idx, ]
   cohort2 <- agg[(drop_idx + 1):length(t), ]
-
+print('cohorts')
   # Step 3a: Reorder cohorts so smallest mass cohort comes first
   if (min(cohort1$mean_mass, na.rm = TRUE) > min(cohort2$mean_mass, na.rm = TRUE)) {
     tmp <- cohort1
@@ -78,7 +78,7 @@ reconstruct_split_cohort <- function(df,
     pull(cohort)
 
   dfOrdered <-  dfOrdered %>% arrange(cohort, dateID)
-
+print('dfOrdered')
   # 2. Define optimization objective
   obj_fn <- function(offset) {
     out <- fit_with_offset(dfOrdered, offset, models, tStart)
@@ -98,12 +98,12 @@ reconstruct_split_cohort <- function(df,
       grid[which.min(grid_scores)]
     } else stop("Optimization failed and grid fallback is off.")
   })
-
+print('optim')
   # 4. Final model fit using optimized offset
   fit_out <- fit_with_offset(dfOrdered, offset_opt, models, tStart)
   fits <- fit_out$fits
   df_pseudo <- fit_out$df_pseudo
-
+print('fit out')
   # 5. Invert model fits to compute pseudotime
   t <- df_pseudo$pseudo_day
   W <- df_pseudo$mean_mass
@@ -120,14 +120,14 @@ reconstruct_split_cohort <- function(df,
                  logistic = p['tStar'] - (1/p['k']) * log(p['Winf']/0.0006 - 1 ),
                  richards = p['tStar'] - (1/p['k']) * log(p['D']*((p['Winf']/0.0006)^(1/D) - 1))
     )
-
+print('t0')
     raw_age <- switch(model_name,
                       vbg = -log(1 - W_cap / p["Winf"]) / p["k"],
                       gompertz = (p["tStar"] - log(-log(W_cap / p["Winf"])) / p["k"]),
                       logistic = (p["tStar"] - log(p["Winf"] / W_cap - 1) / p["k"]),
                       richards = (p["tStar"] - (1 / p['k']) * log(p['D'] * ((p['Winf'] / W_cap)^(1 / p['D']) -1)))
     )
-
+print('raw_age')
     # align such that first pseudotime = abs(t0)
     cohort_ages[[model_name]] <- raw_age - min(raw_age) + abs(t0)
     weights[model_name] <- stats::AIC(fits[[model_name]]) + 2 * 3^2 / (length(t) - 3 - 1)
@@ -139,11 +139,11 @@ reconstruct_split_cohort <- function(df,
 
   pseudo_time <- as.vector(do.call(cbind, cohort_ages) %*% rel_weights)
   pseudo_time <- round(pseudo_time)
-
+print('weights')
   df_remap <- df_pseudo %>%
     mutate(pseudotime = pseudo_time) %>%
     arrange(pseudotime)
-
+print('remap')
   return(list(
     df_remap = df_remap,
     offset = offset_opt,
