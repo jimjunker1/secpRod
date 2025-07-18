@@ -24,6 +24,7 @@ Suggests:
     purrr,
     plyr,
     ggdist,
+    kableExtra,
     rmarkdown
 License: MIT + file LICENSE
 VignetteBuilder: knitr
