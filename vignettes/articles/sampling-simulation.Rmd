@@ -383,15 +383,15 @@ df <- splitCohortSim %>% dplyr::mutate(repID = 1:n(), .by = c('day')) %>%
   select(dateID = day, repID, n_m2 = larvalDensity, massValue = massDistribution) %>% 
   unnest(massValue)
 
-remappedCohort = reconstruct_split_cohort(df = df,
-                                          timeCol = "dateID",
-                                          massCol = "massValue",
-                                          massDropThresh = 0.6,
-                                          tStart = 5,
-                                          models = c("vbg", "gompertz", "logistic", "richards"),
-                                          offsetBounds = c(10, 150),
-                                          fallbackGrid = FALSE
-                                          )
+# remappedCohort = reconstruct_split_cohort(df = df,
+#                                           timeCol = "dateID",
+#                                           massCol = "massValue",
+#                                           massDropThresh = 0.6,
+#                                           tStart = 5,
+#                                           models = c("vbg", "gompertz", "logistic", "richards"),
+#                                           offsetBounds = c(10, 150),
+#                                           fallbackGrid = FALSE
+#                                           )
 ```
 
 ### Remapping a split cohort to a single analysis
@@ -404,17 +404,17 @@ This function reorders the sampling events to follow a continuous growth progres
 
 ```{r plot-remap, fig.height=5, fig.width=5, dpi=300, fig.align='center'}
 
-remappedCohort
-
-# Model-averaged fit
-p1 = plot_cohort_fit(remappedCohort, models = "ensemble")
-
-# Specific model fit
-p2 = plot_cohort_fit(remappedCohort, models = "vbg")
-p3 = plot_cohort_fit(remappedCohort, models = "gompertz", labelPoints = FALSE)
-p4 = plot_cohort_fit(remappedCohort, models = "logistic")
-
-gridExtra::grid.arrange(p1,p2,p3,p4, ncol = 2, nrow = 2)
+# remappedCohort
+# 
+# # Model-averaged fit
+# p1 = plot_cohort_fit(remappedCohort, models = "ensemble")
+# 
+# # Specific model fit
+# p2 = plot_cohort_fit(remappedCohort, models = "vbg")
+# p3 = plot_cohort_fit(remappedCohort, models = "gompertz", labelPoints = FALSE)
+# p4 = plot_cohort_fit(remappedCohort, models = "logistic")
+# 
+# gridExtra::grid.arrange(p1,p2,p3,p4, ncol = 2, nrow = 2)
 
 
 ```
