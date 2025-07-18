@@ -1,4 +1,4 @@
-#' @rdname reconstruct-cohorts
+#' @rdname reconstruct_cohorts
 #' @title reconstruct_split_cohort
 #' @description
 #' This function is used to reconstruct a *non-overlapping* cohort sampled over two years, often with a period of
@@ -152,7 +152,7 @@ reconstruct_split_cohort <- function(df,
   ))
 }
 
-#' @rdname reconstructing-cohorts
+#' @rdname reconstruct_cohorts
 #' @description
 #' This is an internal function used in [reconstruct_split_cohort()] to fit growth functions to find the optimal cohort offset in a split cohort.
 #' @title fit_with_offset
@@ -246,7 +246,7 @@ fit_with_offset <- function(dfOrdered, offset, models = c("vbg", "gompertz", "lo
   return(list(fits=fits, aiccs=aiccs, df_pseudo=df_pseudo))
 }
 
-#' @rdname reconstructing-cohorts
+#' @rdname reconstruct_cohorts
 #' @description
 #' This is an internal function used in [reconstruct_split_cohort()] to fit growth functions to find the optimal cohort offset in a split cohort.
 #' @title plot_cohort_fit
@@ -263,7 +263,7 @@ fit_with_offset <- function(dfOrdered, offset, models = c("vbg", "gompertz", "lo
 plot_cohort_fit <- function(remappedCohort, models = "ensemble", labelPoints = TRUE) {
 
   #declare variables
-  pseudotime <- fitted_mass <- observed_mass <- NULL
+  # pseudotime <- fitted_mass <- observed_mass <- NULL
   df <- remappedCohort$df_remap
   W <- df$mean_mass
   t <- df$pseudotime

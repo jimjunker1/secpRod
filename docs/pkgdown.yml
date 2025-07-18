@@ -1,10 +1,11 @@
-pandoc: 3.1.8
-pkgdown: 2.0.7
+pandoc: '3.4'
+pkgdown: 2.0.9
 pkgdown_sha: ~
 articles:
-  cohort-detection: cohort-detection.html
+  model-testing: model-testing.html
+  sampling-simulation: sampling-simulation.html
   simple-example: simple-example.html
-last_built: 2024-01-26T17:44Z
+last_built: 2025-07-18T03:48Z
 urls:
   reference: https://jimjunker1.github.io/secpRod/reference
   article: https://jimjunker1.github.io/secpRod/articles

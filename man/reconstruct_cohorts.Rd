@@ -2,6 +2,8 @@
 % Please edit documentation in R/reconstruct_cohorts.R
 \name{reconstruct_split_cohort}
 \alias{reconstruct_split_cohort}
+\alias{fit_with_offset}
+\alias{plot_cohort_fit}
 \title{reconstruct_split_cohort}
 \usage{
 reconstruct_split_cohort(
@@ -14,6 +16,15 @@ reconstruct_split_cohort(
   offsetBounds = c(10, 150),
   fallbackGrid = TRUE
 )
+
+fit_with_offset(
+  dfOrdered,
+  offset,
+  models = c("vbg", "gompertz", "logistic", "richards"),
+  tStart = 5
+)
+
+plot_cohort_fit(remappedCohort, models = "ensemble", labelPoints = TRUE)
 }
 \arguments{
 \item{df}{a data.frame of the sample-level observed masses and densities}
@@ -24,17 +35,40 @@ reconstruct_split_cohort(
 
 \item{massDropThresh}{This is the proportional drop in mass used to detect the end and beginning of two cohort portions.}
 
-\item{tStart}{This is the guess for the starting value of age (in days) of the smallest mean size sampled.}
+\item{tStart}{data frame of date information with external predictors for each month. There should be a column name identical to all variables in the growth equation found in taxaInfo data.frame.}
 
-\item{models}{character. String vector of the names of models to fit to estimate \eqn{t_0}. See `details` for more information.}
+\item{models}{character. String vector of the names of models to fit to \eqn{M_t}. See `details` for more information.}
 
 \item{offsetBounds}{integer vector of length = 2. The lower and upper bounds of the offset to test for fit}
 
 \item{fallbackGrid}{logical. If TRUE (default) a grid search procedure will be used if `optim()` fails.}
+
+\item{dfOrdered}{the reordered sampling data set from [reconstruct_split_cohort()] processes}
+
+\item{offset}{the offset (in days) between the final sample and first sample in two cohort portions to be joined}
+
+\item{remappedCohort}{the reordered object returned from [reconstruct_split_cohort()]}
+
+\item{labelPoints}{logical. Should the points be labelled with the sampling date information}
+}
+\value{
+returns a list of three (3) objects:
+
+fits: the growth model fits to reordered sampling dates
+
+aiccs: the Akaike Information Criterion for each model. This is used to build ensemble model estimates for remapped cohort 'times'
+
+df_pseudo: a data.frame of the original date, standardized cohort 'times', and t0 corrected ages estimated from the growth models.
+
+returns a ggplot object of the
 }
 \description{
 This function is used to reconstruct a *non-overlapping* cohort sampled over two years, often with a period of
 of zero abundance (e.g. due to egg or adult stages).
+
+This is an internal function used in [reconstruct_split_cohort()] to fit growth functions to find the optimal cohort offset in a split cohort.
+
+This is an internal function used in [reconstruct_split_cohort()] to fit growth functions to find the optimal cohort offset in a split cohort.
 }
 \details{
 The initiation of a sampling program can often start when the growth of a population cohort is already underway, leading to observing only large, late instars individuals during early sampling events.
@@ -49,9 +83,12 @@ Models are fit to mean cohort mass at each sampling event, \eqn{M_{t}} and retur
 depending on model which is used to estimate \eqn{t_0}), and growth rate, \eqn{k}. These  Current models available are:
 
      "vbg" The 'regular' von Bertalanffy growth model: \deqn{M_{t} = M_{\inf} (1 -e^{-k \dot (t - t_0)})}
-     "gompertz" The Gompertz growth model: \deqn{M_t = M_\inf e^{e^{-k \dot (t - t*)}}}
-     "logistic" The logistic growth model: \deqn{M_t = M_\inf / (1 + e^{-k \dot (t - t*)})}
-     "richards" The Richards growth model: \deqn{M_t = M_\inf (1 + 1/D e^{-k \dot (t - t*)})^{-D}}
+     "gompertz" The Gompertz growth model: \deqn{M_t = M_{\inf} e^{e^{-k \dot (t - t*)}}}
+     "logistic" The logistic growth model: \deqn{M_t = M_{\inf} / (1 + e^{-k \dot (t - t*)})}
+     "richards" The Richards growth model: \deqn{M_t = M_{\inf} (1 + 1/D e^{-k \dot (t - t*)})^{-D}}
+}
+\seealso{
+[reconstruct_split_cohorts()] for documentation on the process used to reconstruct split cohorts
 
-These
+[reconstruct_split_cohorts()] for documentation on the process used to reconstruct split cohorts
 }
