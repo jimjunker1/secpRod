@@ -33,7 +33,7 @@
 #' @importFrom stats optim
 #' @export
 
-reconstruct_split_cohort <- function(df,
+reconstruct_split_cohort <- function(df = NULL,
                                      timeCol = "dateID",
                                      massCol = "massValue",
                                      massDropThresh = 0.6,
@@ -48,7 +48,9 @@ reconstruct_split_cohort <- function(df,
     group_by(.data[[timeCol]]) %>%
     dplyr::summarise(mean_mass = mean(.data[[massCol]], na.rm = TRUE), .groups = "drop") %>%
     dplyr::arrange(.data[[timeCol]])
+
 print('agg')
+
   t <- agg[[timeCol]]
   W <- agg$mean_mass
 
@@ -171,7 +173,7 @@ print('remap')
 #'    [reconstruct_split_cohorts()] for documentation on the process used to reconstruct split cohorts
 #' @export
 
-fit_with_offset <- function(dfOrdered, offset, models = c("vbg", "gompertz", "logistic", "richards"), tStart = 5) {
+fit_with_offset <- function(dfOrdered = NULL, offset = NULL, models = c("vbg", "gompertz", "logistic", "richards"), tStart = 5) {
   stopifnot("cohort" %in% names(dfOrdered))
 # declare global variables
   cohort <- dateID <- pseudo_day <- NULL

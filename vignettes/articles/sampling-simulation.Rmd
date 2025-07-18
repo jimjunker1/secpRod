@@ -387,14 +387,16 @@ We developed a quick algorithm to automate the determination of the beginning an
 
 This function reorders the sampling events to follow a continuous growth progression. This allows for the determination of model-based estimates of cohort production and associated growth statistics and also keeps the information to re-map the production outputs to the original sampling times.
 
-```{r detect-cohort-bounds}
+```{r detect-cohort-bounds, echo = TRUE}
 
 df <- splitCohortSim %>% dplyr::mutate(repID = 1:n(), .by = c('day')) %>% 
   select(dateID = day, repID, n_m2 = larvalDensity, massValue = massDistribution) %>% 
   unnest(massValue)
 
+# debug(reconstruct_split_cohort)
 remappedCohort = reconstruct_split_cohort(df = df)
 remappedCohort
+
 ```
 
 
