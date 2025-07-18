@@ -44,12 +44,12 @@ reconstruct_split_cohort <- function(df,
                                      offsetBounds = c(10, 150),
                                      fallbackGrid = TRUE) {
   # declare global vars
-  cohort <- mean_mass <- min_mass <- dateID <- D <- pseudotime <- NULL
+  # cohort <- mean_mass <- min_mass <- dateID <- D <- pseudotime <- NULL
   # Step 1a: Aggregate replicate-level masses to daily means
   agg <- df %>%
     group_by(.data[[timeCol]]) %>%
-    summarise(mean_mass = mean(.data[[massCol]], na.rm = TRUE), .groups = "drop") %>%
-    arrange(.data[[timeCol]])
+    dplyr::summarise(mean_mass = mean(.data[[massCol]], na.rm = TRUE), .groups = "drop") %>%
+    dplyr::arrange(.data[[timeCol]])
 
   t <- agg[[timeCol]]
   W <- agg$mean_mass
@@ -71,12 +71,12 @@ reconstruct_split_cohort <- function(df,
 
   cohort1$cohort <- 1
   cohort2$cohort <- 2
-  dfOrdered <- bind_rows(cohort1, cohort2) %>% arrange(cohort, .data[[timeCol]])
+  dfOrdered <- bind_rows(cohort1, cohort2) %>% dplyr::arrange(cohort, .data[[timeCol]])
 
   cohort_min <-  dfOrdered %>%
     group_by(cohort) %>%
-    summarise(min_mass = min(mean_mass), .groups = "drop") %>%
-    arrange(min_mass) %>%
+    dplyr::summarise(min_mass = min(mean_mass), .groups = "drop") %>%
+    dplyr::arrange(min_mass) %>%
     pull(cohort)
 
   dfOrdered <-  dfOrdered %>% arrange(cohort, dateID)
