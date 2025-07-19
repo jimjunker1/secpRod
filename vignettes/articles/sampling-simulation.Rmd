@@ -396,6 +396,7 @@ remappedCohort = reconstruct_split_cohort(df = df,
                                           )
 traceback()
 
+tryCatch({remappedCohort}, error = function(e){print("remappedCohort fix did not work")})
 ```
 
 ### Remapping a split cohort to a single analysis

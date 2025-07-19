@@ -123,7 +123,7 @@ print('fit out')
                  vbg = p['t0'],
                  gompertz = p['tStar'] - (1/p['k']) * log(-log(0.0006/p['Winf'])),
                  logistic = p['tStar'] - (1/p['k']) * log(p['Winf']/0.0006 - 1 ),
-                 richards = p['tStar'] - (1/p['k']) * log(p['D']*((p['Winf']/0.0006)^(1/D) - 1))
+                 richards = p['tStar'] - (1/p['k']) * log(p['D']*((p['Winf']/0.0006)^(1/p['D']) - 1))
     )
 print('t0')
     raw_age <- switch(model_name,
