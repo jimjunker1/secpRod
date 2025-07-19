@@ -383,6 +383,10 @@ df <- splitCohortSim %>% dplyr::mutate(repID = 1:n(), .by = c('day')) %>%
   select(dateID = day, repID, n_m2 = larvalDensity, massValue = massDistribution) %>% 
   unnest(massValue)
 
+str(df)
+class(df)
+head(df)
+
 # remappedCohort = reconstruct_split_cohort(df = df,
 #                                           timeCol = "dateID",
 #                                           massCol = "massValue",
