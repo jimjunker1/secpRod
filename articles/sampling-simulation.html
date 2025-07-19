@@ -491,6 +491,21 @@ specific conditions.</p>
 <h4 id="load-summarise-and-visualize-the-simulated-sampling-data-1">Load, summarise, and visualize the simulated sampling data<a class="anchor" aria-label="anchor" href="#load-summarise-and-visualize-the-simulated-sampling-data-1"></a>
 </h4>
 <p><img src="sampling-simulation_files/figure-html/load-split-sim-data-1.png" width="700"></p>
+<pre><code><span><span class="co">#&gt; tibble [6,666 × 4] (S3: tbl_df/tbl/data.frame)</span></span>
+<span><span class="co">#&gt;  $ dateID   : num [1:6666] 101 101 101 101 101 101 101 101 101 101 ...</span></span>
+<span><span class="co">#&gt;  $ repID    : int [1:6666] 1 1 1 1 1 1 1 1 1 1 ...</span></span>
+<span><span class="co">#&gt;  $ n_m2     : int [1:6666] 229 229 229 229 229 229 229 229 229 229 ...</span></span>
+<span><span class="co">#&gt;  $ massValue: num [1:6666] 5.02 4.83 4.83 4.8 5.91 ...</span></span>
+<span><span class="co">#&gt; [1] "tbl_df"     "tbl"        "data.frame"</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 4</span></span></span>
+<span><span class="co">#&gt;   dateID repID  n_m2 massValue</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>    101     1   229      5.02</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>    101     1   229      4.83</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>    101     1   229      4.83</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>    101     1   229      4.80</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>    101     1   229      5.91</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>    101     1   229      5.53</span></span></code></pre>
 </div>
 <div class="section level4">
 <h4 id="remapping-a-split-cohort-to-a-single-analysis">Remapping a split cohort to a single analysis<a class="anchor" aria-label="anchor" href="#remapping-a-split-cohort-to-a-single-analysis"></a>
