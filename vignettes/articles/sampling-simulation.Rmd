@@ -10,6 +10,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteDepends{ggdist}
   %\VignetteDepends{kableExtra}
+  %\VignetteDepends{gridExtra}
 # bibliography: refs.bib
 link-citations: no
 link-color: grey
@@ -37,6 +38,7 @@ library(ggplot2)
 library(ggdist)
 library(knitr)
 library(kableExtra)
+library(gridExtra)
 ```
 
 # Purpose
@@ -401,7 +403,7 @@ We developed a quick algorithm to automate the determination of the beginning an
 
 This function reorders the sampling events to follow a continuous growth progression. This allows for the determination of model-based estimates of cohort production and associated growth statistics and also keeps the information to re-map the production outputs to the original sampling times.
 
-```{r plot-remap, fig.height=5, fig.width=5, dpi=300, fig.align='center'}
+```{r plot-remap, out.width='75%', dpi=300, fig.align='center'}
 
 remappedCohort
 
