@@ -493,38 +493,24 @@ specific conditions.</p>
 <h4 id="load-summarise-and-visualize-the-simulated-sampling-data-1">Load, summarise, and visualize the simulated sampling data<a class="anchor" aria-label="anchor" href="#load-summarise-and-visualize-the-simulated-sampling-data-1"></a>
 </h4>
 <p><img src="sampling-simulation_files/figure-html/load-split-sim-data-1.png" width="700"></p>
-<pre><code><span><span class="co">#&gt; tibble [6,666 × 4] (S3: tbl_df/tbl/data.frame)</span></span>
-<span><span class="co">#&gt;  $ dateID   : num [1:6666] 101 101 101 101 101 101 101 101 101 101 ...</span></span>
-<span><span class="co">#&gt;  $ repID    : int [1:6666] 1 1 1 1 1 1 1 1 1 1 ...</span></span>
-<span><span class="co">#&gt;  $ n_m2     : int [1:6666] 229 229 229 229 229 229 229 229 229 229 ...</span></span>
-<span><span class="co">#&gt;  $ massValue: num [1:6666] 5.02 4.83 4.83 4.8 5.91 ...</span></span>
-<span><span class="co">#&gt; [1] "tbl_df"     "tbl"        "data.frame"</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 4</span></span></span>
-<span><span class="co">#&gt;   dateID repID  n_m2 massValue</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>    101     1   229      5.02</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>    101     1   229      4.83</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>    101     1   229      4.83</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>    101     1   229      4.80</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>    101     1   229      5.91</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>    101     1   229      5.53</span></span>
-<span><span class="co">#&gt; [1] "agg"</span></span>
-<span><span class="co">#&gt; [1] "cohorts"</span></span>
-<span><span class="co">#&gt; [1] "dfOrdered"</span></span>
-<span><span class="co">#&gt; [1] "optim"</span></span>
-<span><span class="co">#&gt; [1] "fit out"</span></span>
-<span><span class="co">#&gt; [1] "t0"</span></span>
-<span><span class="co">#&gt; [1] "raw_age"</span></span>
-<span><span class="co">#&gt; [1] "t0"</span></span>
-<span><span class="co">#&gt; [1] "raw_age"</span></span>
-<span><span class="co">#&gt; [1] "t0"</span></span>
-<span><span class="co">#&gt; [1] "raw_age"</span></span>
-<span><span class="co">#&gt; [1] "t0"</span></span>
-<span><span class="co">#&gt; [1] "raw_age"</span></span>
-<span><span class="co">#&gt; [1] "weights"</span></span>
-<span><span class="co">#&gt; [1] "remap"</span></span>
-<span><span class="co">#&gt; No traceback available</span></span>
-<span><span class="co">#&gt; $df_remap</span></span>
+</div>
+<div class="section level4">
+<h4 id="remapping-a-split-cohort-to-a-single-analysis">Remapping a split cohort to a single analysis<a class="anchor" aria-label="anchor" href="#remapping-a-split-cohort-to-a-single-analysis"></a>
+</h4>
+<p>In order to perform a full cohort analysis on a cohort that is split
+in time, we can ‘remap’ the two cohorts into a new timescale that
+follows a consistent cohort progression. We can then calculate
+production through regular cohort methods. If we need to extract
+time-specific values, we can simply map the estimates back to the
+original time scale.</p>
+<p>We developed a quick algorithm to automate the determination of the
+beginning and ends of a <em>non-overlapping</em> cohort.</p>
+<p>This function reorders the sampling events to follow a continuous
+growth progression. This allows for the determination of model-based
+estimates of cohort production and associated growth statistics and also
+keeps the information to re-map the production outputs to the original
+sampling times.</p>
+<pre><code><span><span class="co">#&gt; $df_remap</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 9 × 5</span></span></span>
 <span><span class="co">#&gt;   dateID mean_mass cohort pseudo_day pseudotime</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
@@ -589,36 +575,7 @@ specific conditions.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Number of iterations to convergence: 32 </span></span>
 <span><span class="co">#&gt; Achieved convergence tolerance: 1.374e-06</span></span></code></pre>
-</div>
-<div class="section level4">
-<h4 id="remapping-a-split-cohort-to-a-single-analysis">Remapping a split cohort to a single analysis<a class="anchor" aria-label="anchor" href="#remapping-a-split-cohort-to-a-single-analysis"></a>
-</h4>
-<p>In order to perform a full cohort analysis on a cohort that is split
-in time, we can ‘remap’ the two cohorts into a new timescale that
-follows a consistent cohort progression. We can then calculate
-production through regular cohort methods. If we need to extract
-time-specific values, we can simply map the estimates back to the
-original time scale.</p>
-<p>We developed a quick algorithm to automate the determination of the
-beginning and ends of a <em>non-overlapping</em> cohort.</p>
-<p>This function reorders the sampling events to follow a continuous
-growth progression. This allows for the determination of model-based
-estimates of cohort production and associated growth statistics and also
-keeps the information to re-map the production outputs to the original
-sampling times.</p>
-<!-- ```{r plot-remap, fig.height=5, fig.width=5, dpi=300, fig.align='center'} -->
-<!-- # remappedCohort -->
-<!-- #  -->
-<!-- # # Model-averaged fit -->
-<!-- # p1 = plot_cohort_fit(remappedCohort, models = "ensemble") -->
-<!-- #  -->
-<!-- # # Specific model fit -->
-<!-- # p2 = plot_cohort_fit(remappedCohort, models = "vbg") -->
-<!-- # p3 = plot_cohort_fit(remappedCohort, models = "gompertz", labelPoints = FALSE) -->
-<!-- # p4 = plot_cohort_fit(remappedCohort, models = "logistic") -->
-<!-- #  -->
-<!-- # gridExtra::grid.arrange(p1,p2,p3,p4, ncol = 2, nrow = 2) -->
-<!-- ``` -->
+<p><img src="sampling-simulation_files/figure-html/plot-remap-1.png" width="75%" style="display: block; margin: auto;"></p>
 </div>
 </div>
 </div>
