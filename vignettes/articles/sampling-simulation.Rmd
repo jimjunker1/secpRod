@@ -394,6 +394,8 @@ remappedCohort = reconstruct_split_cohort(df = df,
                                           offsetBounds = c(10, 150),
                                           fallbackGrid = FALSE
                                           )
+traceback()
+
 ```
 
 ### Remapping a split cohort to a single analysis
