@@ -519,8 +519,76 @@ specific conditions.</p>
 <span><span class="co">#&gt; [1] "raw_age"</span></span>
 <span><span class="co">#&gt; [1] "t0"</span></span>
 <span><span class="co">#&gt; [1] "raw_age"</span></span>
-<span><span class="co">#&gt; Error in 1/D: non-numeric argument to binary operator</span></span>
-<span><span class="co">#&gt; No traceback available</span></span></code></pre>
+<span><span class="co">#&gt; [1] "t0"</span></span>
+<span><span class="co">#&gt; [1] "raw_age"</span></span>
+<span><span class="co">#&gt; [1] "weights"</span></span>
+<span><span class="co">#&gt; [1] "remap"</span></span>
+<span><span class="co">#&gt; No traceback available</span></span>
+<span><span class="co">#&gt; $df_remap</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 9 × 5</span></span></span>
+<span><span class="co">#&gt;   dateID mean_mass cohort pseudo_day pseudotime</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>    371     0.567      1         0          15</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>    401     3.20       1        30          46</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>    431     4.27       1        60          72</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>    221     4.71       2       234.        111</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>    101     4.75       2       114.        125</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>    461     4.77       1        90         136</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span>    131     4.78       2       144.        140</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span>    191     4.79       2       204.        154</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">9</span>    161     4.91       2       174.        182</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $offset</span></span>
+<span><span class="co">#&gt; [1] 114.108</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $weights</span></span>
+<span><span class="co">#&gt;        vbg   gompertz   logistic   richards </span></span>
+<span><span class="co">#&gt; 0.20514544 0.34161392 0.00414202 0.44909862 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $fits</span></span>
+<span><span class="co">#&gt; $fits$vbg</span></span>
+<span><span class="co">#&gt; Nonlinear regression model</span></span>
+<span><span class="co">#&gt;   model: W_all ~ Winf * (1 - exp(-k * (t_all - t0)))</span></span>
+<span><span class="co">#&gt;    data: parent.frame()</span></span>
+<span><span class="co">#&gt;    Winf       k      t0 </span></span>
+<span><span class="co">#&gt;  4.8381  0.0334 -3.6239 </span></span>
+<span><span class="co">#&gt;  residual sum-of-squares: 0.05252</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Number of iterations to convergence: 7 </span></span>
+<span><span class="co">#&gt; Achieved convergence tolerance: 8.844e-07</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $fits$gompertz</span></span>
+<span><span class="co">#&gt; Nonlinear regression model</span></span>
+<span><span class="co">#&gt;   model: W_all ~ Winf * exp(-exp(-k * (t_all - tStar)))</span></span>
+<span><span class="co">#&gt;    data: parent.frame()</span></span>
+<span><span class="co">#&gt;    Winf       k   tStar </span></span>
+<span><span class="co">#&gt;  4.7901  0.0531 13.8014 </span></span>
+<span><span class="co">#&gt;  residual sum-of-squares: 0.04689</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Number of iterations to convergence: 7 </span></span>
+<span><span class="co">#&gt; Achieved convergence tolerance: 8.536e-06</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $fits$logistic</span></span>
+<span><span class="co">#&gt; Nonlinear regression model</span></span>
+<span><span class="co">#&gt;   model: W_all ~ Winf/(1 + exp(-k * (t_all - tStar)))</span></span>
+<span><span class="co">#&gt;    data: parent.frame()</span></span>
+<span><span class="co">#&gt;     Winf        k    tStar </span></span>
+<span><span class="co">#&gt;  4.75343  0.08162 22.32102 </span></span>
+<span><span class="co">#&gt;  residual sum-of-squares: 0.125</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Number of iterations to convergence: 11 </span></span>
+<span><span class="co">#&gt; Achieved convergence tolerance: 3.112e-06</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $fits$richards</span></span>
+<span><span class="co">#&gt; Nonlinear regression model</span></span>
+<span><span class="co">#&gt;   model: W_all ~ Winf * (1 + 1/D * exp(-k * (t_all - tStar)))^-D</span></span>
+<span><span class="co">#&gt;    data: parent.frame()</span></span>
+<span><span class="co">#&gt;     Winf        k    tStar        D </span></span>
+<span><span class="co">#&gt;  4.81075  0.04301  7.23367 -2.19368 </span></span>
+<span><span class="co">#&gt;  residual sum-of-squares: 0.03533</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Number of iterations to convergence: 32 </span></span>
+<span><span class="co">#&gt; Achieved convergence tolerance: 1.374e-06</span></span></code></pre>
 </div>
 <div class="section level4">
 <h4 id="remapping-a-split-cohort-to-a-single-analysis">Remapping a split cohort to a single analysis<a class="anchor" aria-label="anchor" href="#remapping-a-split-cohort-to-a-single-analysis"></a>
