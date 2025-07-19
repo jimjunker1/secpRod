@@ -1,7 +1,7 @@
 #' @rdname reconstruct_cohorts
 #' @title reconstruct_split_cohort
 #' @description
-#' This function is used to reconstruct a *non-overlapping* cohort sampled over two years, often with a period of
+#' \code{reconstruct_split_cohorts()} is used to reconstruct a *non-overlapping* cohort sampled over two years, often with a period of
 #' of zero abundance (e.g. due to egg or adult stages).
 #' @details
 #' The initiation of a sampling program can often start when the growth of a population cohort is already underway, leading to observing only large, late instars individuals during early sampling events.
@@ -28,6 +28,8 @@
 #' @param models character. String vector of the names of models to fit to estimate \eqn{t_0}. See `details` for more information.
 #' @param offsetBounds integer vector of length = 2. The lower and upper bounds of the offset to test for fit
 #' @param fallbackGrid logical. If TRUE (default) a grid search procedure will be used if `optim()` fails.
+#' @returns \code{resonstruct_split_cohort()} returns a dataframe with the original sampling date, estimated cohort ages, and remapped
+#' cohort ages to fit production methods and remap back to original timescale.
 #' @import dplyr
 #' @importFrom stats coef
 #' @importFrom stats optim
@@ -157,21 +159,19 @@ print('remap')
 
 #' @rdname reconstruct_cohorts
 #' @description
-#' This is an internal function used in [reconstruct_split_cohort()] to fit growth functions to find the optimal cohort offset in a split cohort.
+#' \code{fit_with_offset()} is an internal function used in [reconstruct_split_cohort()] to fit growth functions to find the optimal cohort offset in a split cohort.
 #' @title fit_with_offset
 #' @param dfOrdered the reordered sampling data set from [reconstruct_split_cohort()] processes
 #' @param offset the offset (in days) between the final sample and first sample in two cohort portions to be joined
 #' @param models character. String vector of the names of models to fit to estimate \eqn{t_0}. See `details` for more information.
 #' @param tStart data frame of date information with external predictors for each month. There should be a column name identical to all variables in the growth equation found in taxaInfo data.frame.
-#' @returns returns a list of three (3) objects:
+#' @returns \code{fit_with_offset()} returns a list of three (3) objects:
 #' @returns fits: the growth model fits to reordered sampling dates
 #' @returns aiccs: the Akaike Information Criterion for each model. This is used to build ensemble model estimates for remapped cohort 'times'
 #' @returns df_pseudo: a data.frame of the original date, standardized cohort 'times', and t0 corrected ages estimated from the growth models.
 #' @import dplyr
 #' @importFrom stats AIC
 #' @importFrom stats nls
-#' @seealso
-#'    [reconstruct_split_cohorts()] for documentation on the process used to reconstruct split cohorts
 #' @export
 
 fit_with_offset <- function(dfOrdered = NULL, offset = NULL, models = c("vbg", "gompertz", "logistic", "richards"), tStart = 5) {
@@ -251,17 +251,15 @@ fit_with_offset <- function(dfOrdered = NULL, offset = NULL, models = c("vbg", "
 
 #' @rdname reconstruct_cohorts
 #' @description
-#' This is an internal function used in [reconstruct_split_cohort()] to fit growth functions to find the optimal cohort offset in a split cohort.
+#' \code{plot_cohort_fit()} is an internal function used in [reconstruct_split_cohort()] to fit growth functions to find the optimal cohort offset in a split cohort.
 #' @title plot_cohort_fit
 #' @param remappedCohort the reordered object returned from [reconstruct_split_cohort()]
 #' @param models character. String vector of the names of models to fit to \eqn{M_t}. See `details` for more information.
 #' @param labelPoints logical. Should the points be labelled with the sampling date information
-#' @returns returns a ggplot object of the
+#' @returns \code{plot_cohort_fit()} returns a ggplot object of the remapped cohort and growth model fits.
 #' @import dplyr
 #' @import ggplot2
 #' @importFrom stats coef
-#' @seealso
-#'    [reconstruct_split_cohorts()] for documentation on the process used to reconstruct split cohorts
 #' @export
 plot_cohort_fit <- function(remappedCohort, models = "ensemble", labelPoints = TRUE) {
 

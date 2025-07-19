@@ -52,7 +52,10 @@ plot_cohort_fit(remappedCohort, models = "ensemble", labelPoints = TRUE)
 \item{labelPoints}{logical. Should the points be labelled with the sampling date information}
 }
 \value{
-returns a list of three (3) objects:
+\code{resonstruct_split_cohort()} returns a dataframe with the original sampling date, estimated cohort ages, and remapped
+cohort ages to fit production methods and remap back to original timescale.
+
+\code{fit_with_offset()} returns a list of three (3) objects:
 
 fits: the growth model fits to reordered sampling dates
 
@@ -60,15 +63,15 @@ aiccs: the Akaike Information Criterion for each model. This is used to build en
 
 df_pseudo: a data.frame of the original date, standardized cohort 'times', and t0 corrected ages estimated from the growth models.
 
-returns a ggplot object of the
+\code{plot_cohort_fit()} returns a ggplot object of the remapped cohort and growth model fits.
 }
 \description{
-This function is used to reconstruct a *non-overlapping* cohort sampled over two years, often with a period of
+\code{reconstruct_split_cohorts()} is used to reconstruct a *non-overlapping* cohort sampled over two years, often with a period of
 of zero abundance (e.g. due to egg or adult stages).
 
-This is an internal function used in [reconstruct_split_cohort()] to fit growth functions to find the optimal cohort offset in a split cohort.
+\code{fit_with_offset()} is an internal function used in [reconstruct_split_cohort()] to fit growth functions to find the optimal cohort offset in a split cohort.
 
-This is an internal function used in [reconstruct_split_cohort()] to fit growth functions to find the optimal cohort offset in a split cohort.
+\code{plot_cohort_fit()} is an internal function used in [reconstruct_split_cohort()] to fit growth functions to find the optimal cohort offset in a split cohort.
 }
 \details{
 The initiation of a sampling program can often start when the growth of a population cohort is already underway, leading to observing only large, late instars individuals during early sampling events.
@@ -86,9 +89,4 @@ depending on model which is used to estimate \eqn{t_0}), and growth rate, \eqn{k
      "gompertz" The Gompertz growth model: \deqn{M_t = M_{\infty} e^{e^{-k \cdot (t - t*)}}}
      "logistic" The logistic growth model: \deqn{M_t = M_{\infty} / (1 + e^{-k \cdot (t - t*)})}
      "richards" The Richards growth model: \deqn{M_t = M_{\infty} (1 + 1/D \cdot e^{-k \cdot (t - t*)})^{-D}}
-}
-\seealso{
-[reconstruct_split_cohorts()] for documentation on the process used to reconstruct split cohorts
-
-[reconstruct_split_cohorts()] for documentation on the process used to reconstruct split cohorts
 }
