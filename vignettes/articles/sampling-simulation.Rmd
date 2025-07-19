@@ -67,7 +67,7 @@ pars_desc = c("The grid dimension of the 'x' and 'y' direction. Total grid cells
 
 data.frame(pars, pars_desc) %>% 
   knitr::kable(., 'pipe', align = 'l', col.name = c('Parameters', 'Description')) %>% 
-  kable_classic(full_width = TRUE)
+  kabelExtra::kable_classic(full_width = TRUE)
   
 ```
 
@@ -200,11 +200,10 @@ data("singleCohortSim", package = 'secpRod')
 summaryStats <- singleCohortSim %>%
   unnest(massDistribution) %>%
   group_by(day) %>%
-  summarise(
+  dplyr::summarise(
     massMean = mean(massDistribution, na.rm = TRUE),
     massSD = sd(massDistribution, na.rm = TRUE),
-    larvalDensityMean = mean(larvalDensity),
-    .groups = "drop"
+    larvalDensityMean = mean(larvalDensity)
   )
 
 ggplot(summaryStats, aes(x = day)) +
@@ -356,11 +355,10 @@ data("splitCohortSim", package = 'secpRod')
 summary_stats <- splitCohortSim %>%
   unnest(massDistribution) %>%
   group_by(day) %>%
-  summarise(
+  dplyr::summarise(
     massMean = mean(massDistribution, na.rm = TRUE),
     massSD= sd(massDistribution, na.rm = TRUE),
-    larvalDensityMean = mean(larvalDensity),
-    .groups = "drop"
+    larvalDensityMean = mean(larvalDensity)
   )
 
 ggplot(summary_stats, aes(x = day)) +
@@ -387,15 +385,15 @@ str(df)
 class(df)
 head(df)
 
-# remappedCohort = reconstruct_split_cohort(df = df,
-#                                           timeCol = "dateID",
-#                                           massCol = "massValue",
-#                                           massDropThresh = 0.6,
-#                                           tStart = 5,
-#                                           models = c("vbg", "gompertz", "logistic", "richards"),
-#                                           offsetBounds = c(10, 150),
-#                                           fallbackGrid = FALSE
-#                                           )
+remappedCohort = reconstruct_split_cohort(df = df,
+                                          timeCol = "dateID",
+                                          massCol = "massValue",
+                                          massDropThresh = 0.6,
+                                          tStart = 5,
+                                          models = c("vbg", "gompertz", "logistic", "richards"),
+                                          offsetBounds = c(10, 150),
+                                          fallbackGrid = FALSE
+                                          )
 ```
 
 ### Remapping a split cohort to a single analysis
@@ -408,7 +406,7 @@ This function reorders the sampling events to follow a continuous growth progres
 
 ```{r plot-remap, fig.height=5, fig.width=5, dpi=300, fig.align='center'}
 
-# remappedCohort
+remappedCohort
 # 
 # # Model-averaged fit
 # p1 = plot_cohort_fit(remappedCohort, models = "ensemble")
