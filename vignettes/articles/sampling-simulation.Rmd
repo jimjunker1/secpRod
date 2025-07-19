@@ -348,7 +348,7 @@ daily_sampling <- bind_rows(sampling_results)
 
 ### Load, summarise, and visualize the simulated sampling data
 
-```{r load-split-sim-data}
+```{r load-split-sim-data, error = TRUE}
 
 data("splitCohortSim", package = 'secpRod')
 
