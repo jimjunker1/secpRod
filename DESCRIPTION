@@ -25,6 +25,7 @@ Suggests:
     plyr,
     ggdist,
     kableExtra,
+    gridExtra,
     rmarkdown
 License: MIT + file LICENSE
 VignetteBuilder: knitr
