@@ -67,7 +67,7 @@ pars_desc = c("The grid dimension of the 'x' and 'y' direction. Total grid cells
 
 data.frame(pars, pars_desc) %>% 
   knitr::kable(., 'pipe', align = 'l', col.name = c('Parameters', 'Description')) %>% 
-  kabelExtra::kable_classic(full_width = TRUE)
+  kableExtra::kable_classic(full_width = TRUE)
   
 ```
 
