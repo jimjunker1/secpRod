@@ -215,7 +215,7 @@ daily_sampling = daily_sampling %>%
 data("singleCohortSim", package = 'secpRod')
 
 summaryStats <- singleCohortSim %>%
-  unnest(afdm_mg) %>%
+  unnest(afdm_mg, keep_empty = TRUE) %>%
   group_by(dateID) %>%
   dplyr::summarise(
     massMean = mean(afdm_mg, na.rm = TRUE),
