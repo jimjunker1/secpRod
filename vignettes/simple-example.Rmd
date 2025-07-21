@@ -115,7 +115,7 @@ data('singleCohortSim', package = 'secpRod')
 
 The `sampleInfo` for this species includes:
 
-```{r view-sim, echo = FALSE}
+```{r view-sim-data, echo = FALSE}
 
 head(singleCohortSim, 10)
 
