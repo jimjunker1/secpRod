@@ -358,7 +358,22 @@ from a negative exponential model.</p>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="co"># Final output</span></span>
-<span><span class="va">daily_sampling</span> <span class="op">&lt;-</span> <span class="fu">bind_rows</span><span class="op">(</span><span class="va">sampling_results</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co">## clean to consistent naming</span></span>
+<span><span class="va">daily_sampling</span> <span class="op">&lt;-</span> <span class="fu">bind_rows</span><span class="op">(</span><span class="va">sampling_results</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>taxonID <span class="op">=</span> <span class="st">'sppX'</span>, repID <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu">n</span><span class="op">(</span><span class="op">)</span>, .by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'day'</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">rename</span><span class="op">(</span>density <span class="op">=</span> <span class="va">larvalDensity</span>, afdm_mg <span class="op">=</span> <span class="va">massDistribution</span>, dateID <span class="op">=</span> <span class="va">day</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">zeroFills</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expand.grid.html" class="external-link">expand.grid</a></span><span class="op">(</span>taxonID <span class="op">=</span> <span class="st">'sppX'</span>,</span>
+<span>                        dateID <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">daily_sampling</span><span class="op">$</span><span class="va">dateID</span><span class="op">)</span>,</span>
+<span>                        repID <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span>,</span>
+<span>                        density <span class="op">=</span> <span class="fl">0</span>, afdm_mg <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">daily_sampling</span> <span class="op">=</span> <span class="va">daily_sampling</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="va">x</span>,<span class="op">-</span><span class="va">y</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">full_join</span><span class="op">(</span><span class="va">.</span>,<span class="va">zeroFills</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'taxonID'</span>,<span class="st">'dateID'</span>,<span class="st">'repID'</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>density <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">density.x</span><span class="op">)</span>, <span class="va">density.y</span>, <span class="va">density.x</span><span class="op">)</span>,</span>
+<span>         afdm_mg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">afdm_mg.x</span><span class="op">)</span>, <span class="va">afdm_mg.y</span>, <span class="va">afdm_mg.x</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="va">taxonID</span>, <span class="va">dateID</span>, <span class="va">repID</span>, <span class="va">density</span>, <span class="va">afdm_mg</span><span class="op">)</span></span></code></pre></div>
 </details><div class="section level4">
 <h4 id="load-summarise-and-visualize-the-simulated-sampling-data">Load, summarise, and visualize the simulated sampling data<a class="anchor" aria-label="anchor" href="#load-summarise-and-visualize-the-simulated-sampling-data"></a>
 </h4>
@@ -488,7 +503,22 @@ specific conditions.</p>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="co"># Final output</span></span>
-<span><span class="va">daily_sampling</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">sampling_results</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co">## clean to consistent naming</span></span>
+<span><span class="va">daily_sampling</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">sampling_results</span><span class="op">)</span><span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>taxonID <span class="op">=</span> <span class="st">'sppX'</span>, repID <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>, .by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'day'</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>density <span class="op">=</span> <span class="va">larvalDensity</span>, afdm_mg <span class="op">=</span> <span class="va">massDistribution</span>, dateID <span class="op">=</span> <span class="va">day</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">zeroFills</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expand.grid.html" class="external-link">expand.grid</a></span><span class="op">(</span>taxonID <span class="op">=</span> <span class="st">'sppX'</span>,</span>
+<span>                        dateID <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">daily_sampling</span><span class="op">$</span><span class="va">dateID</span><span class="op">)</span>,</span>
+<span>                        repID <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span>,</span>
+<span>                        density <span class="op">=</span> <span class="fl">0</span>, afdm_mg <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">daily_sampling</span> <span class="op">=</span> <span class="va">daily_sampling</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">x</span>,<span class="op">-</span><span class="va">y</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">full_join</a></span><span class="op">(</span><span class="va">.</span>,<span class="va">zeroFills</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'taxonID'</span>,<span class="st">'dateID'</span>,<span class="st">'repID'</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>density <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">density.x</span><span class="op">)</span>, <span class="va">density.y</span>, <span class="va">density.x</span><span class="op">)</span>,</span>
+<span>         afdm_mg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">afdm_mg.x</span><span class="op">)</span>, <span class="va">afdm_mg.y</span>, <span class="va">afdm_mg.x</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">taxonID</span>, <span class="va">dateID</span>, <span class="va">repID</span>, <span class="va">density</span>, <span class="va">afdm_mg</span><span class="op">)</span></span></code></pre></div>
 </details><div class="section level4">
 <h4 id="load-summarise-and-visualize-the-simulated-sampling-data-1">Load, summarise, and visualize the simulated sampling data<a class="anchor" aria-label="anchor" href="#load-summarise-and-visualize-the-simulated-sampling-data-1"></a>
 </h4>
@@ -511,70 +541,61 @@ estimates of cohort production and associated growth statistics and also
 keeps the information to re-map the production outputs to the original
 sampling times.</p>
 <pre><code><span><span class="co">#&gt; $df_remap</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 9 × 5</span></span></span>
-<span><span class="co">#&gt;   dateID mean_mass cohort pseudo_day pseudotime</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>    371     0.567      1         0          15</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>    401     3.20       1        30          46</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>    431     4.27       1        60          72</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>    221     4.71       2       234.        111</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>    101     4.75       2       114.        125</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>    461     4.77       1        90         136</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span>    131     4.78       2       144.        140</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span>    191     4.79       2       204.        154</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">9</span>    161     4.91       2       174.        182</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 11 × 5</span></span></span>
+<span><span class="co">#&gt;    dateID mean_mass cohort pseudo_day pseudotime</span></span>
+<span><span class="co">#&gt;     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>    371     0.566      1        0            4</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>    401     3.20       1       30           34</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>    431     4.27       1       60           64</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>    461     4.71       1       90           97</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>    101     4.74       2       94.8        101</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>    131     4.87       2      125.         128</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>    161     4.87       2      155.         130</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>    251     4.94       2      245.         180</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>    281     4.94       2      275.         181</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>    191     4.95       2      185.         195</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span>    221     5.01       2      215.         224</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $offset</span></span>
-<span><span class="co">#&gt; [1] 114.108</span></span>
+<span><span class="co">#&gt; [1] 94.7847</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $weights</span></span>
-<span><span class="co">#&gt;        vbg   gompertz   logistic   richards </span></span>
-<span><span class="co">#&gt; 0.20514544 0.34161392 0.00414202 0.44909862 </span></span>
+<span><span class="co">#&gt;          vbg     gompertz     logistic </span></span>
+<span><span class="co">#&gt; 9.999940e-01 5.997599e-06 1.207573e-08 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $fits</span></span>
 <span><span class="co">#&gt; $fits$vbg</span></span>
 <span><span class="co">#&gt; Nonlinear regression model</span></span>
 <span><span class="co">#&gt;   model: W_all ~ Winf * (1 - exp(-k * (t_all - t0)))</span></span>
 <span><span class="co">#&gt;    data: parent.frame()</span></span>
-<span><span class="co">#&gt;    Winf       k      t0 </span></span>
-<span><span class="co">#&gt;  4.8381  0.0334 -3.6239 </span></span>
-<span><span class="co">#&gt;  residual sum-of-squares: 0.05252</span></span>
+<span><span class="co">#&gt;     Winf        k       t0 </span></span>
+<span><span class="co">#&gt;  4.96086  0.03079 -3.90798 </span></span>
+<span><span class="co">#&gt;  residual sum-of-squares: 0.007637</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Number of iterations to convergence: 7 </span></span>
-<span><span class="co">#&gt; Achieved convergence tolerance: 8.844e-07</span></span>
+<span><span class="co">#&gt; Number of iterations to convergence: 6 </span></span>
+<span><span class="co">#&gt; Achieved convergence tolerance: 4.548e-07</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $fits$gompertz</span></span>
 <span><span class="co">#&gt; Nonlinear regression model</span></span>
 <span><span class="co">#&gt;   model: W_all ~ Winf * exp(-exp(-k * (t_all - tStar)))</span></span>
 <span><span class="co">#&gt;    data: parent.frame()</span></span>
-<span><span class="co">#&gt;    Winf       k   tStar </span></span>
-<span><span class="co">#&gt;  4.7901  0.0531 13.8014 </span></span>
-<span><span class="co">#&gt;  residual sum-of-squares: 0.04689</span></span>
+<span><span class="co">#&gt;     Winf        k    tStar </span></span>
+<span><span class="co">#&gt;  4.90177  0.04918 14.45722 </span></span>
+<span><span class="co">#&gt;  residual sum-of-squares: 0.06798</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Number of iterations to convergence: 7 </span></span>
-<span><span class="co">#&gt; Achieved convergence tolerance: 8.536e-06</span></span>
+<span><span class="co">#&gt; Number of iterations to convergence: 10 </span></span>
+<span><span class="co">#&gt; Achieved convergence tolerance: 2.645e-06</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $fits$logistic</span></span>
 <span><span class="co">#&gt; Nonlinear regression model</span></span>
 <span><span class="co">#&gt;   model: W_all ~ Winf/(1 + exp(-k * (t_all - tStar)))</span></span>
 <span><span class="co">#&gt;    data: parent.frame()</span></span>
 <span><span class="co">#&gt;     Winf        k    tStar </span></span>
-<span><span class="co">#&gt;  4.75343  0.08162 22.32102 </span></span>
-<span><span class="co">#&gt;  residual sum-of-squares: 0.125</span></span>
+<span><span class="co">#&gt;  4.85909  0.07554 23.18953 </span></span>
+<span><span class="co">#&gt;  residual sum-of-squares: 0.2102</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Number of iterations to convergence: 11 </span></span>
-<span><span class="co">#&gt; Achieved convergence tolerance: 3.112e-06</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $fits$richards</span></span>
-<span><span class="co">#&gt; Nonlinear regression model</span></span>
-<span><span class="co">#&gt;   model: W_all ~ Winf * (1 + 1/D * exp(-k * (t_all - tStar)))^-D</span></span>
-<span><span class="co">#&gt;    data: parent.frame()</span></span>
-<span><span class="co">#&gt;     Winf        k    tStar        D </span></span>
-<span><span class="co">#&gt;  4.81075  0.04301  7.23367 -2.19368 </span></span>
-<span><span class="co">#&gt;  residual sum-of-squares: 0.03533</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Number of iterations to convergence: 32 </span></span>
-<span><span class="co">#&gt; Achieved convergence tolerance: 1.374e-06</span></span></code></pre>
+<span><span class="co">#&gt; Number of iterations to convergence: 13 </span></span>
+<span><span class="co">#&gt; Achieved convergence tolerance: 8.37e-06</span></span></code></pre>
 <p><img src="sampling-simulation_files/figure-html/plot-remap-1.png" width="75%" style="display: block; margin: auto;"></p>
 </div>
 </div>

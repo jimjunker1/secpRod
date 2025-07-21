@@ -71,6 +71,173 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
+<p>The <code>secpRod</code> package provides a number of methods to
+calculate secondary production of populations, both those with clear
+cohort structure and those where cohort structure is not possible to
+discern. First, we walk through the available methods using simulated
+populations that mimic the data structure of real sampling regimes. The
+parameters to create these simulated populations is outlined in
+companion article, vignette(“Simulating the sampling of populations”).
+These simulated populations skip some of the steps of moving from
+initial sampling processes (e.g., length to mass conversions, sample
+subsetting, etc.) that are often part of the process. More complete
+examples that showcase helper functions within <code>secpRod</code> that
+deal with these processes can be found below in <a href="#more-complete-examples">More complete examples</a>. Here, we just
+showcase the secondary production methods available.</p>
+<p>The methods within the package use two main objects,
+<code>sampleInfo</code> the sample-level information (e.g., site, date ,
+replicate) and density and length or mass. An additional dataframe,
+<code>taxaInfo</code> that houses species-specific information such as
+length to mass conversions, and method specific information such as
+cohort production interval estimates (CPIs), production:biomass ratios
+(PBs), and growth equations. The columns contain information for the
+calculation of production. These include, but are not limited to:</p>
+<ul>
+<li><p>taxonID: a character string that matches the name of taxonID from
+sampleInfo</p></li>
+<li><p>massForm: a character string that is coercible to a formula for
+the conversion from length to mass (e.g.,
+<code>afdm_mg~(a*lengthClass^b)</code>)</p></li>
+<li><p>a: numeric variable for the coefficients used in
+massForm</p></li>
+<li><p>b: numeric variable for the coefficients used in
+massForm</p></li>
+<li><p>percAsh: numeric integer 0–100</p></li>
+<li>
+<p>method: character string for the method to use. Must be one of
+the following:</p>
+<ul>
+<li>‘is’: increment-summation method. This cohort-based method
+calculates interval and annual production,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>P</mi><annotation encoding="application/x-tex">P</annotation></semantics></math>,
+from field data as the sum of all interval production,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>t</mi></msubsup><mover><mi>N</mi><mo accent="true">¯</mo></mover><mi>Δ</mi><mi>W</mi></mrow><annotation encoding="application/x-tex">\sum_{i = 1}^{t} \overline{N} \Delta W</annotation></semantics></math>,
+plus initial biomass,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>B</mi><mrow><mi>i</mi><mi>n</mi><mi>i</mi><mi>i</mi><mi>t</mi><mi>a</mi><mi>l</mi></mrow></msub><annotation encoding="application/x-tex">B_{iniital}</annotation></semantics></math>:</li>
+</ul>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo>=</mo><msub><mi>B</mi><mrow><mi>i</mi><mi>n</mi><mi>i</mi><mi>t</mi><mi>i</mi><mi>a</mi><mi>l</mi></mrow></msub><mo>+</mo><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>t</mi></munderover><mover><mi>N</mi><mo accent="true">¯</mo></mover><mi>Δ</mi><mi>W</mi></mrow><annotation encoding="application/x-tex">P = B_{initial} + \sum_{i = 1}^{t} \overline{N} \Delta W </annotation></semantics></math></p>
+<ul>
+<li><p>‘rs’: removal-summation method is similar to the
+increment-summation method but instead calculates the prodcution
+<em>lost</em> during a sampling interval as the product of the decrease
+in density,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Δ</mi><mi>N</mi></mrow><annotation encoding="application/x-tex">\Delta N</annotation></semantics></math>
+and the mean individual mass,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>W</mi><mo accent="true">¯</mo></mover><annotation encoding="application/x-tex">\overline{W}</annotation></semantics></math>
+plus the increase in biomass,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Δ</mi><mi>B</mi></mrow><annotation encoding="application/x-tex">\Delta B</annotation></semantics></math>.</p></li>
+<li><p>‘sf’: size frequency method</p></li>
+</ul>
+</li>
+<li><p>growthForm: a character string that is coercible to a formula.
+This formula is parsed and will reference existing information (e.g.,
+size information) if variables are included in the formula. Further, an
+additional data</p></li>
+<li><p>min.cpi: integer of the minimum estimated cohort production
+interval for adjusting annual production estimates using the
+size-frequency method</p></li>
+<li><p>max.cpi: integer of the maximum estimated cohort production
+interval for adjusting annual production estimates using the
+size-frequency method</p></li>
+<li><p>pb: numeric of the production to biomass (PB) ratio for the
+specific taxa. This can take three forms 1) a single value, 2) a vector
+of values the same length as <code>bootNum</code>, and 3) a string of a
+distribution to randomly sample, <strong>not</strong> including the
+<code>n =</code> (e.g., ‘rnorm(mean = 5, sd = 0.5)’, ‘runif(min = 3, max
+= 8)’). The function will automatically sample the <code>bootNum</code>
+values. <strong><em>Fair warning</em></strong>: We suggest you
+explicitly name the parameters in the function call string. Possible
+unwanted and unknown things may happen otherwise. The tests for this
+feature are still under development, it will not reject any nonsensical
+values (e.g, negative, NA, or Inf). If your distribution samples
+negative values you will get negative productions estimates–at least
+until the <code>min.growth</code> feature is implemented.</p></li>
+<li><p>min.growth: a minimal value of production to assign when density
+is &gt;0 and production estimates for a taxon are &lt;0.</p></li>
+<li><p>notes: notes for researcher use. This column will be maintained
+in output summaries.</p></li>
+<li><p>…: additional information or data to pass to the function. This
+is mainly used to pass environmental data to inform growth rate
+information by included information such as temperature, food
+availability, etc.</p></li>
+</ul>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">taxaInfo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  taxonID <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sppX"</span><span class="op">)</span>,</span>
+<span>  massForm <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"afdm_mg~(a*lengthClass^b)*percAsh"</span><span class="op">)</span>,</span>
+<span>  <span class="co"># a is NA for this example because we simulated mass growth and don't need to convert from length to mass</span></span>
+<span>  a <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span><span class="op">)</span>,</span>
+<span>  <span class="co"># b is NA for this example because we simulated mass growth and don't need to convert from length to mass</span></span>
+<span>  b <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span><span class="op">)</span>,</span>
+<span>  <span class="co"># percAsh is NA for this example because we simulated mass growth and don't need to convert from length to mass</span></span>
+<span>  percAsh <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span><span class="op">)</span>,</span>
+<span>  <span class="co"># method can accept one or more values. This allow comparisons among different methods.</span></span>
+<span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"is"</span><span class="op">)</span>,</span>
+<span>  g.a <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span><span class="op">)</span>,</span>
+<span>  growthForm <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"log(g_d) = 1 - 0.25*log(afdm_mg)"</span><span class="op">)</span>,</span>
+<span>  min.cpi <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">335</span><span class="op">)</span>,</span>
+<span>  max.cpi <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">365</span><span class="op">)</span>,</span>
+<span>  pb <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"runif(min = 3, max = 8)"</span><span class="op">)</span>,</span>
+<span>  min.growth <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.001</span><span class="op">)</span>,</span>
+<span>  notes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"This is here for your use. No information will be used, but this column will be maintained in some summaries. See *** for more information."</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="a-multi-method-comparison-with-simulated-data">A multi-method comparison with simulated data<a class="anchor" aria-label="anchor" href="#a-multi-method-comparison-with-simulated-data"></a>
+</h2>
+<p>First, we load and visualize the simulated cohort data set, which
+contains a single species and follows the progression of density and
+distribution of individual masses through it life cycle.</p>
+<p>The data set is available within the <code>secpRod</code> package
+with:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">'singleCohortSim'</span>, package <span class="op">=</span> <span class="st">'secpRod'</span><span class="op">)</span></span></code></pre></div>
+<p>The <code>sampleInfo</code> for this species includes:</p>
+<pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 10 × 5</span></span></span>
+<span><span class="co">#&gt;    taxonID dateID repID density afdm_mg    </span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> sppX         1     1     541 <span style="color: #949494;">&lt;dbl [541]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> sppX         1     2     571 <span style="color: #949494;">&lt;dbl [571]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> sppX         1     3     550 <span style="color: #949494;">&lt;dbl [550]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> sppX         1     4     347 <span style="color: #949494;">&lt;dbl [347]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> sppX         1     5     467 <span style="color: #949494;">&lt;dbl [467]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> sppX         1     6     387 <span style="color: #949494;">&lt;dbl [387]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> sppX         1     7     466 <span style="color: #949494;">&lt;dbl [466]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> sppX         1     8     381 <span style="color: #949494;">&lt;dbl [381]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> sppX         1     9     583 <span style="color: #949494;">&lt;dbl [583]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> sppX         1    10     403 <span style="color: #949494;">&lt;dbl [403]&gt;</span></span></span></code></pre>
+<details><div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">summary_stats</span> <span class="op">&lt;-</span> <span class="va">singleCohortSim</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link">unnest</a></span><span class="op">(</span><span class="va">afdm_mg</span>, keep_empty <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">dateID</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span></span>
+<span>    massMean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">afdm_mg</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>    massSD<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">afdm_mg</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>    larvalDensityMean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">density</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="va">sim_plot</span> <span class="op">=</span> </span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">summary_stats</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">dateID</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://mjskay.github.io/ggdist/reference/stat_halfeye.html" class="external-link">stat_halfeye</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">splitCohortSim</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">dateID</span>, y <span class="op">=</span> <span class="va">density</span><span class="op">)</span>,</span>
+<span>               color <span class="op">=</span> <span class="st">'green'</span><span class="op">)</span><span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://mjskay.github.io/ggdist/reference/stat_halfeye.html" class="external-link">stat_halfeye</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">splitCohortSim</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link">unnest</a></span><span class="op">(</span><span class="va">afdm_mg</span><span class="op">)</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">dateID</span>, y <span class="op">=</span> <span class="va">afdm_mg</span><span class="op">*</span><span class="fl">100</span><span class="op">)</span>,</span>
+<span>               color <span class="op">=</span> <span class="st">'red'</span><span class="op">)</span><span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_path</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">larvalDensityMean</span><span class="op">)</span>, color <span class="op">=</span> <span class="st">'green'</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_path</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">massMean</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span>, color <span class="op">=</span> <span class="st">'red'</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_y_continuous</a></span><span class="op">(</span></span>
+<span>    name <span class="op">=</span> <span class="st">"Larval Density"</span>,</span>
+<span>    sec.axis <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/sec_axis.html" class="external-link">sec_axis</a></span><span class="op">(</span><span class="op">~</span><span class="va">.</span><span class="op">/</span><span class="fl">100</span>, name <span class="op">=</span> <span class="st">"Mean Mass (mg)"</span><span class="op">)</span>,</span>
+<span>    </span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Larval Density and Mean Mass over Time"</span>, x <span class="op">=</span> <span class="st">"Day"</span><span class="op">)</span><span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.title.y.right <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">'red'</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+</details><p><img src="simple-example_files/figure-html/view-sim-1.png" width="700"></p>
+</div>
+<div class="section level2">
+<h2 id="more-complete-examples-more-complete-examples">More complete examples (#more-complete-examples)<a class="anchor" aria-label="anchor" href="#more-complete-examples-more-complete-examples"></a>
+</h2>
 <p>Currently, the analysis is fully implemented for the size-frequency
 and production:biomass ratio methods. This quick tutorial will outline
 steps to calculate secondary production for whole communities. First,
@@ -86,7 +253,7 @@ Cross (2014)</span> that can be accessed with
 </ol>
 <p>The simulated data set is a single data frame of artificially sampled
 size-frequency data through time.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"univoltine"</span>, package <span class="op">=</span> <span class="st">'secpRod'</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">#clean this data set to align </span></span>
@@ -102,7 +269,7 @@ size-frequency data through time.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> sppA    2023-01-31 1             3       0</span></span></code></pre></div>
 <p>For this simple example, we can create the required ‘taxaInfo’
 object:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># clean simulated data to workable form</span></span>
 <span></span>
 <span><span class="va">taxaInfo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
@@ -181,7 +348,7 @@ described above.</p></li>
 </h3>
 <p>A quick walkthrough of the calculation of secondary production for a
 single species.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## isolate a single species data frame from sampleInfo object</span></span>
 <span></span>
 <span><span class="va">acentrella</span> <span class="op">&lt;-</span> <span class="va">wbtData</span><span class="op">[[</span><span class="st">'sampleInfo'</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">'Acentrella sp.'</span><span class="op">]</span><span class="op">]</span></span>
@@ -208,7 +375,7 @@ patterns. Here we use the <code><a href="../reference/convert_length_to_mass.htm
 function, which adds a column of the individual masses based on the
 length-to-mass formula and coefficients in taxaInfo.</p>
 <p>We can take a look at what this looks like:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">acentrellaInfo</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">taxaInfo</span>, <span class="va">taxonID</span> <span class="op">==</span> <span class="st">"Acentrella sp."</span><span class="op">)</span></span>
 <span><span class="va">acentrellaInfo</span></span>
@@ -220,7 +387,7 @@ length-to-mass formula and coefficients in taxaInfo.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 3 more variables: pb &lt;dbl&gt;, min.growth &lt;dbl&gt;, notes &lt;chr&gt;</span></span></span></code></pre></div>
 <p>Information on its use can be viewed with
 <code><a href="../reference/convert_length_to_mass.html">?convert_length_to_mass</a></code></p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">acentrellaMass</span> <span class="op">=</span> <span class="fu"><a href="../reference/convert_length_to_mass.html">convert_length_to_mass</a></span><span class="op">(</span>taxaSampleList <span class="op">=</span> <span class="va">acentrella</span>,</span>
 <span>                                         taxaInfo <span class="op">=</span> <span class="va">wbtData</span><span class="op">[[</span><span class="st">'taxaInfo'</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
@@ -238,7 +405,7 @@ length-to-mass formula and coefficients in taxaInfo.</p>
 <p>From here you can view the size frequency histograms using the
 <code><a href="../reference/plot_cohorts.html">plot_cohorts()</a></code> function. Check out the function options
 with <code><a href="../reference/plot_cohorts.html">?plot_cohorts</a></code>.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/plot_cohorts.html">plot_cohorts</a></span><span class="op">(</span>taxaSampleListMass <span class="op">=</span> <span class="va">acentrellaMass</span>,</span>
 <span>             param <span class="op">=</span> <span class="st">'length'</span>,</span>
@@ -258,7 +425,7 @@ that will estimate community production.</p>
 <p>To apply it to our single species example, we input the sample
 information and taxa information along with how many bootstraps we would
 like, as:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/calc_production.html">calc_production</a></span><span class="op">(</span></span>
 <span>  taxaSampleListMass <span class="op">=</span> <span class="va">acentrellaMass</span>,</span>
@@ -270,13 +437,13 @@ like, as:</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; $P.boots</span></span>
 <span><span class="co">#&gt;            [,1]     [,2]     [,3]     [,4]     [,5]     [,6]     [,7]    </span></span>
-<span><span class="co">#&gt; P.ann.samp 7381.303 7278.619 8014.519 7254.593 7338.797 8494.39  8192.762</span></span>
-<span><span class="co">#&gt; B.ann.samp 230.6566 237.3738 251.6796 243.2384 265.6653 311.0682 263.5823</span></span>
-<span><span class="co">#&gt; N.ann.samp 632.4695 594.3964 702.0031 642.308  731.771  751.7389 701.1135</span></span>
+<span><span class="co">#&gt; P.ann.samp 7894.01  7079.587 6613.092 8324.897 7190.444 6737.9   8233.515</span></span>
+<span><span class="co">#&gt; B.ann.samp 260.319  249.3877 264.5394 281.8144 246.7723 220.5484 290.1389</span></span>
+<span><span class="co">#&gt; N.ann.samp 665.1926 663.8497 581.4014 701.705  596.9849 596.5369 792.4515</span></span>
 <span><span class="co">#&gt;            [,8]     [,9]     [,10]   </span></span>
-<span><span class="co">#&gt; P.ann.samp 7150.631 6808.053 8607.359</span></span>
-<span><span class="co">#&gt; B.ann.samp 243.4686 240.5153 294.0658</span></span>
-<span><span class="co">#&gt; N.ann.samp 577.9719 627.671  719.5711</span></span>
+<span><span class="co">#&gt; P.ann.samp 8605.992 7213.12  6350.352</span></span>
+<span><span class="co">#&gt; B.ann.samp 262.7356 249.5579 229.219 </span></span>
+<span><span class="co">#&gt; N.ann.samp 754.534  649.3973 508.9685</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $taxaSummary</span></span>
 <span><span class="co">#&gt; $taxaSummary$summaryType</span></span>
@@ -471,7 +638,7 @@ annual biomass, and annual abundance.</p></li>
 above the full can be a lot. The ‘short’ is a paired down version of
 this</p></li>
 </ol>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/calc_production.html">calc_production</a></span><span class="op">(</span></span>
 <span>  taxaSampleListMass <span class="op">=</span> <span class="va">acentrellaMass</span>,</span>
@@ -483,13 +650,13 @@ this</p></li>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; $P.boots</span></span>
 <span><span class="co">#&gt;            [,1]     [,2]     [,3]     [,4]     [,5]     [,6]     [,7]    </span></span>
-<span><span class="co">#&gt; P.ann.samp 8126.271 8024.821 6318.987 7345.596 8034.588 8480.26  7259.096</span></span>
-<span><span class="co">#&gt; B.ann.samp 290.0835 279.4578 216.4758 271.4307 296.4643 282.6735 233.9973</span></span>
-<span><span class="co">#&gt; N.ann.samp 733.3796 709.7602 565.4998 700.2419 763.9362 766.1124 576.9509</span></span>
+<span><span class="co">#&gt; P.ann.samp 6577.237 7689.972 8032.055 7666.049 7863.849 7524.68  7949.663</span></span>
+<span><span class="co">#&gt; B.ann.samp 240.9445 270.1543 284.5143 232.0916 291.3699 249.4617 274.3334</span></span>
+<span><span class="co">#&gt; N.ann.samp 588.0506 694.8745 691.2424 639.103  809.3192 647.6252 729.6995</span></span>
 <span><span class="co">#&gt;            [,8]     [,9]     [,10]   </span></span>
-<span><span class="co">#&gt; P.ann.samp 7340.748 6429.438 7445.705</span></span>
-<span><span class="co">#&gt; B.ann.samp 235.5219 238.4497 246.6102</span></span>
-<span><span class="co">#&gt; N.ann.samp 612.8401 559.0729 657.6272</span></span>
+<span><span class="co">#&gt; P.ann.samp 6265.627 7721.312 7122.196</span></span>
+<span><span class="co">#&gt; B.ann.samp 214.3935 269.127  252.255 </span></span>
+<span><span class="co">#&gt; N.ann.samp 451.6489 691.9201 685.241 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $taxaSummary</span></span>
 <span><span class="co">#&gt; $taxaSummary$summaryType</span></span>
@@ -552,7 +719,7 @@ a more explicit option to set all the values of pb that will be used. In
 the future, if the length
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>≠</mo><annotation encoding="application/x-tex">\neq</annotation></semantics></math><code>bootNum</code> an error will be returned for the taxa.</p></li>
 </ol>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">acentrellaInfo</span><span class="op">$</span><span class="va">method</span> <span class="op">=</span> <span class="st">"pb"</span></span>
 <span><span class="va">acentrellaInfo</span><span class="op">$</span><span class="va">pb</span> <span class="op">=</span> <span class="st">"runif(min = 3, max = 8)"</span></span>
@@ -567,13 +734,13 @@ the future, if the length
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; $P.boots</span></span>
 <span><span class="co">#&gt;            [,1]     [,2]     [,3]     [,4]     [,5]     [,6]     [,7]    </span></span>
-<span><span class="co">#&gt; P.ann.samp 1361.193 1572.705 1040.817 1756.294 1903.171 1494.856 857.3934</span></span>
-<span><span class="co">#&gt; B.ann.samp 268.2725 216.9402 229.3572 264.7083 244.9545 267.2671 266.9924</span></span>
-<span><span class="co">#&gt; N.ann.samp 645.543  583.4459 649.0435 697.8241 614.991  607.0912 608.9363</span></span>
+<span><span class="co">#&gt; P.ann.samp 1088.466 1712.322 1742.765 1987.615 1809.562 2060.79  1218.325</span></span>
+<span><span class="co">#&gt; B.ann.samp 270.4973 226.5819 251.4287 259.6744 259.8879 290.8709 283.018 </span></span>
+<span><span class="co">#&gt; N.ann.samp 686.2019 607.9946 633.1745 629.4606 639.5113 736.3917 806.5242</span></span>
 <span><span class="co">#&gt;            [,8]     [,9]     [,10]   </span></span>
-<span><span class="co">#&gt; P.ann.samp 1350.811 1420.969 1668.782</span></span>
-<span><span class="co">#&gt; B.ann.samp 204.2793 284.1068 273.7509</span></span>
-<span><span class="co">#&gt; N.ann.samp 527.6573 699.4041 711.2406</span></span>
+<span><span class="co">#&gt; P.ann.samp 1831.69  1489.918 1000.54 </span></span>
+<span><span class="co">#&gt; B.ann.samp 269.8947 256.5597 261.3129</span></span>
+<span><span class="co">#&gt; N.ann.samp 720.5662 697.1245 774.2984</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $taxaSummary</span></span>
 <span><span class="co">#&gt; $taxaSummary$summaryType</span></span>
@@ -586,10 +753,10 @@ the future, if the length
 <span><span class="co">#&gt; [1] "pb"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $taxaSummary$P.ann.samp</span></span>
-<span><span class="co">#&gt; [1] 1636.523</span></span>
+<span><span class="co">#&gt; [1] 1968.429</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $taxaSummary$pb</span></span>
-<span><span class="co">#&gt; [1] 6.447713</span></span>
+<span><span class="co">#&gt; [1] 7.755384</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $taxaSummary$meanN</span></span>
 <span><span class="co">#&gt; [1] 657.723</span></span>
@@ -624,7 +791,7 @@ by splitting the full sampleInfo into a list by taxa and using
 <code>apply</code> or functions from the (<code>purrr</code> package)[<a href="https://purrr.tidyverse.org/" class="external-link uri">https://purrr.tidyverse.org/</a>]</p>
 <p>The code below shows how to accomplish this. Again, only size
 frequency and pb are accepted currently.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># load needed packages</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://purrr.tidyverse.org/" class="external-link">purrr</a></span><span class="op">)</span></span>
@@ -703,11 +870,11 @@ frequency and pb are accepted currently.</p>
 <span><span class="co">#&gt; List of 32</span></span>
 <span><span class="co">#&gt;  $ Acentrella sp.    :List of 2</span></span>
 <span><span class="co">#&gt;   ..$ P.boots    :List of 30</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 6126</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 219</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 495</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 7319</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 265</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 6968</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 244</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 612</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 7217</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 257</span></span>
 <span><span class="co">#&gt;   .. .. [list output truncated]</span></span>
 <span><span class="co">#&gt;   .. ..- attr(*, "dim")= int [1:2] 3 10</span></span>
 <span><span class="co">#&gt;   .. ..- attr(*, "dimnames")=List of 2</span></span>
@@ -722,11 +889,11 @@ frequency and pb are accepted currently.</p>
 <span><span class="co">#&gt;   .. .. [list output truncated]</span></span>
 <span><span class="co">#&gt;  $ Ameletus spp.     :List of 2</span></span>
 <span><span class="co">#&gt;   ..$ P.boots    :List of 30</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 479</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 29.1</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 20</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 476</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 25.8</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 796</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 41.6</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 31.7</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 736</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 41.9</span></span>
 <span><span class="co">#&gt;   .. .. [list output truncated]</span></span>
 <span><span class="co">#&gt;   .. ..- attr(*, "dim")= int [1:2] 3 10</span></span>
 <span><span class="co">#&gt;   .. ..- attr(*, "dimnames")=List of 2</span></span>
@@ -741,11 +908,11 @@ frequency and pb are accepted currently.</p>
 <span><span class="co">#&gt;   .. .. [list output truncated]</span></span>
 <span><span class="co">#&gt;  $ Attenella spp.    :List of 2</span></span>
 <span><span class="co">#&gt;   ..$ P.boots    :List of 30</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 3002</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 130</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 77.8</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 2974</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 136</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 2617</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 112</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 71.7</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 2814</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 125</span></span>
 <span><span class="co">#&gt;   .. .. [list output truncated]</span></span>
 <span><span class="co">#&gt;   .. ..- attr(*, "dim")= int [1:2] 3 10</span></span>
 <span><span class="co">#&gt;   .. ..- attr(*, "dimnames")=List of 2</span></span>
@@ -760,11 +927,11 @@ frequency and pb are accepted currently.</p>
 <span><span class="co">#&gt;   .. .. [list output truncated]</span></span>
 <span><span class="co">#&gt;  $ Baetis spp.       :List of 2</span></span>
 <span><span class="co">#&gt;   ..$ P.boots    :List of 30</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 3738</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 140</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 233</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 3366</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 131</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 3568</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 139</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 221</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 3821</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 133</span></span>
 <span><span class="co">#&gt;   .. .. [list output truncated]</span></span>
 <span><span class="co">#&gt;   .. ..- attr(*, "dim")= int [1:2] 3 10</span></span>
 <span><span class="co">#&gt;   .. ..- attr(*, "dimnames")=List of 2</span></span>
@@ -779,11 +946,11 @@ frequency and pb are accepted currently.</p>
 <span><span class="co">#&gt;   .. .. [list output truncated]</span></span>
 <span><span class="co">#&gt;  $ Barbaetis spp.    :List of 2</span></span>
 <span><span class="co">#&gt;   ..$ P.boots    :List of 30</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 1529</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 50.5</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 74.9</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 1729</span></span>
-<span><span class="co">#&gt;   .. ..$ : num 61.3</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 1787</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 66.4</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 92.4</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 1495</span></span>
+<span><span class="co">#&gt;   .. ..$ : num 52.7</span></span>
 <span><span class="co">#&gt;   .. .. [list output truncated]</span></span>
 <span><span class="co">#&gt;   .. ..- attr(*, "dim")= int [1:2] 3 10</span></span>
 <span><span class="co">#&gt;   .. ..- attr(*, "dimnames")=List of 2</span></span>
