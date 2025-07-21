@@ -188,7 +188,22 @@ for (t in seq(sample_start, sample_end, by = sample_interval)) {
 }
 
 # Final output
-daily_sampling <- bind_rows(sampling_results)
+## clean to consistent naming
+daily_sampling <- bind_rows(sampling_results) %>%
+  dplyr::mutate(taxonID = 'sppX', repID = 1:n(), .by = c('day')) %>%
+  rename(density = larvalDensity, afdm_mg = massDistribution, dateID = day)
+
+zeroFills = expand.grid(taxonID = 'sppX',
+                        dateID = unique(daily_sampling$dateID),
+                        repID = 1:10,
+                        density = 0, afdm_mg = NA)
+
+daily_sampling = daily_sampling %>%
+  select(-x,-y) %>%
+  full_join(.,zeroFills, by = c('taxonID','dateID','repID')) %>%
+  mutate(density = ifelse(is.na(density.x), density.y, density.x),
+         afdm_mg = ifelse(is.na(afdm_mg.x), afdm_mg.y, afdm_mg.x)) %>%
+  select(taxonID, dateID, repID, density, afdm_mg)
 
 ```
 
@@ -200,24 +215,24 @@ daily_sampling <- bind_rows(sampling_results)
 data("singleCohortSim", package = 'secpRod')
 
 summaryStats <- singleCohortSim %>%
-  unnest(massDistribution) %>%
-  group_by(day) %>%
+  unnest(afdm_mg) %>%
+  group_by(dateID) %>%
   dplyr::summarise(
-    massMean = mean(massDistribution, na.rm = TRUE),
-    massSD = sd(massDistribution, na.rm = TRUE),
-    larvalDensityMean = mean(larvalDensity)
+    massMean = mean(afdm_mg, na.rm = TRUE),
+    massSD = sd(afdm_mg, na.rm = TRUE),
+    larvalDensityMean = mean(density, na.rm = TRUE)
   )
 
-ggplot(summaryStats, aes(x = day)) +
-  stat_halfeye(data = singleCohortSim, aes(x = day, y = larvalDensity),
+ggplot(summaryStats, aes(x = dateID)) +
+  stat_halfeye(data = singleCohortSim, aes(x = dateID, y = density),
                color = 'green')+
-  stat_halfeye(data = singleCohortSim %>% unnest(massDistribution), aes(x = day, y = massDistribution*100),
+  stat_halfeye(data = singleCohortSim %>% unnest(afdm_mg), aes(x = dateID, y = afdm_mg*100),
                color = 'red')+
   geom_line(aes(y = larvalDensityMean), color = 'green') +
   geom_line(aes(y = massMean * 100), color = 'red') +
   scale_y_continuous(
     name = "Larval Density",
-    sec.axis = sec_axis(~./100, name = "Mean Mass (mg)")
+    sec.axis = sec_axis(~./100, name = "Mean Mass (AFDM mg)")
   ) +
   theme_minimal() +
   labs(title = "Larval Density and Mean Mass over Time", x = "Day")
@@ -343,7 +358,22 @@ for (t in seq(sample_start, sample_end, by = sample_interval)) {
 }
 
 # Final output
-daily_sampling <- bind_rows(sampling_results)
+## clean to consistent naming
+daily_sampling <- bind_rows(sampling_results)%>%
+  dplyr::mutate(taxonID = 'sppX', repID = 1:n(), .by = c('day')) %>%
+  rename(density = larvalDensity, afdm_mg = massDistribution, dateID = day)
+
+zeroFills = expand.grid(taxonID = 'sppX',
+                        dateID = unique(daily_sampling$dateID),
+                        repID = 1:10,
+                        density = 0, afdm_mg = NA)
+
+daily_sampling = daily_sampling %>%
+  select(-x,-y) %>%
+  full_join(.,zeroFills, by = c('taxonID','dateID','repID')) %>%
+  mutate(density = ifelse(is.na(density.x), density.y, density.x),
+         afdm_mg = ifelse(is.na(afdm_mg.x), afdm_mg.y, afdm_mg.x)) %>%
+  select(taxonID, dateID, repID, density, afdm_mg)
 ```
 
 </details>
@@ -355,18 +385,18 @@ daily_sampling <- bind_rows(sampling_results)
 data("splitCohortSim", package = 'secpRod')
 
 summary_stats <- splitCohortSim %>%
-  unnest(massDistribution) %>%
-  group_by(day) %>%
+  unnest(afdm_mg) %>%
+  group_by(dateID) %>%
   dplyr::summarise(
-    massMean = mean(massDistribution, na.rm = TRUE),
-    massSD= sd(massDistribution, na.rm = TRUE),
-    larvalDensityMean = mean(larvalDensity)
+    massMean = mean(afdm_mg, na.rm = TRUE),
+    massSD= sd(afdm_mg, na.rm = TRUE),
+    larvalDensityMean = mean(density, na.rm = TRUE)
   )
 
-ggplot(summary_stats, aes(x = day)) +
-  stat_halfeye(data = splitCohortSim, aes(x = day, y = larvalDensity),
+ggplot(summary_stats, aes(x = dateID)) +
+  stat_halfeye(data = splitCohortSim, aes(x = dateID, y = density),
                color = 'green')+
-  stat_halfeye(data = splitCohortSim %>% unnest(massDistribution), aes(x = day, y = massDistribution*100),
+  stat_halfeye(data = splitCohortSim %>% unnest(afdm_mg), aes(x = dateID, y = afdm_mg*100),
                color = 'red')+
   geom_path(aes(y = larvalDensityMean), color = 'green') +
   geom_path(aes(y = massMean * 100), color = 'red') +
@@ -379,16 +409,12 @@ ggplot(summary_stats, aes(x = day)) +
   labs(title = "Larval Density and Mean Mass over Time", x = "Day")+
   theme(axis.title.y.right = element_text(color = 'red'))
 
-df <- splitCohortSim %>% dplyr::mutate(repID = 1:n(), .by = c('day')) %>% 
-  select(dateID = day, repID, n_m2 = larvalDensity, massValue = massDistribution) %>% 
-  unnest(massValue)
-
-remappedCohort = reconstruct_split_cohort(df = df,
+remappedCohort = reconstruct_split_cohort(df = splitCohortSim %>% unnest(afdm_mg, keep_empty = TRUE),
                                           timeCol = "dateID",
-                                          massCol = "massValue",
+                                          massCol = "afdm_mg",
                                           massDropThresh = 0.6,
                                           tStart = 5,
-                                          models = c("vbg", "gompertz", "logistic", "richards"),
+                                          models = c("vbg", "gompertz", "logistic"),
                                           offsetBounds = c(10, 150),
                                           fallbackGrid = FALSE
                                           )
@@ -418,8 +444,6 @@ p4 = plot_cohort_fit(remappedCohort, models = "logistic")
 gridExtra::grid.arrange(p1,p2,p3,p4, ncol = 2, nrow = 2)
 
 ```
-
-
 
 
 # Spare(d) words

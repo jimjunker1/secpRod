@@ -249,7 +249,7 @@ fit_with_offset <- function(dfOrdered = NULL, offset = NULL, models = c("vbg", "
 
 #' @rdname reconstruct_cohorts
 #' @description
-#' \code{plot_cohort_fit()} is an internal function used in [reconstruct_split_cohort()] to fit growth functions to find the optimal cohort offset in a split cohort.
+#' \code{plot_cohort_fit()} is used to visualize remapped cohorts from [reconstruct_split_cohort()].
 #' @title plot_cohort_fit
 #' @param remappedCohort the reordered object returned from [reconstruct_split_cohort()]
 #' @param models character. String vector of the names of models to fit to \eqn{M_t}. See `details` for more information.
@@ -288,7 +288,7 @@ plot_cohort_fit <- function(remappedCohort, models = "ensemble", labelPoints = T
                            vbg = p["Winf"] * (1 - exp(-p["k"] * (t - p["t0"]))),
                            gompertz = p["Winf"] * exp(-exp(-p["k"] * (t - p["tStar"]))),
                            logistic = p["Winf"] / (1 + exp(-p["k"]*(t - p["tStar"]))),
-                           richards = p["Winf"] * (1 + 1 / p["D"] * exp(-p["k"] * (t - p["tStar"])))^p["D"]
+                           richards = p["Winf"] * (1 + 1 / p["D"] * exp(-p["k"] * (t - p["tStar"])))^-p["D"]
       )
     }
     pred_df$fitted_mass <- as.vector(preds %*% weights)
@@ -302,7 +302,7 @@ plot_cohort_fit <- function(remappedCohort, models = "ensemble", labelPoints = T
                                   vbg = p["Winf"] * (1 - exp(-p["k"] * (t - p["t0"]))),
                                   gompertz = p["Winf"] * exp(-exp(-p["k"] * (t - p["tStar"]))),
                                   logistic = p["Winf"] / (1 + exp(-p["k"]*(t - p["tStar"]))),
-                                  richards = p["Winf"] * (1 + 1 / p["D"] * exp(-p["k"] * (t - p["tStar"])))^p["D"]
+                                  richards = p["Winf"] * (1 + 1 / p["D"] * exp(-p["k"] * (t - p["tStar"])))^-p["D"]
     )
     model_label <- paste("Fitted:", models)
   }

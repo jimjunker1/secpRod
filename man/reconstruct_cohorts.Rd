@@ -71,7 +71,7 @@ of zero abundance (e.g. due to egg or adult stages).
 
 \code{fit_with_offset()} is an internal function used in [reconstruct_split_cohort()] to fit growth functions to find the optimal cohort offset in a split cohort.
 
-\code{plot_cohort_fit()} is an internal function used in [reconstruct_split_cohort()] to fit growth functions to find the optimal cohort offset in a split cohort.
+\code{plot_cohort_fit()} is used to visualize remapped cohorts from [reconstruct_split_cohort()].
 }
 \details{
 The initiation of a sampling program can often start when the growth of a population cohort is already underway, leading to observing only large, late instars individuals during early sampling events.

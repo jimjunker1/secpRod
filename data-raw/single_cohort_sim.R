@@ -13,7 +13,7 @@ sigma_N_init <- 100
 initial_mass <- 0.0006
 mu_ln <- log(5^2 / sqrt(0.5^2 + 5^2))
 sigma_ln <- sqrt(log(1 + (0.5^2 / 5^2)))
-mu_z <- 0.04
+mu_z <- 0.035
 sigma_z <- 0.01
 cpi_start <- 290
 cpi_end <- 310
@@ -119,7 +119,23 @@ for (t in seq(sample_start, sample_end, by = sample_interval)) {
 }
 
 # Final output
-daily_sampling <- bind_rows(sampling_results)
+daily_sampling <- bind_rows(sampling_results) %>%
+  dplyr::mutate(taxonID = 'sppX', repID = 1:n(), .by = c('day')) %>%
+  rename(density = larvalDensity, afdm_mg = massDistribution, dateID = day)
+
+zeroFills = expand.grid(taxonID = 'sppX',
+                        dateID = unique(daily_sampling$dateID),
+                        repID = 1:10,
+                        density = 0,
+                        afdm_mg = NA)
+
+daily_sampling = daily_sampling %>%
+  select(-x,-y) %>%
+  full_join(.,zeroFills, by = c('taxonID','dateID','repID')) %>%
+  mutate(density = ifelse(is.na(density.x), density.y, density.x),
+         afdm_mg = ifelse(is.na(afdm_mg.x), afdm_mg.y, afdm_mg.x)) %>%
+  select(taxonID, dateID, repID, density, afdm_mg)
+
 singleCohortSim <- daily_sampling
 
 usethis::use_data(singleCohortSim, overwrite = TRUE)
@@ -127,26 +143,24 @@ usethis::use_data(singleCohortSim, overwrite = TRUE)
 
 ### Below was used to summarise and visualize the data sets ####
 
-# load(here::here("ignore/working/sampling and model test/single_cohort_sim.RData"))
 # # Summarize samples over time
 # summary_stats <- daily_sampling %>%
-#   unnest(massDistribution) %>%
-#   group_by(day) %>%
+#   unnest(afdm_mg, keep_empty= TRUE) %>%
+#   group_by(dateID) %>%
 #   summarise(
-#     mean_mass = mean(massDistribution, na.rm = TRUE),
-#     sd_mass = sd(massDistribution, na.rm = TRUE),
-#     mean_larvalDensity = mean(larvalDensity),
-#     .groups = "drop"
+#     meanMass = mean(afdm_mg, na.rm = TRUE),
+#     sdMass = sd(afdm_mg, na.rm = TRUE),
+#     meanDensity = mean(density, na.rm = TRUE)
 #   )
 #
 # # Plot mean larval density and mass
-# ggplot(summary_stats, aes(x = day)) +
-#   stat_halfeye(data = daily_sampling, aes(x = day, y = larvalDensity),
+# ggplot(summary_stats, aes(x = dateID)) +
+#   stat_halfeye(data = daily_sampling, aes(x = dateID, y = density),
 #                color = 'green')+
-#   stat_halfeye(data = daily_sampling %>% unnest(massDistribution), aes(x = day, y = massDistribution*100),
+#   stat_halfeye(data = daily_sampling %>% unnest(afdm_mg), aes(x = dateID, y = afdm_mg*100),
 #                color = 'red')+
-#   geom_line(aes(y = mean_larvalDensity), color = 'green') +
-#   geom_line(aes(y = mean_mass * 100), color = 'red') +
+#   geom_line(aes(y = meanDensity), color = 'green') +
+#   geom_line(aes(y = meanMass * 100), color = 'red') +
 #   scale_y_continuous(
 #     name = "Larval Density",
 #     sec.axis = sec_axis(~./100, name = "Mean Mass (mg)")
@@ -156,11 +170,9 @@ usethis::use_data(singleCohortSim, overwrite = TRUE)
 #
 # # Ridge plot of larval mass distributions over time
 # daily_sampling %>%
-#   unnest(massDistribution) %>%
-#   ggplot(aes(x = massDistribution, y = factor(day))) +
+#   unnest(afdm_mg) %>%
+#   ggplot(aes(x = afdm_mg, y = factor(dateID))) +
 #   stat_halfeye(.width = 0.5, fill = 'gray70') +
 #   theme_minimal() +
 #   labs(x = "Larval Mass (mg)", y = "Day", title = "Larval Mass Distributions Over Time")+
 #   coord_flip()
-#
-

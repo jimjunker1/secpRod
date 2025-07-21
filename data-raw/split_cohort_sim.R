@@ -13,7 +13,7 @@ sigma_N_init <- 100
 initial_mass <- 0.0006
 mu_ln <- log(5^2 / sqrt(0.5^2 + 5^2))
 sigma_ln <- sqrt(log(1 + (0.5^2 / 5^2)))
-mu_z <- 0.04
+mu_z <- 0.03
 sigma_z <- 0.01
 cpi_start <- 290
 cpi_end <- 310
@@ -110,7 +110,22 @@ for (t in seq(sample_start, sample_end, by = sample_interval)) {
 }
 
 # Final output
-daily_sampling <- bind_rows(sampling_results)
+daily_sampling <- bind_rows(sampling_results) %>%
+  dplyr::mutate(taxonID = 'sppX', repID = 1:n(), .by = c('day')) %>%
+  rename(density = larvalDensity, afdm_mg = massDistribution, dateID = day)
+
+zeroFills = expand.grid(taxonID = 'sppX',
+                        dateID = unique(daily_sampling$dateID),
+                        repID = 1:10,
+                        density = 0, afdm_mg = NA)
+
+daily_sampling = daily_sampling %>%
+  select(-x,-y) %>%
+  full_join(.,zeroFills, by = c('taxonID','dateID','repID')) %>%
+  mutate(density = ifelse(is.na(density.x), density.y, density.x),
+         afdm_mg = ifelse(is.na(afdm_mg.x), afdm_mg.y, afdm_mg.x)) %>%
+  select(taxonID, dateID, repID, density, afdm_mg)
+
 splitCohortSim <- daily_sampling
 
 usethis::use_data(splitCohortSim, overwrite = TRUE)

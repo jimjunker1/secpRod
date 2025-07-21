@@ -31,6 +31,43 @@ data("wbtData", package = 'secpRod')
 
 ## Introduction 
 
+The `secpRod` package provides a number of methods to calculate secondary production of populations, both those with clear cohort structure and those where cohort structure is not possible to discern because of multiple overlapping cohorts. First, we walk through each of these methods using simulated populations that mimic the data structure of real sampling regimes. The parameters to create these simulated populations is outlined in companion article, vignette("Simulating the sampling of populations"). These simulated populations skip some of the steps of moving from initial sampling processes (e.g., length to mass conversions, sample subsetting, etc.) that are often part of the process. More complete examples that showcase helper functions within `secpRod` that deal with these processes can be found below in [More complete examples](#more-complete-examples). Here, we just showcase the secondary production methods available.
+
+First, we load and visualize the simulated cohort data set, which contains 
+
+```{r load-cohort-sim, eval = TRUE, echo = FALSE}
+data('singleCohortSim', package = 'secpRod')
+
+summary_stats <- singleCohortSim %>%
+  unnest(afdm_mg) %>%
+  group_by(dateID) %>%
+  dplyr::summarise(
+    massMean = mean(afdm_mg, na.rm = TRUE),
+    massSD= sd(afdm_mg, na.rm = TRUE),
+    larvalDensityMean = mean(density, na.rm = TRUE)
+  )
+
+ggplot(summary_stats, aes(x = dateID)) +
+  stat_halfeye(data = splitCohortSim, aes(x = dateID, y = density),
+               color = 'green')+
+  stat_halfeye(data = splitCohortSim %>% unnest(afdm_mg), aes(x = dateID, y = afdm_mg*100),
+               color = 'red')+
+  geom_path(aes(y = larvalDensityMean), color = 'green') +
+  geom_path(aes(y = massMean * 100), color = 'red') +
+  scale_y_continuous(
+    name = "Larval Density",
+    sec.axis = sec_axis(~./100, name = "Mean Mass (mg)"),
+    
+  ) +
+  theme_minimal() +
+  labs(title = "Larval Density and Mean Mass over Time", x = "Day")+
+  theme(axis.title.y.right = element_text(color = 'red'))
+
+```
+
+
+## More complete examples (#more-complete-examples)
+
 Currently, the analysis is fully implemented for the size-frequency and production:biomass ratio methods. This quick tutorial will outline steps to calculate secondary production for whole communities. First, load the package with `library(secpRod)`.
 
 The package comes with a number of data sets of macroinvertebrate species and community data:
