@@ -7,6 +7,8 @@ vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteDepends{purrr}
   %\VignetteDepends{ggdist}
+  %\VignetteDepends{kableExtra}
+  %\VignetteDepends{gridExtra}
 bibliography: secpRod-refs.bib
 link-citations: no
 link-color: grey
@@ -25,22 +27,103 @@ knitr::opts_chunk$set(
 ```{r setup, echo=FALSE, include=TRUE}
 library(secpRod)
 library(dplyr)
+library(tidyr)
+library(purrr)
+library(ggplot2)
 library(ggdist)
+library(knitr)
+library(kableExtra)
+library(gridExtra)
 # library(tidyverse)
 # load the example data set
 data("wbtData", package = 'secpRod')
+data('singleCohortSim', package = 'secpRod')
 
 ```
 
 ## Introduction 
 
-The `secpRod` package provides a number of methods to calculate secondary production of populations, both those with clear cohort structure and those where cohort structure is not possible to discern because of multiple overlapping cohorts. First, we walk through each of these methods using simulated populations that mimic the data structure of real sampling regimes. The parameters to create these simulated populations is outlined in companion article, vignette("Simulating the sampling of populations"). These simulated populations skip some of the steps of moving from initial sampling processes (e.g., length to mass conversions, sample subsetting, etc.) that are often part of the process. More complete examples that showcase helper functions within `secpRod` that deal with these processes can be found below in [More complete examples](#more-complete-examples). Here, we just showcase the secondary production methods available.
+The `secpRod` package provides a number of methods to calculate secondary production of populations, both those with clear cohort structure and those where cohort structure is not possible to discern. First, we walk through the available methods using simulated populations that mimic the data structure of real sampling regimes. The parameters to create these simulated populations is outlined in companion article, vignette("Simulating the sampling of populations"). These simulated populations skip some of the steps of moving from initial sampling processes (e.g., length to mass conversions, sample subsetting, etc.) that are often part of the process. More complete examples that showcase helper functions within `secpRod` that deal with these processes can be found below in [More complete examples](#more-complete-examples). Here, we just showcase the secondary production methods available.
 
-First, we load and visualize the simulated cohort data set, which contains 
+The methods within the package use two main objects, `sampleInfo` the sample-level information (e.g., site, date , replicate) and density and length or mass. An additional dataframe, `taxaInfo` that houses species-specific information such as length to mass conversions, and method specific information such as cohort production interval estimates (CPIs), production:biomass ratios (PBs), and growth equations. The columns contain information for the calculation of production. These include, but are not limited to:
 
-```{r load-cohort-sim, eval = TRUE, echo = FALSE}
+- taxonID: a character string that matches the name of taxonID from sampleInfo
 
+- massForm: a character string that is coercible to a formula for the conversion from length to mass (e.g., `afdm_mg~(a*lengthClass^b)`)
+
+- a: numeric variable for the coefficients used in massForm
+
+- b: numeric variable for the coefficients used in massForm
+
+- percAsh: numeric integer 0--100
+
+- method: character string for the method to use. Must be one of the following: 
+
+  - 'is': increment-summation method. This cohort-based method calculates interval and annual production, $P$, from field data as the sum of all interval production, $\sum_{i = 1}^{t} \overline{N} \Delta W$, plus initial biomass, $B_{iniital}$: 
+  
+  $$P = B_{initial} + \sum_{i = 1}^{t} \overline{N} \Delta W $$
+  
+  - 'rs': removal-summation method is similar to the increment-summation method but instead calculates the prodcution *lost* during a sampling interval as the product of the decrease in density, $\Delta N$ and the mean individual mass, $\overline{W}$ plus the increase in biomass, $\Delta B$.
+
+  - 'sf': size frequency method
+
+- growthForm: a character string that is coercible to a formula. This formula is parsed and will reference existing information (e.g., size information) if variables are included in the formula. Further, an additional data
+
+- min.cpi: integer of the minimum estimated cohort production interval for adjusting annual production estimates using the size-frequency method
+
+- max.cpi: integer of the maximum estimated cohort production interval for adjusting annual production estimates using the size-frequency method
+
+- pb: numeric of the production to biomass (PB) ratio for the specific taxa. This can take three forms 1) a single value, 2) a vector of values the same length as `bootNum`, and 3) a string of a distribution to randomly sample, **not** including the `n =` (e.g., 'rnorm(mean = 5, sd = 0.5)', 'runif(min = 3, max = 8)'). The function will automatically sample the `bootNum` values. ***Fair warning***: We suggest you explicitly name the parameters in the function call string. Possible unwanted and unknown things may happen otherwise. The tests for this feature are still under development, it will not reject any nonsensical values (e.g, negative, NA, or Inf). If your distribution samples negative values you will get negative productions estimates--at least until the `min.growth` feature is implemented.
+
+- min.growth: a minimal value of production to assign when density is >0 and production estimates for a taxon are <0.
+
+- notes: notes for researcher use. This column will be maintained in output summaries.
+
+- ...: additional information or data to pass to the function. This is mainly used to pass environmental data to inform growth rate information by included information such as temperature, food availability, etc.
+
+```{r simulation-taxa-info, eval = TRUE, echo = TRUE}
+taxaInfo <- data.frame(
+  taxonID = c("sppX"),
+  massForm = c("afdm_mg~(a*lengthClass^b)*percAsh"),
+  # a is NA for this example because we simulated mass growth and don't need to convert from length to mass
+  a = c(NA),
+  # b is NA for this example because we simulated mass growth and don't need to convert from length to mass
+  b = c(NA),
+  # percAsh is NA for this example because we simulated mass growth and don't need to convert from length to mass
+  percAsh = c(NA),
+  # method can accept one or more values. This allow comparisons among different methods.
+  method = c("is"),
+  g.a = c(NA),
+  growthForm = c("log(g_d) = 1 - 0.25*log(afdm_mg)"),
+  min.cpi = c(335),
+  max.cpi = c(365),
+  pb = c("runif(min = 3, max = 8)"),
+  min.growth = c(0.001),
+  notes = c("This is here for your use. No information will be used, but this column will be maintained in some summaries. See *** for more information.")
+)
+```
+
+## A multi-method comparison with simulated data
+
+First, we load and visualize the simulated cohort data set, which contains a single species and follows the progression of density and distribution of individual masses through it life cycle.
+
+The data set is available within the `secpRod` package with:
+
+```{r load-sim, eval = FALSE, echo = TRUE}
 data('singleCohortSim', package = 'secpRod')
+```
+
+The `sampleInfo` for this species includes:
+
+```{r view-sim, echo = FALSE}
+
+head(singleCohortSim, 10)
+
+```
+
+<details>
+
+```{r viz-cohort-sim, eval = TRUE, echo = TRUE}
 
 summary_stats <- singleCohortSim %>%
   unnest(afdm_mg, keep_empty = TRUE) %>%
@@ -51,6 +134,7 @@ summary_stats <- singleCohortSim %>%
     larvalDensityMean = mean(density, na.rm = TRUE)
   )
 
+sim_plot = 
 ggplot(summary_stats, aes(x = dateID)) +
   stat_halfeye(data = splitCohortSim, aes(x = dateID, y = density),
                color = 'green')+
@@ -67,6 +151,12 @@ ggplot(summary_stats, aes(x = dateID)) +
   labs(title = "Larval Density and Mean Mass over Time", x = "Day")+
   theme(axis.title.y.right = element_text(color = 'red'))
 
+```
+
+</details>
+
+```{r view-sim, echo=FALSE}
+sim_plot
 ```
 
 
