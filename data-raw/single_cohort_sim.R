@@ -78,10 +78,10 @@ simulation[[1]] <- grid_population
 for (d in 2:days) {
   updated_pop <- update_day(simulation[[d - 1]], d - 1)
 
-  if (d == 366) {
-    new_cohort <- map2_dfr(rep(1:grid_size, each = grid_size), rep(1:grid_size, times = grid_size), ~init_cohort(.x, .y, 366))
-    updated_pop <- bind_rows(updated_pop, new_cohort)
-  }
+  # if (d == 366) {
+  #   new_cohort <- map2_dfr(rep(1:grid_size, each = grid_size), rep(1:grid_size, times = grid_size), ~init_cohort(.x, .y, 366))
+  #   updated_pop <- bind_rows(updated_pop, new_cohort)
+  # }
   simulation[[d]] <- updated_pop
 }
 
