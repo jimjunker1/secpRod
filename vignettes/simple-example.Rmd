@@ -160,7 +160,7 @@ sim_plot
 ```
 
 
-## More complete examples (#more-complete-examples)
+## More complete examples {#more-complete-examples}
 
 Currently, the analysis is fully implemented for the size-frequency and production:biomass ratio methods. This quick tutorial will outline steps to calculate secondary production for whole communities. First, load the package with `library(secpRod)`.
 
