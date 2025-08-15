@@ -410,7 +410,7 @@ gridExtra::grid.arrange(list(p1,p2,p3,p4), ncol = 2, nrow = 2)
 
 
 
-# Spare(d) words
+<!-- # Spare(d) words -->
 
 <!-- ```{r old reconstruct} -->
 <!-- fit_with_offset <- function(df_ordered, offset, models_to_fit = c("vonbert", "gompertz"), t_start = 5) { -->

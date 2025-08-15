@@ -9,6 +9,7 @@ header-includes:
 - \usepackage{lineno}
 - \usepackage{amsmath}
 - \numberwithin{equation}
+bibliography: refs.bib
 ---
 
 ```{r, include = FALSE}
@@ -22,6 +23,34 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(secpRod)
 
-load('singleCohortSim.rda')
+load('data/singleCohortSim.rda')
 
 ```
+
+# Purpose
+
+This document walks through the different methods and models to calculate secondary production. We start with a single simulated univoltine population for simplicity. The details for this simulation can be found in [Simulating the sampling of populations](https://jimjunker1.github.io/secpRod/articles/sampling-simulation.html) vignette. 
+
+## Introduction 
+
+Currently, the analysis is fully implemented for the size-frequency and production:biomass ratio methods. This quick tutorial will outline steps to calculate secondary production for populations and whole communities. First, load the package with `library(secpRod)`.
+
+The package comes with a number of data sets of macroinvertebrate species and community data:
+
+1) simulated data set of a single univoltine species accessed with `data("singleCohortSim")`
+
+2) a full community data set from @junker2014 that can be accessed with `data("wbtData")`
+
+The simulated data set is a single data frame of artificially sampled density and size-frequency data through time. This 
+
+```{r echo = TRUE}
+data("singleCohortSim")
+
+#clean this data set to align 
+head(singleCohortSim)
+```
+
+
+
+# References
+
