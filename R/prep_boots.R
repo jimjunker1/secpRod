@@ -27,7 +27,7 @@ prep_boots <- function(df = NULL,
       do.call(
         rbind,
         mapply(FUN = function(x,y) {
-          x[which(x$repID %in% sample(1:y, y, replace = TRUE)), ]
+          x[sample(y,y, replace = TRUE), ]
         }, x = split(df, df$dateID), y = samp_num, SIMPLIFY = FALSE)
       )
     }

@@ -1,6 +1,6 @@
 #' @description
-#' This function calculates secondary production with the size-frequency method.
-#' @title calc_prod_sf
+#' This function calculates secondary production with the increment-summation method.
+#' @title calc_prod_is
 #' @param taxaSampleListMass description
 #' @param taxaInfo data frame of taxonomic information for calculating production
 #' @param bootNum integer. How many bootstrap samples should be constructed
@@ -21,35 +21,33 @@
 #' @importFrom stats as.formula
 #' @export
 
-calc_prod_sf <- function(taxaSampleListMass= NULL,
+calc_prod_is <- function(taxaSampleListMass= NULL,
                          taxaInfo = NULL,
                          bootNum = NULL,
                          dateDf = NULL,
                          taxaSummary = 'full',
                          wrap = FALSE,
                          massValue = NULL,
-                         massLabel = NULL,
+                         abunValue = NULL,
                          bootList = NULL,...) {
 
   ## tests ##
 
   ## end tests ##
   speciesName = unique(taxaSampleListMass$taxonID)
-  taxaInfo = taxaInfo[which(taxaInfo$taxonID == speciesName),]
   # ## function prep ##
   # ### make a list of key variables to pass to sample function
   funcList = list(
     df = taxaSampleListMass,
     # sizesDf = unique(taxaSampleListMass[, c("lengthClass", rev(names(taxaSampleListMass))[1])])
-    sizesDf = unique(taxaSampleListMass[, c("lengthClass", eval(massValue))]),
+    # sizesDf = unique(taxaSampleListMass[, c(eval(lengthValue), eval(massValue))]),
     massValue = massValue,
-    massLabel = massLabel
+    abunValue = abunValue#,
+    # massLabel = massLabel
   )
 
   # calculate the production from the full samples
-  taxaCPI <- mean(c(taxaInfo$min.cpi, taxaInfo$max.cpi))
-  funcList = c(funcList, list(cpi = taxaCPI))
-  P.samp = do.call(sf_prod.sample, args = funcList)
+  P.samp = do.call(is_prod.sample, args = funcList)
   if(P.samp$P.ann.samp == 0){
     if(taxaSummary == "none"){
       taxaSummary <- NULL
@@ -57,11 +55,9 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
       # # create a list for output
       taxaSummary <- list(
         summaryType = "full",
-        taxonID = taxaInfo$taxonID,
-        method = "sf",
+        taxonID = speciesName,
+        method = "is",
         P.ann.samp = 0,
-        P.uncorr.samp = 0,
-        cpi = NA_real_,
         pb = NA_real_,
         meanN = 0,
         meanB = 0,
@@ -76,9 +72,8 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
       taxaSummary <- list(
         summaryType = "short",
         taxonID = taxaInfo$taxonID,
-        method = "sf",
+        method = "is",
         P.ann.samp = 0,
-        cpi = NA_real_,
         pb = NA_real_,
         meanN = 0,
         meanB = 0,
@@ -90,15 +85,13 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
                                     taxaSummary = taxaSummary)))
   }
 
-  cpiBoots = sample(seq.int(from = as.integer(taxaInfo$min.cpi), to = as.integer(taxaInfo$max.cpi), by = 1), as.integer(bootNum), replace = TRUE)
-
-  P.boots = mapply(FUN = sf_prod.sample,
+  P.boots = mapply(FUN = is_prod.sample,
                    df = bootList,
                    sizesDf = lapply(1:bootNum, function(x) funcList$sizesDf),
                    massValue = massValue,
                    massLabel = massLabel,
-                   cpi = cpiBoots,
                    full = FALSE)
+
   #### create SAMPLE information to export as summary ####
   # summarise sample sizes across dates
   sampDatesInfo <- stats::setNames(unique(stats::aggregate(taxaSampleListMass[c("repID")], by = list(taxaSampleListMass$dateID, taxaSampleListMass$lengthClass), vers_count)[c(1, 3)]), c("dateID", "N"))
@@ -152,7 +145,7 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
     taxaSummary <- list(
       summaryType = "full",
       taxonID = taxaInfo$taxonID,
-      method = "sf",
+      method = "is",
       P.ann.samp = P.samp$P.ann.samp,
       P.uncorr.samp = P.samp$P.uncorr.samp,
       cpi = taxaCPI,
@@ -170,7 +163,7 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
     taxaSummary <- list(
       summaryType = "short",
       taxonID = taxaInfo$taxonID,
-      method = "sf",
+      method = "is",
       P.ann.samp = P.samp$P.ann.samp,
       cpi = taxaCPI,
       pb = pb,

@@ -1,6 +1,6 @@
 #' @description
-#' This function calculates secondary production with the size-frequency method.
-#' @title calc_prod_sf
+#' This function calculates secondary production with the removal-summation method.
+#' @title calc_prod_rs
 #' @param taxaSampleListMass description
 #' @param taxaInfo data frame of taxonomic information for calculating production
 #' @param bootNum integer. How many bootstrap samples should be constructed
@@ -21,12 +21,12 @@
 #' @importFrom stats as.formula
 #' @export
 
-calc_prod_sf <- function(taxaSampleListMass= NULL,
+calc_prod_rs <- function(taxaSampleListMass= NULL,
                          taxaInfo = NULL,
                          bootNum = NULL,
                          dateDf = NULL,
                          taxaSummary = 'full',
-                         wrap = FALSE,
+                         wrap = TRUE,
                          massValue = NULL,
                          massLabel = NULL,
                          bootList = NULL,...) {
@@ -49,7 +49,7 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
   # calculate the production from the full samples
   taxaCPI <- mean(c(taxaInfo$min.cpi, taxaInfo$max.cpi))
   funcList = c(funcList, list(cpi = taxaCPI))
-  P.samp = do.call(sf_prod.sample, args = funcList)
+  P.samp = do.call(rs_prod.sample, args = funcList)
   if(P.samp$P.ann.samp == 0){
     if(taxaSummary == "none"){
       taxaSummary <- NULL
@@ -58,7 +58,7 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
       taxaSummary <- list(
         summaryType = "full",
         taxonID = taxaInfo$taxonID,
-        method = "sf",
+        method = "rs",
         P.ann.samp = 0,
         P.uncorr.samp = 0,
         cpi = NA_real_,
@@ -76,7 +76,7 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
       taxaSummary <- list(
         summaryType = "short",
         taxonID = taxaInfo$taxonID,
-        method = "sf",
+        method = "rs",
         P.ann.samp = 0,
         cpi = NA_real_,
         pb = NA_real_,
@@ -90,14 +90,11 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
                                     taxaSummary = taxaSummary)))
   }
 
-  cpiBoots = sample(seq.int(from = as.integer(taxaInfo$min.cpi), to = as.integer(taxaInfo$max.cpi), by = 1), as.integer(bootNum), replace = TRUE)
-
   P.boots = mapply(FUN = sf_prod.sample,
                    df = bootList,
                    sizesDf = lapply(1:bootNum, function(x) funcList$sizesDf),
                    massValue = massValue,
                    massLabel = massLabel,
-                   cpi = cpiBoots,
                    full = FALSE)
   #### create SAMPLE information to export as summary ####
   # summarise sample sizes across dates
@@ -152,7 +149,7 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
     taxaSummary <- list(
       summaryType = "full",
       taxonID = taxaInfo$taxonID,
-      method = "sf",
+      method = "rs",
       P.ann.samp = P.samp$P.ann.samp,
       P.uncorr.samp = P.samp$P.uncorr.samp,
       cpi = taxaCPI,
@@ -170,7 +167,7 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
     taxaSummary <- list(
       summaryType = "short",
       taxonID = taxaInfo$taxonID,
-      method = "sf",
+      method = "rs",
       P.ann.samp = P.samp$P.ann.samp,
       cpi = taxaCPI,
       pb = pb,

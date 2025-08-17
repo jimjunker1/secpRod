@@ -168,6 +168,19 @@ vers_count = function (..., condition = (function(x) TRUE))
 
 #'
 #'
+string_agg = function(df, colString = NULL){
+  if(length(colString) > 1){
+    firstString = paste0("cbind(",paste0(colString, collapse = ","),")~")
+    secondString = paste0('taxonID+dateID+repID+',eval(massValue))
+  } else{
+    firstString = paste0(colString,"~")
+    secondString = paste0('taxonID+dateID+repID+',eval(massValue))
+  }
+  aggregate(formula(paste0(firstString, secondString)), data = df, FUN = vers_count)
+}
+
+#'
+#'
 # calc_Linf = function(df,...){
 #   dataList = make_standata(log(count)~lengthClass, data = df)
 #   modelCode = make_stancode(log(count)~lengthClass,
