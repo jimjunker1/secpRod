@@ -132,9 +132,9 @@ this object can be a data.frame (or coercible) or a tibble (if list-cols are use
 
 - repID: an identifier representing the replicate for the length and mass data
 
-- density: organism density in the replicate
+- density: organism density of each length or mass class in the replicate
 
-- afdm_mg: a list-column of individual masses. This can be of arbitrary length. For example, it can contain measurements for every individual, as in the case of this simulated example, or be a representative sub-sample.
+- afdm_mg: individual mass. This is the mass class with a corresponding density. The density of each mass class sums to the total sample density currently.
 
 We can summarise and visualize this data set further.
 
@@ -143,19 +143,19 @@ We can summarise and visualize this data set further.
 ```{r viz-cohort-sim, eval = TRUE, echo = TRUE}
 
 summary_stats <- singleCohortSim %>%
-  unnest(afdm_mg, keep_empty = TRUE) %>%
-  group_by(dateID) %>%
+  dplyr::mutate(density = sum(density, na.rm = TRUE), .by = c('taxonID','dateID','repID')) %>% 
   dplyr::summarise(
     massMean = mean(afdm_mg, na.rm = TRUE),
     massSD= sd(afdm_mg, na.rm = TRUE),
-    larvalDensityMean = mean(density, na.rm = TRUE)
+    larvalDensityMean = mean(density, na.rm = TRUE), .by = 'dateID'
   )
 
 sim_plot = 
 ggplot(summary_stats, aes(x = dateID)) +
-  stat_halfeye(data = singleCohortSim, aes(x = dateID, y = density),
+  stat_halfeye(data = singleCohortSim %>% 
+                 dplyr::summarise(density = sum(density, na.rm = TRUE), .by = c('taxonID','dateID','repID')), aes(x = dateID, y = density),
                color = 'green')+
-  stat_halfeye(data = singleCohortSim %>% unnest(afdm_mg), aes(x = dateID, y = afdm_mg*100),
+  stat_halfeye(data = singleCohortSim, aes(x = dateID, y = afdm_mg*100),
                color = 'red')+
   geom_path(aes(y = larvalDensityMean), color = 'green') +
   geom_path(aes(y = massMean * 100), color = 'red') +
@@ -184,14 +184,14 @@ We use this data set to calculate secondary production with different methods. F
 To apply it to our single species example, we input the sample information and taxa information along with how many bootstraps we would like, as:
 
 ```{r single species production,include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
-debugonce(calc_production)
-calc_production(
-  taxaSampleListMass = singleCohortSim,
-  infoCols = c(1:3),
-  taxaInfo = taxaInfo,
-  bootNum = 10,
-  taxaSummary = 'full'
-)
+# debugonce(calc_production)
+# calc_production(
+#   taxaSampleListMass = singleCohortSim,
+#   infoCols = c(1:3),
+#   taxaInfo = taxaInfo,
+#   bootNum = 10,
+#   taxaSummary = 'full'
+# )
 
 ```
 

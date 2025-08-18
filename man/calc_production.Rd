@@ -10,6 +10,9 @@ calc_production(
   taxaInfo = NULL,
   bootNum = 100,
   taxaSummary = "full",
+  lengthValue = NULL,
+  massValue = "afdm_mg",
+  abunValue = "density",
   ...
 )
 }
@@ -23,6 +26,12 @@ calc_production(
 \item{bootNum}{integer. The number of bootstrapped samples to create}
 
 \item{taxaSummary}{string of \code{'short'}, \code{'full'}, or \code{'none'} to distinguish the information returned}
+
+\item{lengthValue}{string of the column name containing length class measurements. If NULL (default)}
+
+\item{massValue}{string of the column name containing the mass measurement}
+
+\item{abunValue}{string of the column name containing the abundance or density measurement}
 
 \item{...}{additional arguments passed to function}
 }

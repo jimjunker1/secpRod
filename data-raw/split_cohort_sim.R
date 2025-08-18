@@ -119,14 +119,17 @@ zeroFills = expand.grid(taxonID = 'sppX',
                         repID = 1:10,
                         density = 0, afdm_mg = NA)
 
-daily_sampling = daily_sampling %>%
-  select(-x,-y) %>%
+daily_sampling_fin = daily_sampling %>%
+  dplyr::select(-x,-y) %>%
   full_join(.,zeroFills, by = c('taxonID','dateID','repID')) %>%
-  mutate(density = ifelse(is.na(density.x), density.y, density.x),
+  dplyr::mutate(density = ifelse(is.na(density.x), density.y, density.x),
          afdm_mg = ifelse(is.na(afdm_mg.x), afdm_mg.y, afdm_mg.x)) %>%
-  select(taxonID, dateID, repID, density, afdm_mg)
+  dplyr::select(taxonID, dateID, repID, density, afdm_mg)%>%
+  tidyr::unnest(afdm_mg, keep_empty = TRUE) %>%
+  mutate(afdm_mg = round(afdm_mg, 3)) %>%
+  dplyr::summarise(density = n(), .by = c('taxonID','dateID','repID','afdm_mg'))
 
-splitCohortSim <- daily_sampling
+splitCohortSim <- daily_sampling_fin
 
 usethis::use_data(splitCohortSim, overwrite = TRUE)
 

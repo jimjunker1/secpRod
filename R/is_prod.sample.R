@@ -22,7 +22,7 @@ is_prod.sample <- function(df = NULL,
   if('list' %in% sapply(df, class)){
     nestedColString = names(df[which(sapply(df, class) %in% 'list')])
 # need to keep 0 samples to accurately characterize density
-    df2 = unnest(df, which(sapply(df, class) %in% 'list'))
+    df2 = unnest(df, which(sapply(df, class) %in% 'list'), keep_empty = TRUE)
     df3 = string_agg(df2, colString = eval(abunValue))
   }
   #### GUTS of function ####
