@@ -49,8 +49,10 @@
 <span>  infoCols <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  taxaInfo <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  bootNum <span class="op">=</span> <span class="fl">100</span>,</span>
-<span>  wrap <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  taxaSummary <span class="op">=</span> <span class="st">"full"</span>,</span>
+<span>  lengthValue <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  massValue <span class="op">=</span> <span class="st">"afdm_mg"</span>,</span>
+<span>  abunValue <span class="op">=</span> <span class="st">"density"</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -75,12 +77,20 @@
 <dd><p>integer. The number of bootstrapped samples to create</p></dd>
 
 
-<dt id="arg-wrap">wrap<a class="anchor" aria-label="anchor" href="#arg-wrap"></a></dt>
-<dd><p>logical should an extra date be added to make a full calendar year?</p></dd>
-
-
 <dt id="arg-taxasummary">taxaSummary<a class="anchor" aria-label="anchor" href="#arg-taxasummary"></a></dt>
 <dd><p>string of <code>'short'</code>, <code>'full'</code>, or <code>'none'</code> to distinguish the information returned</p></dd>
+
+
+<dt id="arg-lengthvalue">lengthValue<a class="anchor" aria-label="anchor" href="#arg-lengthvalue"></a></dt>
+<dd><p>string of the column name containing length class measurements. If NULL (default)</p></dd>
+
+
+<dt id="arg-massvalue">massValue<a class="anchor" aria-label="anchor" href="#arg-massvalue"></a></dt>
+<dd><p>string of the column name containing the mass measurement</p></dd>
+
+
+<dt id="arg-abunvalue">abunValue<a class="anchor" aria-label="anchor" href="#arg-abunvalue"></a></dt>
+<dd><p>string of the column name containing the abundance or density measurement</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>

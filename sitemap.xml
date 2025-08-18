@@ -9,7 +9,9 @@
 <url><loc>https://jimjunker1.github.io/secpRod/authors.html</loc></url>
 <url><loc>https://jimjunker1.github.io/secpRod/index.html</loc></url>
 <url><loc>https://jimjunker1.github.io/secpRod/reference/calc_prod_igr.html</loc></url>
+<url><loc>https://jimjunker1.github.io/secpRod/reference/calc_prod_is.html</loc></url>
 <url><loc>https://jimjunker1.github.io/secpRod/reference/calc_prod_pb.html</loc></url>
+<url><loc>https://jimjunker1.github.io/secpRod/reference/calc_prod_rs.html</loc></url>
 <url><loc>https://jimjunker1.github.io/secpRod/reference/calc_prod_sf.html</loc></url>
 <url><loc>https://jimjunker1.github.io/secpRod/reference/calc_production.html</loc></url>
 <url><loc>https://jimjunker1.github.io/secpRod/reference/convert_length_to_mass.html</loc></url>
@@ -18,12 +20,14 @@
 <url><loc>https://jimjunker1.github.io/secpRod/reference/igr_prod.sample.html</loc></url>
 <url><loc>https://jimjunker1.github.io/secpRod/reference/index.html</loc></url>
 <url><loc>https://jimjunker1.github.io/secpRod/reference/inv.logit.html</loc></url>
+<url><loc>https://jimjunker1.github.io/secpRod/reference/is_prod.sample.html</loc></url>
 <url><loc>https://jimjunker1.github.io/secpRod/reference/overlapCohortSim.html</loc></url>
 <url><loc>https://jimjunker1.github.io/secpRod/reference/pb_prod.sample.html</loc></url>
 <url><loc>https://jimjunker1.github.io/secpRod/reference/pipe.html</loc></url>
 <url><loc>https://jimjunker1.github.io/secpRod/reference/plot_cohorts.html</loc></url>
 <url><loc>https://jimjunker1.github.io/secpRod/reference/prep_boots.html</loc></url>
 <url><loc>https://jimjunker1.github.io/secpRod/reference/reconstruct_cohorts.html</loc></url>
+<url><loc>https://jimjunker1.github.io/secpRod/reference/rs_prod.sample.html</loc></url>
 <url><loc>https://jimjunker1.github.io/secpRod/reference/sf_prod.sample.html</loc></url>
 <url><loc>https://jimjunker1.github.io/secpRod/reference/singleCohortSim.html</loc></url>
 <url><loc>https://jimjunker1.github.io/secpRod/reference/splitCohortSim.html</loc></url>

@@ -544,24 +544,24 @@ sampling times.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 11 × 5</span></span></span>
 <span><span class="co">#&gt;    dateID mean_mass cohort pseudo_day pseudotime</span></span>
 <span><span class="co">#&gt;     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>    371     0.566      1        0            4</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>    371     0.571      1        0            4</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>    401     3.20       1       30           34</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>    431     4.27       1       60           64</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>    461     4.71       1       90           97</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>    101     4.74       2       94.8        101</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>    131     4.87       2      125.         128</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>    101     4.74       2       95.2        101</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>    131     4.87       2      125.         129</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>    161     4.87       2      155.         130</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>    251     4.94       2      245.         180</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>    281     4.94       2      275.         181</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>    191     4.95       2      185.         195</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>    281     4.94       2      275.         177</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>    251     4.94       2      245.         185</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>    191     4.95       2      185.         196</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span>    221     5.01       2      215.         224</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $offset</span></span>
-<span><span class="co">#&gt; [1] 94.7847</span></span>
+<span><span class="co">#&gt; [1] 95.15894</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $weights</span></span>
 <span><span class="co">#&gt;          vbg     gompertz     logistic </span></span>
-<span><span class="co">#&gt; 9.999940e-01 5.997599e-06 1.207573e-08 </span></span>
+<span><span class="co">#&gt; 9.999941e-01 5.854241e-06 1.168372e-08 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $fits</span></span>
 <span><span class="co">#&gt; $fits$vbg</span></span>
@@ -569,33 +569,33 @@ sampling times.</p>
 <span><span class="co">#&gt;   model: W_all ~ Winf * (1 - exp(-k * (t_all - t0)))</span></span>
 <span><span class="co">#&gt;    data: parent.frame()</span></span>
 <span><span class="co">#&gt;     Winf        k       t0 </span></span>
-<span><span class="co">#&gt;  4.96086  0.03079 -3.90798 </span></span>
-<span><span class="co">#&gt;  residual sum-of-squares: 0.007637</span></span>
+<span><span class="co">#&gt;  4.96028  0.03079 -3.94332 </span></span>
+<span><span class="co">#&gt;  residual sum-of-squares: 0.007516</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Number of iterations to convergence: 6 </span></span>
-<span><span class="co">#&gt; Achieved convergence tolerance: 4.548e-07</span></span>
+<span><span class="co">#&gt; Achieved convergence tolerance: 5.796e-07</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $fits$gompertz</span></span>
 <span><span class="co">#&gt; Nonlinear regression model</span></span>
 <span><span class="co">#&gt;   model: W_all ~ Winf * exp(-exp(-k * (t_all - tStar)))</span></span>
 <span><span class="co">#&gt;    data: parent.frame()</span></span>
 <span><span class="co">#&gt;     Winf        k    tStar </span></span>
-<span><span class="co">#&gt;  4.90177  0.04918 14.45722 </span></span>
-<span><span class="co">#&gt;  residual sum-of-squares: 0.06798</span></span>
+<span><span class="co">#&gt;  4.90159  0.04913 14.41041 </span></span>
+<span><span class="co">#&gt;  residual sum-of-squares: 0.06719</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Number of iterations to convergence: 10 </span></span>
-<span><span class="co">#&gt; Achieved convergence tolerance: 2.645e-06</span></span>
+<span><span class="co">#&gt; Achieved convergence tolerance: 2.578e-06</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $fits$logistic</span></span>
 <span><span class="co">#&gt; Nonlinear regression model</span></span>
 <span><span class="co">#&gt;   model: W_all ~ Winf/(1 + exp(-k * (t_all - tStar)))</span></span>
 <span><span class="co">#&gt;    data: parent.frame()</span></span>
-<span><span class="co">#&gt;     Winf        k    tStar </span></span>
-<span><span class="co">#&gt;  4.85909  0.07554 23.18953 </span></span>
-<span><span class="co">#&gt;  residual sum-of-squares: 0.2102</span></span>
+<span><span class="co">#&gt;    Winf       k   tStar </span></span>
+<span><span class="co">#&gt;  4.8592  0.0754 23.1575 </span></span>
+<span><span class="co">#&gt;  residual sum-of-squares: 0.2081</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Number of iterations to convergence: 13 </span></span>
-<span><span class="co">#&gt; Achieved convergence tolerance: 8.37e-06</span></span></code></pre>
+<span><span class="co">#&gt; Achieved convergence tolerance: 7.797e-06</span></span></code></pre>
 <p><img src="sampling-simulation_files/figure-html/plot-remap-1.png" width="75%" style="display: block; margin: auto;"></p>
 </div>
 </div>
