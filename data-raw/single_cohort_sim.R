@@ -137,7 +137,8 @@ daily_sampling_fin = daily_sampling %>%
   dplyr::select(taxonID, dateID, repID, density, afdm_mg) %>%
   tidyr::unnest(afdm_mg, keep_empty = TRUE) %>%
   mutate(afdm_mg = round(afdm_mg, 3)) %>%
-  dplyr::summarise(density = n(), .by = c('taxonID','dateID','repID','afdm_mg'))
+  dplyr::summarise(density = n(), .by = c('taxonID','dateID','repID','afdm_mg')) %>%
+  dplyr::mutate(density = ifelse(is.na(afdm_mg), 0, density))
 
 singleCohortSim <- daily_sampling_fin
 

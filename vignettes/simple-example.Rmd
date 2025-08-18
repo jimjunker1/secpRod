@@ -84,7 +84,7 @@ The methods within the package use two main objects, `sampleInfo` the sample-lev
 - ...: additional information or data to pass to the function. This is mainly used to pass environmental data to inform growth rate information by included information such as temperature, food availability, etc.
 
 ```{r simulation-taxa-info, eval = TRUE, echo = TRUE}
-taxaInfo <- data.frame(
+taxaInfo <- tibble::tibble(
   taxonID = c("sppX"),
   massForm = c("afdm_mg~(a*lengthClass^b)*percAsh"),
   # a is NA for this example because we simulated mass growth and don't need to convert from length to mass
@@ -94,7 +94,7 @@ taxaInfo <- data.frame(
   # percAsh is NA for this example because we simulated mass growth and don't need to convert from length to mass
   percAsh = c(NA),
   # method can accept one or more values. This allow comparisons among different methods.
-  method = list("is","pb","sf"),
+  method = 'is',#list(c("is","pb","sf")),
   g.a = c(NA),
   growthForm = c("log(g_d) = 1 - 0.25*log(afdm_mg)"),
   min.cpi = c(335),
@@ -185,13 +185,16 @@ To apply it to our single species example, we input the sample information and t
 
 ```{r single species production,include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
 # debugonce(calc_production)
-# calc_production(
-#   taxaSampleListMass = singleCohortSim,
-#   infoCols = c(1:3),
-#   taxaInfo = taxaInfo,
-#   bootNum = 10,
-#   taxaSummary = 'full'
-# )
+set.seed(1312)
+calc_production(
+  taxaSampleListMass = singleCohortSim,
+  infoCols = c(1:3),
+  taxaInfo = taxaInfo,
+  bootNum = 10,
+  taxaSummary = 'full',
+  massValue = 'afdm_mg',
+  abunValue = 'density'
+)
 
 ```
 

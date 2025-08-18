@@ -20,14 +20,21 @@ calc_production = function(taxaSampleListMass = NULL,
                            lengthValue = NULL,
                            massValue = 'afdm_mg',
                            abunValue = 'density',
+                           dateCol = 'dateID',
+                           repCol = 'repID',
                            ...){
 
   ### tests ###
-  ## taxaInfo is currently only allowed to have one species.
-  ## This function is currently only set up for a single species. Future updates will allow full community
-  ## estimates to be done with a single call.
-  if(length(droplevels(unlist(taxaInfo$taxonID))) > 1) stop("Error: More than one species' taxaInfo passed to function. Only single species are allowed within each call currently.")
+  # taxaInfo is currently only allowed to have one species.
+  # This function is currently only set up for a single species. Future updates will allow full community
+  # estimates to be done with a single call.
+  if(length(unlist(taxaInfo$taxonID)) > 1) stop("Error: More than one species' taxaInfo passed to function. Only single species are allowed within each call currently.")
 
+  # are the methods all recognizable?
+  if(!all(unlist(taxaInfo$method) %in% c('is','sf','pb','igr'))){
+    badMethod = unique(unlist(taxaInfo$method)[which(unlist(taxaInfo$method) %ni% c('is','sf','pb','igr'))])
+    stop(paste0("Error: ",badMethod," is not a recognized method. Available values are 'is','sf','pb','igr'. See documentation for more information."))
+  }
   ### end tests ###
   # prep size-abundance boots
   bootList = prep_boots(df = taxaSampleListMass,
@@ -41,25 +48,65 @@ calc_production = function(taxaSampleListMass = NULL,
   # massLabel = paste0(massValue, "_m2")
   wrap = unlist(taxaInfo$wrap)
 
+  if(is.null(lengthValue)){
+    funcList <- list(
+      taxaSampleListMass = taxaSampleListMass,
+      infoCols = infoCols,
+      taxaInfo = taxaInfo,
+      massValue = massValue,
+      abunValue = abunValue,
+      dateCol = dateCol,
+      repCol = repCol,
+      dateDf = wrap_dates(df = taxaSampleListMass, dateCol = dateCol, wrapDate = wrap),
+      # dataframe of sizes and masses
+      sizesDf = unique(taxaSampleListMass[, c(massValue)]),
+      bootNum = bootNum,
+      taxaSummary = taxaSummary,
+      wrap = wrap,
+      bootList = bootList
+    )
+
+  } else if(!is.null(lengthValue)){
+
   funcList <- list(
     taxaSampleListMass = taxaSampleListMass,
     infoCols = infoCols,
     taxaInfo = taxaInfo,
     massValue = massValue,
-    # massLabel = massLabel,
-    dateDf = wrap_dates(df = taxaSampleListMass, wrapDate = wrap),
+    abunValue = abunValue,
+    dateCol = dateCol,
+    repCol = repCol,
+    dateDf = wrap_dates(df = taxaSampleListMass, dateCol = dateCol, wrapDate = wrap),
     # dataframe of sizes and masses
-    sizesDf = unique(taxaSampleListMass[, c("lengthClass", rev(names(taxaSampleListMass))[1])]),
+    sizesDf = unique(taxaSampleListMass[, c(lengthValue, rev(names(taxaSampleListMass))[1])]),
     bootNum = bootNum,
     taxaSummary = taxaSummary,
     wrap = wrap,
     bootList = bootList
-  )
+  )}
+
+# Are there multiple methods in nested list-col? Unnest them and add to funcList
+  if('list' %in% class(taxaInfo$method)){
+    funcList[['method']] = list(unlist(taxaInfo$method))
+  } else{
+    funcList[['method']] = unlist(taxaInfo$method)
+  }
 
 ## calculated production based on methods
+### increment summation
+  if('is' %in% funcList$method){
+    # debugonce(calc_prod_is)
+    # debugonce(is_prod.sample)
+    is_prod = do.call(calc_prod_is, args = funcList)
+    browser()
+    return(is_prod)
+  }
+  # is_prod = calc_prod_is()
 
+  # return(sf_prod)
+  # return(pb_prod)
 ### size frequency
-  if('sf' %in% taxaInfo$method){
+  if('sf' %in% funcList$method){
 #   debugonce(sf_prod.sample)
 #   debugonce(calc_prod_sf)
   sf_prod = do.call(calc_prod_sf, args = funcList)
@@ -74,10 +121,6 @@ calc_production = function(taxaSampleListMass = NULL,
   }
 ### removal summation
   # rs_prod = calc_prod_rs()
-### increment summation
-  # is_prod = calc_prod_is()
 
-  # return(sf_prod)
-  # return(pb_prod)
 
 }

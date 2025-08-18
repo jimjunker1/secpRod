@@ -9,7 +9,7 @@
 #' @param ... additional arguments passed to function
 #' @return list object with taxa summary of the sampled data
 #' @export
-is_prod.sample <- function(df = NULL,
+rs_prod.sample <- function(df = NULL,
                            sizesDf = NULL,
                            massValue = NULL,
                            massLabel = NULL,

@@ -8,33 +8,41 @@
 #' @param full logical. should the full summary be returned with mean and sd
 #' @param ... additional arguments passed to function
 #' @return list object with taxa summary of the sampled data
-#' @importFrom tidyr unnest
+#' @importFrom stats filter
+#' @importFrom stats aggregate
 #' @export
 is_prod.sample <- function(df = NULL,
-                           sizesDf = NULL,
-                           massValue = NULL,
-                           abunValue = NULL,
+                           dateDf = dateDf,
+                           # sizesDf = NULL,
+                           massValue = 'afdm_mg',
+                           abunValue = 'density',
+                           dateCol = 'dateID',
+                           repCol = 'repID',
+                           wrap = FALSE,
                            full = TRUE,
                            ...) {
 
   #### tests ####
-  # Are the masses nested? Unnest them
-  if('list' %in% sapply(df, class)){
-    nestedColString = names(df[which(sapply(df, class) %in% 'list')])
-# need to keep 0 samples to accurately characterize density
-    df2 = unnest(df, which(sapply(df, class) %in% 'list'), keep_empty = TRUE)
-    df3 = string_agg(df2, colString = eval(abunValue))
-  }
-  #### GUTS of function ####
-  # calculate mean biomass and abundance across all dates
-  df[["biomass"]] <- df[[abunValue]] * df[[massValue]]
-  N.ann.list = estimate_ann_stats(df,
-                                  var = abunValue)
-  B.ann.list = estimate_ann_stats(df,
 
-                                  var = massValue)
- df[[massLabel]] <- NULL
- if(B.ann.list[[eval(paste0(massLabel,"_mean"))]] == 0){
+  #### end tests ####
+  #### GUTS of function ####
+  # calculate mean biomass and abundance across all dates for summaries
+  df[["biomass"]] <- df[[abunValue]] * df[[massValue]]
+  N.ann.list = estimate_ann_stats(df, var = abunValue,
+                                  massValue = 'afdm_mg',
+                                  abunValue = 'density',
+                                  dateCol = 'dateID',
+                                  repCol = 'repID',
+                                  wrap = wrap)
+
+  B.ann.list = estimate_ann_stats(df, var = "biomass",
+                                  massValue = 'afdm_mg',
+                                  abunValue = 'density',
+                                  dateCol = 'dateID',
+                                  repCol = 'repID',
+                                  wrap = wrap)
+
+ if(B.ann.list[["biomass_mean"]] == 0){
    if(full == TRUE){
      return(list(P.ann.samp = 0,
                  P.uncorr.samp = 0,
@@ -50,52 +58,92 @@ is_prod.sample <- function(df = NULL,
 
  } else{
 
-
   #### calculate SAMPLE annual production ####
-  # Create a matrix with these 4 columns: individual length (mm), mean density for all samples throughout year (number m^-2), individual mass (mg AFDM), and biomass (mg AFDM m^-2) for each size class (rows)
-  SF <- matrix(0, length(unique(unlist(df$lengthClass))), 4)
+  # Create a matrix with these 8 columns:
+  # [1] date
+  # [2] density,
+  # [3] mean individual mass,
+  # [4] biomass,
+  # [5] gross individual growth,
+  # [6] mean density,
+  # [7] interval P,
+  # [8] daily P,
+  # [9] growth rate (d^-1),
 
-  SF[, c(1,3)] <- c(
-    sizesDf[[1]], # lengthClass
-    sizesDf[[2]] # massClass
-  )
-  SF[, 2] <- unname(unlist(aggregate(df$n_m2, by = list(df$lengthClass), mean, na.rm = TRUE)[2]))
-  SF[, 4] <- SF[, 2] * SF[, 3]
+  # 0) create the matrix object
+  isTab <- data.frame(matrix(0, length(unique(unlist(df[[dateCol]]))), 9))
+  names(isTab) <- c(dateCol, abunValue, 'ind.mass','biomass','mean.growth','density.mean','p.int','p.daily','g.daily')
 
-  # Create a matrix with these 4 columns: number lost (number m^-2), individual mass at loss (mg AFDM), biomass lost (mg AFDM m^-2), and biomass lost * number size classes (mg AFDM m^-2) for each transistion between size classes (rows)
-  SF.int <- matrix(0, length(unique(unlist(df$lengthClass))), 4)
-  # Calculate the number lost between size classes, but subtract zero from the mean number in the largest size class for the "final" transition out of the largest size class
-  SF.int[, 1] <- c(-diff(SF[, 2]), (SF[dim(SF)[1], 2] - 0))
-  # Calculate the geometric mean of individual masses between size classes, but use the individual mass of the largest size class for the "final" transition out of the largest size class, as Benke & Huryn (2007) suggest
-  SF.int[, 2] <- c((SF[(1:(dim(SF)[1] - 1)), 3] * SF[(2:dim(SF)[1]), 3])^(1 / 2), SF[dim(SF)[1], 3])
-  SF.int[, 3] <- SF.int[, 1] * SF.int[, 2]
-  SF.int[, 4] <- SF.int[, 3] * max(sizesDf[[1]])
-  # If the first value in the column of biomass * number of size classes (mg AFDM m^-2) is negative, set it to zero
-  if (SF.int[1, 4] < 0) {
-    SF.int[1, 4] <- 0
+  # 1) add date column
+  isTab[,1] <- sort(unique(unlist(df[[dateCol]])))
+
+  # 2) add density column
+  ## first sum across all size classes within each replicate
+  densityAgg = aggregate(formula(paste0(abunValue,"~",dateCol,"+",repCol)), data = df, FUN = sum, na.action = na.omit)
+  ## then take the mean for each date
+  isTab[,2] <- aggregate(formula(paste0(abunValue,"~",dateCol)), data = densityAgg, FUN = mean, na.action = na.omit, simplify = TRUE)[,2]
+
+  # 3) add mean individual mass column
+  ## first create a weighted mean across all size classes within a replicate
+  ### create size class sum density
+  dateMassSums <- aggregate(formula(paste0(abunValue,"~",massValue,"+",dateCol)), data = df, FUN = sum, na.action = na.omit)
+  ### create date-level total density
+  dateSums <- aggregate(formula(paste0(abunValue,"~",dateCol)), data = df, FUN = sum, na.action = na.omit)
+  ### merge size class sum density and date-level total density
+  dateMerge <- merge(dateMassSums, dateSums, by = eval(dateCol))
+  ### calculate the weights for each size class based on relative density
+  dateMerge[['weights']] <- dateMerge$density.x/dateMerge$density.y
+  ### weight the size class by relative weights
+  dateMerge[['w.mass']] <- dateMerge$afdm_mg * dateMerge$weights
+  ### sum the weighted size class within sampling date
+  massAgg <- setNames(aggregate(formula(paste0('w.mass ~',dateCol)), data = dateMerge, FUN = sum, na.action = na.omit), nm = c(dateCol, 'w.mass'))
+  massAgg <- merge(isTab[dateCol], massAgg, by = dateCol, all.x = TRUE)
+  naMasses <- which(is.na(massAgg$w.mass))
+  if(length(naMasses) > 0){
+    if(length(naMasses) == 1 & naMasses == length(massAgg$w.mass)){
+      massAgg$w.mass[length(massAgg$w.mass)] <- massAgg$w.mass[length(massAgg$w.mass)-1]
+    } else{
+  for(i in 1:length(naMasses)){
+    massAgg$w.mass[i] <- (massAgg$w.mass[i-1]+massAgg$w.mass[i+1])/2
   }
-  # Set negative values to zero only if no positive values precede them and they occur below a non-positive value (i.e., negative or zero) in the column of biomass * number of size classes (mg AFDM m^-2) as Benke & Huryn (2007) suggest
-  for (s in 2:dim(SF.int)[1]) {
-    if (SF.int[s, 4] < 0 & sum(SF.int[1:(s - 1), 4] > 0) == 0) {
-      SF.int[s, 4] <- 0
     }
-  }
+    }
+  ## set the weighted mean individual mass for each date
+  isTab[,3] <- massAgg$w.mass
 
-  # Calculate "uncorrected" production by summing all values in the the column of biomass * number of size classes (mg AFDM m^-2)
-  P.uncorr.samp <- sum(SF.int[, 4])
+  # 4) calculate biomass for each date
+  isTab[,4] <- isTab[,2] * isTab[,3]
+
+  # 5) add the gross individual growth column
+  ## create a lagged mean using the massAgg object
+  isTab[,5] <- c(NA,diff(massAgg$w.mass))
+
+  # 6) create a lagged mean using the density calculations
+  isTab[,6] <- stats::filter(isTab[,2], c(1,1)/2, sides = 1)
+
+  # 7) estimate interval production
+  isTab[,7] <- isTab[,5] * isTab[,4]
+
+  # 8) estimate the daily production rates by merging interval lengths
+  isTab[,8] <- isTab[,7] / c(NA, dateDf$int_days)
+
+  # 9) estimate growth rate by merging interval lengths
+  isTab[,9] <- isTab[,5] / c(NA, dateDf$int_days)
+
+  # Calculate secondary production by summing initial biomass and all production values in isTab[,7]
+  P.ann.samp <- isTab[1,4] + sum(isTab[, 7], na.rm = TRUE)
 
 }
   if(full == TRUE){
     return(list(P.ann.samp = P.ann.samp,
-                P.uncorr.samp = P.uncorr.samp,
-                B.ann.mean = B.ann.list[[paste0(massLabel,"_mean")]],
-                B.ann.sd = B.ann.list[[paste0(massLabel,"_sd")]],
-                N.ann.mean = N.ann.list$n_m2_mean,
-                N.ann.sd = N.ann.list$n_m2_sd))
+                B.ann.mean = B.ann.list[["biomass_mean"]],
+                B.ann.sd = B.ann.list[["biomass_sd"]],
+                N.ann.mean = N.ann.list[[paste0(abunValue,"_mean")]],
+                N.ann.sd = N.ann.list[[paste0(abunValue,"_sd")]]))
   } else{
     return(list(P.ann.samp = P.ann.samp,
-                B.ann.samp = B.ann.list[[paste0(massLabel,"_mean")]],
-                N.ann.samp = N.ann.list$n_m2_mean))
+                B.ann.samp = B.ann.list[["biomass_mean"]],
+                N.ann.samp = N.ann.list[[paste0(abunValue,"_mean")]]))
   }
   # #### create SAMPLE information to export as summary ####
   # # summarise sample sizes across dates

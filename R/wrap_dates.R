@@ -55,6 +55,25 @@ wrap_dates <- function(df = NULL, dateCol = NULL, wrapDate = TRUE,...) {
       return(as.data.frame(returnDf))
     }
   } else{
+    if('numeric' %in% class(df[[dateCol]])){
+      t = sort(union(df[[dateCol]], NULL))
+
+      #Create a vector of durations (days) between successive sampling intervals:
+      t.int = diff(t)
+
+      # Do we want to create a wrap around interval for the last interval to complete a year?
+      if(wrapDate){
+        t.int = c(t.int, (364-sum(t.int)),NA)
+        t = c(t, t[length(t)]+t.int[length(t.int)-1])
+      } else{
+        t = t[-length(t)]
+      }
+      returnDf = list()
+      returnDf[[dateCol]] <- t
+      # returnDf[["julianDate"]] <- julian(date1, origin = as.Date("1970-01-01"))
+      returnDf[["int_days"]] <- t.int
+      return(as.data.frame(returnDf))
+    }
 
   }
 }

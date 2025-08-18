@@ -27,8 +27,10 @@ calc_prod_is <- function(taxaSampleListMass= NULL,
                          dateDf = NULL,
                          taxaSummary = 'full',
                          wrap = FALSE,
-                         massValue = NULL,
-                         abunValue = NULL,
+                         massValue = 'afdm_mg',
+                         abunValue = 'density',
+                         dateCol = 'dateID',
+                         repCol = 'repID',
                          bootList = NULL,...) {
 
   ## tests ##
@@ -42,8 +44,9 @@ calc_prod_is <- function(taxaSampleListMass= NULL,
     # sizesDf = unique(taxaSampleListMass[, c("lengthClass", rev(names(taxaSampleListMass))[1])])
     # sizesDf = unique(taxaSampleListMass[, c(eval(lengthValue), eval(massValue))]),
     massValue = massValue,
-    abunValue = abunValue#,
-    # massLabel = massLabel
+    abunValue = abunValue,
+    dateDf = dateDf,
+    dateCol = dateCol# massLabel = massLabel
   )
 
   # calculate the production from the full samples
@@ -85,24 +88,29 @@ calc_prod_is <- function(taxaSampleListMass= NULL,
                                     taxaSummary = taxaSummary)))
   }
 
+## perform the bootstrap procedure
   P.boots = mapply(FUN = is_prod.sample,
                    df = bootList,
-                   sizesDf = lapply(1:bootNum, function(x) funcList$sizesDf),
+                   # sizesDf = lapply(1:bootNum, function(x) funcList$sizesDf),
                    massValue = massValue,
-                   massLabel = massLabel,
+                   abunValue = abunValue,
+                   dateDf = lapply(1:bootNum, function(x) dateDf),
+                   dateCol = dateCol,
                    full = FALSE)
 
+browser()
   #### create SAMPLE information to export as summary ####
   # summarise sample sizes across dates
-  sampDatesInfo <- stats::setNames(unique(stats::aggregate(taxaSampleListMass[c("repID")], by = list(taxaSampleListMass$dateID, taxaSampleListMass$lengthClass), vers_count)[c(1, 3)]), c("dateID", "N"))
+  ## count the number of replicates across dates
+  sampDatesInfo <- stats::setNames(stats::aggregate(taxaSampleListMass[[repCol]], by = list(taxaSampleListMass[[dateCol]]), FUN = function(x) length(unique(x))), c("dateID", "N"))
   if (wrap) {
-    temp <- data.frame(dateID = dateDf[nrow(dateDf), "dateID"])
+    temp <- data.frame(dateID = dateDf[nrow(dateDf), dateCol])
     temp[["N"]] <- NA
     sampDatesInfo <- rbind(sampDatesInfo, temp)
   }
   # summarise the sample abundance N across all dates and size classes
-  Nmean <- stats::setNames(cleanAggDf(stats::aggregate(taxaSampleListMass, by = list(taxaSampleListMass$dateID, taxaSampleListMass$lengthClass), mean, na.rm = TRUE)), nm = c("dateID", "lengthClass", "n_m2_mean"))
-  Nsd <- stats::setNames(cleanAggDf(stats::aggregate(taxaSampleListMass["n_m2"], by = list(taxaSampleListMass$dateID, taxaSampleListMass$lengthClass), stats::sd, na.rm = TRUE)), nm = "n_m2_sd")
+  Nmean <- stats::setNames(cleanAggDf(stats::aggregate(taxaSampleListMass, by = list(taxaSampleListMass[[dateCol]], taxaSampleListMass[[abunValue]]), mean, na.rm = TRUE)), nm = c("dateID", massValue, paste0(abunValue,"_mean")))
+  Nsd <- stats::setNames(cleanAggDf(stats::aggregate(taxaSampleListMass[[abunValue]], by = list(taxaSampleListMass[[dateCol]], taxaSampleListMass[[massValue]]), stats::sd, na.rm = TRUE)), nm = "n_m2_sd")
   Nbind <- cbind(Nmean, Nsd)
   Nbind$lengthClass <- factor(Nbind$lengthClass, levels = unique(Nbind$lengthClass))
   NmeanTab <- as.data.frame.matrix(stats::xtabs(n_m2_mean ~ dateID + lengthClass, Nbind))
@@ -137,7 +145,7 @@ calc_prod_is <- function(taxaSampleListMass= NULL,
   # create the full summary
   datesInfo <- Reduce(function(x, y) merge(x, y, all = TRUE), list(sampDatesInfo, NdatesInfo, BdatesInfo))
   #estimate the sample PB
-  pb = P.samp$P.ann.samp/mean(unlist(datesInfo[[eval(paste0(massLabel, "_mean"))]]))
+  pb = P.samp$P.ann.samp/mean(unlist(datesInfo[[eval(paste0(massValue, "_mean"))]]))
   if(taxaSummary == "none"){
 
   } else if (taxaSummary == "full") {
