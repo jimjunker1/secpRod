@@ -19,7 +19,7 @@ calc_production = function(taxaSampleListMass = NULL,
                            taxaInfo = NULL,
                            bootNum = 1e2,
                            taxaSummary = 'full',
-                           lengthValue = NULL,
+                           lengthValue = 'lengthClass',
                            massValue = 'afdm_mg',
                            abunValue = 'density',
                            dateCol = 'dateID',
@@ -31,7 +31,11 @@ calc_production = function(taxaSampleListMass = NULL,
   # This function is currently only set up for a single species. Future updates will allow full community
   # estimates to be done with a single call.
   if(length(unlist(taxaInfo$taxonID)) > 1) stop("Error: More than one species' taxaInfo passed to function. Only single species are allowed within each call currently.")
-
+  # are all the input values in the taxaSampleList?
+  colVec = c(lengthValue, massValue, abunValue, dateCol, repCol)
+  if(!all(colVec %in% names(taxaSampleListMass))){
+    stop(paste0("Error: Not all named column inputs found in the taxaSampleListMass. ", paste(colVec[colVec %ni% names(taxaSampleListMass)], collapse = ",")," were not present."))
+  }
   # are the methods all recognizable?
   if(!all(unlist(taxaInfo$method) %in% c('is','sf','pb','igr'))){
     badMethod = unique(unlist(taxaInfo$method)[which(unlist(taxaInfo$method) %ni% c('is','sf','pb','igr'))])
@@ -82,7 +86,7 @@ calc_production = function(taxaSampleListMass = NULL,
     repCol = repCol,
     dateDf = wrap_dates(df = taxaSampleListMass, dateCol = dateCol, wrapDate = wrap),
     # dataframe of sizes and masses
-    sizesDf = unique(taxaSampleListMass[, c(lengthValue, rev(names(taxaSampleListMass))[1])]),
+    sizesDf = unique(taxaSampleListMass[, c(lengthValue, massValue)]),
     bootNum = bootNum,
     taxaSummary = taxaSummary,
     wrap = wrap,

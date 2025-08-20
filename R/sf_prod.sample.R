@@ -12,8 +12,12 @@
 #' @export
 sf_prod.sample <- function(df = NULL,
                            sizesDf = NULL,
-                           massValue = NULL,
-                           massLabel = NULL,
+                           lengthValue = NULL,
+                           massValue = 'afdm_mg',
+                           abunValue = 'density',
+                           dateCol = 'dateID',
+                           repCol = 'repID',
+                           wrap = FALSE,
                            cpi = NULL,
                            full = TRUE,
                            ...) {
@@ -21,13 +25,23 @@ sf_prod.sample <- function(df = NULL,
   #### tests ####
   #### GUTS of function ####
   # calculate mean biomass and abundance across all dates
-  df[[massLabel]] <- df$n_m2 * df[[massValue]]
-  N.ann.list = estimate_ann_stats(df,
-                     var = 'n_m2')
-  B.ann.list = estimate_ann_stats(df,
-                                  var = massLabel)
- df[[massLabel]] <- NULL
- if(B.ann.list[[eval(paste0(massLabel,"_mean"))]] == 0){
+  df[["biomass"]] <- df[[abunValue]] * df[[massValue]]
+  N.ann.list = estimate_ann_stats(df = df,
+                                  var = abunValue,
+                                  massValue = 'afdm_mg',
+                                  abunValue = 'density',
+                                  dateCol = 'dateID',
+                                  repCol = 'repID',
+                                  wrap = wrap)
+  B.ann.list = estimate_ann_stats(df = df,
+                                  var = "biomass",
+                                  massValue = 'afdm_mg',
+                                  abunValue = 'density',
+                                  dateCol = 'dateID',
+                                  repCol = 'repID',
+                                  wrap = wrap)
+ # df[["biomass_mean"]] <- NULL
+ if(B.ann.list[["biomass_mean"]] == 0){
    if(full == TRUE){
      return(list(P.ann.samp = 0,
                  P.uncorr.samp = 0,
@@ -45,8 +59,17 @@ sf_prod.sample <- function(df = NULL,
 
 
   #### calculate SAMPLE annual production ####
-  # Create a matrix with these 4 columns: individual length (mm), mean density for all samples throughout year (number m^-2), individual mass (mg AFDM), and biomass (mg AFDM m^-2) for each size class (rows)
-  SF <- matrix(0, length(unique(unlist(df$lengthClass))), 4)
+  # Create a matrix with these 8 columns:
+  # [1] size class (mm or mass),
+  # [2] mean density for all samples throughout year (number m^-2),
+  # [3] individual mass (mg AFDM) if mass is used for size class this will be duplicate of [1],
+  # [4] density loss
+  # [5] biomass density for each size class (rows),
+  # [6] mass at loss (mean mass between size classes),
+  # [7] biomass loss,
+  # [8] multiply by # of size classes
+  sfTab <- data.frame(matrix(0, length(unique(unlist(df$lengthClass))), 8))
+  names(sfTab) <- c(size, abunValue, 'ind.mass', paste0(abunValue,'.loss'),'biomass','mass.at.loss','biomass.loss','multiply.by.no.sizes')
 
   SF[, c(1,3)] <- c(
     sizesDf[[1]], # lengthClass

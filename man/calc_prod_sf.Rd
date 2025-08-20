@@ -11,8 +11,10 @@ calc_prod_sf(
   dateDf = NULL,
   taxaSummary = "full",
   wrap = FALSE,
-  massValue = NULL,
-  massLabel = NULL,
+  massValue = "afdm_mg",
+  abunValue = "density",
+  dateCol = "dateID",
+  repCol = "repID",
   bootList = NULL,
   ...
 )
@@ -32,11 +34,11 @@ calc_prod_sf(
 
 \item{massValue}{string. What is the mass value and units of the production}
 
-\item{massLabel}{string. What label should the output units be. It is possible this will default to 'massValue' in the future.}
-
 \item{bootList}{list. This is the bootstrapped samples passed from `calc_production()`}
 
 \item{...}{additional arguments to be passed to the function}
+
+\item{massLabel}{string. What label should the output units be. It is possible this will default to 'massValue' in the future.}
 }
 \value{
 returns a list of 2 objects:

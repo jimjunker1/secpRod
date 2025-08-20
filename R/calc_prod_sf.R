@@ -26,6 +26,7 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
                          dateDf = NULL,
                          taxaSummary = 'full',
                          wrap = FALSE,
+                         lengthValue = NULL,
                          massValue = 'afdm_mg',
                          abunValue = 'density',
                          dateCol = 'dateID',
@@ -37,15 +38,41 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
   ## end tests ##
   speciesName = unique(taxaSampleListMass$taxonID)
   taxaInfo = taxaInfo[which(taxaInfo$taxonID == speciesName),]
-  # ## function prep ##
-  # ### make a list of key variables to pass to sample function
+  ## function prep ##
+  ### make a list of key variables to pass to sample function
+  #### create the sizesDf object
+  #### Create size class breakdown if lengthValue not provided, i.e. just masses are present ####
+    if(is.null(lengthValue)){
+      # make a guess if the masses are classes or continuous
+      # determine the number of unique size classes relative to total density?
+      numSizes = length(unique(taxaSampleListMass[[massValue]]))
+      totalDensity = sum(taxaSampleListMass[[abunValue]], na.rm = TRUE)
+      if(numSizes/totalDensity > 0.5){
+      # If continuous, bin the masses into X bins
+      # X should be as large as possible, but not too big that there are bins with 0s
+      sizes = as.numeric(taxaSampleListMass[[massValue]])
+      # get min and max sizes
+      min_size = min(sizes);max_size = max(sizes)
+      # set breaks for equally spaced bins within this range with a minimum of 6
+      bins_out = c()
+      binList = lapply(15:6, FUN = function(x){
+        breaks = seq(min_size, max_size, length.out = x +1)
+        bins = cut(sizes, breaks = breaks, include.lowest = TRUE)
+        all(table(bins) != 0)
+        })
+
+      }
+    }
+
   funcList = list(
     df = taxaSampleListMass,
     # sizesDf = unique(taxaSampleListMass[, c("lengthClass", rev(names(taxaSampleListMass))[1])])
-    sizesDf = unique(taxaSampleListMass[, c("lengthClass", eval(massValue))]),
+    sizesDf = unique(taxaSampleListMass[, c(eval(lengthValue), eval(massValue))]),
     massValue = massValue,
-    massLabel = massLabel
-  )
+    abunValue = abunValue,
+    dateDf = dateDf,
+    dateCol = dateCol
+  )}
 
   # calculate the production from the full samples
   taxaCPI <- mean(c(taxaInfo$min.cpi, taxaInfo$max.cpi))
@@ -95,11 +122,12 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
 
   P.boots = mapply(FUN = sf_prod.sample,
                    df = bootList,
-                   sizesDf = lapply(1:bootNum, function(x) funcList$sizesDf),
+                   # sizesDf = lapply(1:bootNum, function(x) funcList$sizesDf),
                    massValue = massValue,
                    massLabel = massLabel,
                    cpi = cpiBoots,
-                   full = FALSE)
+                   full = FALSE, MoreArgs = list(sizesDf = sizesDf,
+                                                 dateDf = dateDf))
   #### create SAMPLE information to export as summary ####
   sampSummary = create_sample_summary(df = taxaSampleListMass,
                                       wrap = wrap,

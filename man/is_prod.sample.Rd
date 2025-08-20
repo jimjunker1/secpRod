@@ -6,9 +6,12 @@
 \usage{
 is_prod.sample(
   df = NULL,
-  sizesDf = NULL,
-  massValue = NULL,
-  massLabel = NULL,
+  dateDf = dateDf,
+  massValue = "afdm_mg",
+  abunValue = "density",
+  dateCol = "dateID",
+  repCol = "repID",
+  wrap = FALSE,
   full = TRUE,
   ...
 )
@@ -16,15 +19,15 @@ is_prod.sample(
 \arguments{
 \item{df}{a data.frame of long format returned from \code{convert_length_to_mass()} function}
 
-\item{sizesDf}{a data.frame of the}
-
 \item{massValue}{character string identifying the column name of the mass value}
-
-\item{massLabel}{character string identifying the column name of the mass value}
 
 \item{full}{logical. should the full summary be returned with mean and sd}
 
 \item{...}{additional arguments passed to function}
+
+\item{sizesDf}{a data.frame of the}
+
+\item{massLabel}{character string identifying the column name of the mass value}
 }
 \value{
 list object with taxa summary of the sampled data

@@ -13,6 +13,8 @@ calc_production(
   lengthValue = NULL,
   massValue = "afdm_mg",
   abunValue = "density",
+  dateCol = "dateID",
+  repCol = "repID",
   ...
 )
 }
@@ -32,6 +34,10 @@ calc_production(
 \item{massValue}{string of the column name containing the mass measurement}
 
 \item{abunValue}{string of the column name containing the abundance or density measurement}
+
+\item{dateCol}{string of the column name containing the date information. This can be either a recognized date object (e.g., Date, POSIX)}
+
+\item{repCol}{string of the column name containing the replicate information}
 
 \item{...}{additional arguments passed to function}
 }

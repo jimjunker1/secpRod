@@ -4,7 +4,7 @@
 \alias{prep_boots}
 \title{prep_boots}
 \usage{
-prep_boots(df = NULL, bootNum = bootNum)
+prep_boots(df = NULL, bootNum = bootNum, dateCol = "dateID", repCol = "repID")
 }
 \arguments{
 \item{df}{data.frame. A dataframe of the species size, mass, and frequency data.}

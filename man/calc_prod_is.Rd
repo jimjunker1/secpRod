@@ -11,8 +11,10 @@ calc_prod_is(
   dateDf = NULL,
   taxaSummary = "full",
   wrap = FALSE,
-  massValue = NULL,
-  abunValue = NULL,
+  massValue = "afdm_mg",
+  abunValue = "density",
+  dateCol = "dateID",
+  repCol = "repID",
   bootList = NULL,
   ...
 )

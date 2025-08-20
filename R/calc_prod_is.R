@@ -93,9 +93,11 @@ calc_prod_is <- function(taxaSampleListMass= NULL,
                    # sizesDf = lapply(1:bootNum, function(x) funcList$sizesDf),
                    massValue = massValue,
                    abunValue = abunValue,
-                   dateDf = lapply(1:bootNum, function(x) dateDf),
+                   # dateDf = dateDf,
+                   # dateDf = lapply(1:bootNum, function(x) dateDf),
                    dateCol = dateCol,
-                   full = FALSE)
+                   full = FALSE,
+                   MoreArgs = list(dateDf = dateDf))
 
 # browser()
   #### create SAMPLE information to export as summary ####

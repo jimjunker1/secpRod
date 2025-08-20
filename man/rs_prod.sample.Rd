@@ -2,10 +2,9 @@
 % Please edit documentation in R/rs_prod.sample.R
 \name{rs_prod.sample}
 \alias{rs_prod.sample}
-\alias{is_prod.sample}
 \title{rs_prod.sample}
 \usage{
-is_prod.sample(
+rs_prod.sample(
   df = NULL,
   sizesDf = NULL,
   massValue = NULL,

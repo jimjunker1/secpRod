@@ -205,8 +205,9 @@ This will output a lot of information though it has a simple structure:
 ### Increment-summation
 
 ```{r single species IS production,include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
-
+debug(calc_prod_is)
 set.seed(1312)
+debugonce(calc_production)
 calc_production(
   taxaSampleListMass = singleCohortSim,
   # infoCols = c(1:3),
@@ -222,43 +223,46 @@ calc_production(
 ### Size-frequency
 
 ```{r single species SF production,include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
-# taxaInfo <- tibble::tibble(
-#   taxonID = c("sppX"),
-#   massForm = c("afdm_mg~(a*lengthClass^b)*percAsh"),
-#   # a is NA for this example because we simulated mass growth and don't need to convert from length to mass
-#   a = c(NA),
-#   # b is NA for this example because we simulated mass growth and don't need to convert from length to mass
-#   b = c(NA),
-#   # percAsh is NA for this example because we simulated mass growth and don't need to convert from length to mass
-#   percAsh = c(NA),
-#   # method can accept one or more values. This allow comparisons among different methods.
-#   method = 'sf',#list(c("is","pb","sf")),
-#   g.a = c(NA),
-#   growthForm = c("log(g_d) = 1 - 0.25*log(afdm_mg)"),
-#   min.cpi = c(335),
-#   max.cpi = c(365),
-#   pb = c("runif(min = 3, max = 8)"),
-#   min.growth = c(0.001),
-#   wrap = FALSE,
-#   notes = c("This is here for your use. No information will be used, but this column will be maintained in some summaries. See *** for more information.")
-# )
-# 
-# set.seed(1312)
-# calc_production(
-#   taxaSampleListMass = singleCohortSim,
-#   # infoCols = c(1:3),
-#   taxaInfo = taxaInfo,
-#   bootNum = 1e1,
-#   taxaSummary = 'full',
-#   massValue = 'afdm_mg',
-#   abunValue = 'density'
-# )
+taxaInfo <- tibble::tibble(
+  taxonID = c("sppX"),
+  massForm = c("afdm_mg~(a*lengthClass^b)*percAsh"),
+  # a is NA for this example because we simulated mass growth and don't need to convert from length to mass
+  a = c(NA),
+  # b is NA for this example because we simulated mass growth and don't need to convert from length to mass
+  b = c(NA),
+  # percAsh is NA for this example because we simulated mass growth and don't need to convert from length to mass
+  percAsh = c(NA),
+  # method can accept one or more values. This allow comparisons among different methods.
+  method = 'sf',#list(c("is","pb","sf")),
+  g.a = c(NA),
+  growthForm = c("log(g_d) = 1 - 0.25*log(afdm_mg)"),
+  min.cpi = c(335),
+  max.cpi = c(365),
+  pb = c("runif(min = 3, max = 8)"),
+  min.growth = c(0.001),
+  wrap = FALSE,
+  notes = c("This is here for your use. No information will be used, but this column will be maintained in some summaries. See *** for more information.")
+)
+
+debugonce(calc_production)
+debugonce(calc_prod_sf)
+debug(sf_prod.sample)
+set.seed(1312)
+calc_production(
+  taxaSampleListMass = singleCohortSim,
+  # infoCols = c(1:3),
+  taxaInfo = taxaInfo,
+  bootNum = 1e1,
+  taxaSummary = 'full',
+  massValue = 'afdm_mg',
+  abunValue = 'density'
+)
 
 ```
 
 ## Production:Biomass ratio method
 
-```{r single species SF production,include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+```{r single species PB production,include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
 # taxaInfo <- tibble::tibble(
 #   taxonID = c("sppX"),
 #   massForm = c("afdm_mg~(a*lengthClass^b)*percAsh"),

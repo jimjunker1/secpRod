@@ -117,7 +117,7 @@ cleanAggDf = function(df,...){
 #'
 #'
 #'
-estimate_ann_stats = function(df,
+estimate_ann_stats = function(df = NULL,
                               var = NULL,
                               wrap = TRUE,
                               massValue = 'afdm_mg',
@@ -134,11 +134,11 @@ estimate_ann_stats = function(df,
     return(x)
   }
   # sum across lengthClass
-  varDateSum <- setNames(aggregate(df[var], by = list(df[[dateCol]], df[[repCol]]), sum, na.rm = TRUE), nm = c("dateID", "repID", paste0(var,"_sum")))
+  varDateSum <- stats::setNames(stats::aggregate(df[var], by = list(df[[dateCol]], df[[repCol]]), sum, na.rm = TRUE), nm = c("dateID", "repID", paste0(var,"_sum")))
   # take means of all dates across reps
-  varDateSumMean <- setNames(aggregate(varDateSum[grep(var, names(varDateSum))], by = list(varDateSum$dateID), mean, na.rm = TRUE), nm = c("dateID", paste0(var,"_mean")))
+  varDateSumMean <- stats::setNames(stats::aggregate(varDateSum[grep(var, names(varDateSum))], by = list(varDateSum$dateID), mean, na.rm = TRUE), nm = c("dateID", paste0(var,"_mean")))
   # take sd of all dates across reps
-  varDateSumSD <- setNames(aggregate(varDateSum[grep(var, names(varDateSum))], by = list(varDateSum$dateID), sd, na.rm = TRUE), nm = c("dateID", paste0(var,"_sd")))
+  varDateSumSD <- stats::setNames(stats::aggregate(varDateSum[grep(var, names(varDateSum))], by = list(varDateSum$dateID), sd, na.rm = TRUE), nm = c("dateID", paste0(var,"_sd")))
   # wrap the date around
   if(wrap){
     varSumMeanWrap = (varDateSumMean[1,grep(var, names(varDateSumMean))]+varDateSumMean[nrow(varDateSumMean),grep(var, names(varDateSumMean))])/2
