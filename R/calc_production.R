@@ -9,6 +9,8 @@
 #' @param lengthValue string of the column name containing length class measurements. If NULL (default)
 #' @param massValue string of the column name containing the mass measurement
 #' @param abunValue string of the column name containing the abundance or density measurement
+#' @param dateCol string of the column name containing the date information. This can be either a recognized date object (e.g., Date, POSIX)
+#' @param repCol string of the column name containing the replicate information
 #' @param ... additional arguments passed to function
 #'@export
 
@@ -37,15 +39,17 @@ calc_production = function(taxaSampleListMass = NULL,
   }
   ### end tests ###
   # prep size-abundance boots
+
   bootList = prep_boots(df = taxaSampleListMass,
-                        bootNum = bootNum)
+                        bootNum = bootNum,
+                        dateCol = dateCol,
+                        repCol = repCol)
   ## function prep ##
   speciesName = unique(taxaSampleListMass$taxonID)
 
   ### make a list of key variables to pass
   massValue = massValue
   abunValue = abunValue
-  # massLabel = paste0(massValue, "_m2")
   wrap = unlist(taxaInfo$wrap)
 
   if(is.null(lengthValue)){
@@ -98,7 +102,7 @@ calc_production = function(taxaSampleListMass = NULL,
     # debugonce(calc_prod_is)
     # debugonce(is_prod.sample)
     is_prod = do.call(calc_prod_is, args = funcList)
-    browser()
+    # browser()
     return(is_prod)
   }
   # is_prod = calc_prod_is()

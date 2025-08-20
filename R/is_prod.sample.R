@@ -10,6 +10,7 @@
 #' @return list object with taxa summary of the sampled data
 #' @importFrom stats filter
 #' @importFrom stats aggregate
+#' @importFrom zoo na.approx
 #' @export
 is_prod.sample <- function(df = NULL,
                            dateDf = dateDf,
@@ -100,11 +101,17 @@ is_prod.sample <- function(df = NULL,
   massAgg <- merge(isTab[dateCol], massAgg, by = dateCol, all.x = TRUE)
   naMasses <- which(is.na(massAgg$w.mass))
   if(length(naMasses) > 0){
-    if(length(naMasses) == 1 & naMasses == length(massAgg$w.mass)){
+    if(all(length(naMasses) == 1 & naMasses == length(massAgg$w.mass))){
       massAgg$w.mass[length(massAgg$w.mass)] <- massAgg$w.mass[length(massAgg$w.mass)-1]
-    } else{
+    } else if(any(diff(naMasses) == 1)){
+      if(any(length(massAgg$w.mass) %in% naMasses)){
+        massAgg$w.mass[length(massAgg$w.mass)] <- massAgg$w.mass[length(massAgg$w.mass)-1] <- massAgg$w.mass[length(massAgg$w.mass)-2]
+      } else if(length(massAgg$w.mass) %ni% naMasses){
+        naLocs = which(diff(naMasses) == 1)
+        massAgg$w.mass[c((naLocs-1), naLocs)] <- zoo::na.approx(c(naLocs-2, naLocs -1, naLocs, naLocs +1))
+      }} else{
   for(i in 1:length(naMasses)){
-    massAgg$w.mass[i] <- (massAgg$w.mass[i-1]+massAgg$w.mass[i+1])/2
+    massAgg$w.mass[naMasses[i]] <- (massAgg$w.mass[naMasses[i]-1]+massAgg$w.mass[naMasses[i]+1])/2
   }
     }
     }

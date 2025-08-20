@@ -67,15 +67,15 @@ The methods within the package use two main objects, `sampleInfo` the sample-lev
 
   - 'sf': size-frequency method
 
-- growthForm: a character string that is coercible to a formula. This formula is parsed and will reference existing information (e.g., size information) if variables are included in the formula. Further, an additional data
+- growthForm: a character string that is coercible to a formula. This formula is parsed and will reference existing information (e.g., size information) if variables are included in the formula.
 
 - min.cpi: integer of the minimum estimated cohort production interval for adjusting annual production estimates using the size-frequency method
 
 - max.cpi: integer of the maximum estimated cohort production interval for adjusting annual production estimates using the size-frequency method
 
-- pb: numeric of the production to biomass (PB) ratio for the specific taxa. This can take three forms 1) a single value, 2) a vector of values the same length as `bootNum`, and 3) a string of a distribution to randomly sample, **not** including the `n =` (e.g., 'rnorm(mean = 5, sd = 0.5)', 'runif(min = 3, max = 8)'). The function will automatically sample the `bootNum` values. ***Fair warning***: We suggest you explicitly name the parameters in the function call string. Possible unwanted and unknown things may happen otherwise. The tests for this feature are still under development, it will not reject any nonsensical values (e.g, negative, NA, or Inf). If your distribution samples negative values you will get negative productions estimates--at least until the `min.growth` feature is implemented.
+- pb: numeric of the production to biomass (PB) ratio for the specific taxa. This can take three forms 1) a single value, 2) a vector of values the same length as `bootNum`, and 3) a string of a distribution to randomly sample, **not** including the `n =` (e.g., 'rnorm(mean = 5, sd = 0.5)', 'runif(min = 3, max = 8)'). The function will automatically sample the `bootNum` values. ***Fair warning***: We suggest you explicitly name the parameters (e.g., mean, sd, min, max) in the function call string. Possible unwanted and unknown things may happen otherwise. The tests for this feature are still under development, it will not reject any nonsensical values (e.g, negative, NA, or Inf). If your distribution samples negative values you will get negative productions estimates--at least until the `min.growth` feature is implemented.
 
-- min.growth: a minimal value of production to assign when density is >0 and production estimates for a taxon are <0.
+- min.growth: a minimal value of production to assign when density is >0 and production estimates for a taxon are <0. *This is currently not implemented, but is kept for future use.*
 
 - wrap: logical (or coercible) indicating whether the production estimate should wrap the first and last dates to create a full annual cycle. If TRUE, this will create an additional sampling interval using the mean densities and masses to create a full annual data set.
 
@@ -184,13 +184,15 @@ We use this data set to calculate secondary production with different methods. F
 To apply it to our single species example, we input the sample information and taxa information along with how many bootstraps we would like, as:
 
 ```{r single species production,include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
-# debugonce(calc_production)
+debug(is_prod.sample)
+debugonce(calc_production)
+debugonce(prep_boots)
 set.seed(1312)
 calc_production(
   taxaSampleListMass = singleCohortSim,
-  infoCols = c(1:3),
+  # infoCols = c(1:3),
   taxaInfo = taxaInfo,
-  bootNum = 10,
+  bootNum = 1e1,
   taxaSummary = 'full',
   massValue = 'afdm_mg',
   abunValue = 'density'

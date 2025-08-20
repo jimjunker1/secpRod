@@ -189,6 +189,12 @@ string_agg = function(df, colString = NULL){
 
 #'
 #'
+#'
+# recode_boot_dates = function(a = NULL, b = NULL){
+#
+# }
+#'
+#'
 # calc_Linf = function(df,...){
 #   dataList = make_standata(log(count)~lengthClass, data = df)
 #   modelCode = make_stancode(log(count)~lengthClass,
