@@ -43,7 +43,7 @@ data('singleCohortSim', package = 'secpRod')
 
 ## Introduction 
 
-The `secpRod` package provides a number of methods to calculate secondary production of populations, both those with clear cohort structure and those where cohort structure is not possible to discern. First, we walk through the available methods using simulated populations that mimic the data structure of real sampling regimes. The parameters to create these simulated populations is outlined in companion article, vignette("Simulating the sampling of populations"). These simulated populations skip some of the steps of moving from initial sampling processes (e.g., length to mass conversions, sample subsetting, etc.) that are often part of the process. More complete examples that showcase helper functions within `secpRod` that deal with these processes can be found below in [More complete examples](\@ref(more-complete-examples)). Here, we just showcase the secondary production methods available.
+The `secpRod` package provides a number of methods to calculate secondary production of populations, both those with clear cohort structure and those where cohort structure is not possible to discern. First, we walk through the available methods using simulated populations that mimic the data structure of real sampling regimes. The parameters to create these simulated populations is outlined in companion article, vignette("Simulating the sampling of populations"). These simulated populations skip some of the steps of moving from initial sampling processes (e.g., length to mass conversions, sample subsetting, etc.) that are often part of the process. More complete examples that showcase helper functions within `secpRod` that deal with these processes can be found below in \@ref(more-complete-examples). Here, we just showcase the secondary production methods available.
 
 The methods within the package use two main objects, `sampleInfo` the sample-level information (e.g., site, date , replicate) and density and length or mass. An additional dataframe, `taxaInfo` that houses species-specific information such as length to mass conversions, and method specific information such as cohort production interval estimates (CPIs), production:biomass ratios (PBs), and growth equations. The columns contain information for the calculation of production. These include, but are not limited to:
 
@@ -183,14 +183,10 @@ We use this data set to calculate secondary production with different methods. F
 
 To apply it to our single species example, we input the sample information and taxa information along with how many bootstraps we would like, as:
 
-```{r single species production,include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
-debug(is_prod.sample)
-debugonce(calc_production)
-debugonce(prep_boots)
-set.seed(1312)
+```{r calc_prod call,include=TRUE, echo=TRUE, warning=FALSE, message=FALSE, eval = FALSE}
+
 calc_production(
   taxaSampleListMass = singleCohortSim,
-  # infoCols = c(1:3),
   taxaInfo = taxaInfo,
   bootNum = 1e1,
   taxaSummary = 'full',
@@ -208,7 +204,94 @@ This will output a lot of information though it has a simple structure:
 
 ### Increment-summation
 
+```{r single species IS production,include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
 
+set.seed(1312)
+calc_production(
+  taxaSampleListMass = singleCohortSim,
+  # infoCols = c(1:3),
+  taxaInfo = taxaInfo,
+  bootNum = 1e1,
+  taxaSummary = 'full',
+  massValue = 'afdm_mg',
+  abunValue = 'density'
+)
+
+```
+
+### Size-frequency
+
+```{r single species SF production,include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+# taxaInfo <- tibble::tibble(
+#   taxonID = c("sppX"),
+#   massForm = c("afdm_mg~(a*lengthClass^b)*percAsh"),
+#   # a is NA for this example because we simulated mass growth and don't need to convert from length to mass
+#   a = c(NA),
+#   # b is NA for this example because we simulated mass growth and don't need to convert from length to mass
+#   b = c(NA),
+#   # percAsh is NA for this example because we simulated mass growth and don't need to convert from length to mass
+#   percAsh = c(NA),
+#   # method can accept one or more values. This allow comparisons among different methods.
+#   method = 'sf',#list(c("is","pb","sf")),
+#   g.a = c(NA),
+#   growthForm = c("log(g_d) = 1 - 0.25*log(afdm_mg)"),
+#   min.cpi = c(335),
+#   max.cpi = c(365),
+#   pb = c("runif(min = 3, max = 8)"),
+#   min.growth = c(0.001),
+#   wrap = FALSE,
+#   notes = c("This is here for your use. No information will be used, but this column will be maintained in some summaries. See *** for more information.")
+# )
+# 
+# set.seed(1312)
+# calc_production(
+#   taxaSampleListMass = singleCohortSim,
+#   # infoCols = c(1:3),
+#   taxaInfo = taxaInfo,
+#   bootNum = 1e1,
+#   taxaSummary = 'full',
+#   massValue = 'afdm_mg',
+#   abunValue = 'density'
+# )
+
+```
+
+## Production:Biomass ratio method
+
+```{r single species SF production,include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+# taxaInfo <- tibble::tibble(
+#   taxonID = c("sppX"),
+#   massForm = c("afdm_mg~(a*lengthClass^b)*percAsh"),
+#   # a is NA for this example because we simulated mass growth and don't need to convert from length to mass
+#   a = c(NA),
+#   # b is NA for this example because we simulated mass growth and don't need to convert from length to mass
+#   b = c(NA),
+#   # percAsh is NA for this example because we simulated mass growth and don't need to convert from length to mass
+#   percAsh = c(NA),
+#   # method can accept one or more values. This allow comparisons among different methods.
+#   method = 'pb',#list(c("is","pb","sf")),
+#   g.a = c(NA),
+#   growthForm = c("log(g_d) = 1 - 0.25*log(afdm_mg)"),
+#   min.cpi = c(335),
+#   max.cpi = c(365),
+#   pb = c("runif(min = 3, max = 8)"),
+#   min.growth = c(0.001),
+#   wrap = FALSE,
+#   notes = c("This is here for your use. No information will be used, but this column will be maintained in some summaries. See *** for more information.")
+# )
+# 
+# set.seed(1312)
+# calc_production(
+#   taxaSampleListMass = singleCohortSim,
+#   # infoCols = c(1:3),
+#   taxaInfo = taxaInfo,
+#   bootNum = 1e1,
+#   taxaSummary = 'full',
+#   massValue = 'afdm_mg',
+#   abunValue = 'density'
+# )
+
+```
 
 ## More complete examples {#more-complete-examples}
 
