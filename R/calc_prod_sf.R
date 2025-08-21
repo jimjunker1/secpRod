@@ -54,11 +54,12 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
       # get min and max sizes
       min_size = min(sizes);max_size = max(sizes)
       # set breaks for equally spaced bins within this range with a minimum of 6
-      bins_out = c()
-      binList = lapply(15:6, FUN = function(x){
+
+      zeroBins = sapply(15:6, FUN = function(x){
         breaks = seq(min_size, max_size, length.out = x +1)
         bins = cut(sizes, breaks = breaks, include.lowest = TRUE)
-        all(table(bins) != 0)
+        zeros = any(unlist(table(bins)) == 0)
+        return(zeros)
         })
 
       }
