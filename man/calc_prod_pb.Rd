@@ -2,7 +2,7 @@
 % Please edit documentation in R/calc_prod_pb.R
 \name{calc_prod_pb}
 \alias{calc_prod_pb}
-\title{calc_prod_sf}
+\title{calc_prod_pb}
 \usage{
 calc_prod_pb(
   taxaSampleListMass = NULL,
@@ -20,7 +20,7 @@ calc_prod_pb(
 )
 }
 \arguments{
-\item{taxaSampleListMass}{description}
+\item{taxaSampleListMass}{a data.frame of long format returned from \code{convert_length_to_mass()} function}
 
 \item{taxaInfo}{data frame of taxonomic information for calculating production}
 
@@ -34,7 +34,7 @@ calc_prod_pb(
 
 \item{massValue}{string. What is the mass value and units of the production}
 
-\item{bootList}{list of bootstraps from [prep_boots()].}
+\item{bootList}{list of bootstraps data sets from \code{prep_boots()}.}
 
 \item{...}{additional arguments to be passed to the function}
 

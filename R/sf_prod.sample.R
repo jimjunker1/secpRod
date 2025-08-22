@@ -78,6 +78,10 @@ sf_prod.sample <- function(df = NULL,
    df$lengthClass <- df[[lengthValue]]
    df$massClass <- df[[massValue]]
  }
+  # do we need to wrap the data to make a full year?
+   if(wrap){
+
+   }
    classedDf <- c()
    if(all(is.na(df$lengthClass))){
      densityRepAggForm <- paste0(abunValue,"~taxonID+massClass+",repCol)
@@ -88,11 +92,11 @@ sf_prod.sample <- function(df = NULL,
    densityAggForm <- gsub(paste0("\\+",repCol), "", densityRepAggForm)
    classedDf[[abunValue]] <- stats::aggregate(formula(densityAggForm), data = repClassedDf, FUN = mean)[[abunValue]]
 
-   if(all(is.na(df$lengthClass))){
-     massAggForm <- paste0(massValue,"~taxonID+massClass")
-   } else{
-     massAggForm <- paste0(massValue,"~taxonID+lengthClass+massClass")
-   }
+   # if(all(is.na(df$lengthClass))){
+   #   massAggForm <- paste0(massValue,"~taxonID+massClass")
+   # } else{
+   #   massAggForm <- paste0(massValue,"~taxonID+lengthClass+massClass")
+   # }
    # classedDf[[massValue]] <- stats::aggregate(formula())
   #### calculate SAMPLE annual production ####
   # Create a matrix with these 8 columns:

@@ -29,10 +29,11 @@ devtools::install_github("jimjunker1/secpRod")
 Status: Active Development
 -----------
 
+
 Usage
 --------
 
-
+The basic usage of the main function, `calc_production()`, is outlined in ["]
 
 
 <!-- secpRod has XX functions related to data organization: -->

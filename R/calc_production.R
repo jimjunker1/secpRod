@@ -15,7 +15,7 @@
 #'@export
 
 calc_production = function(taxaSampleListMass = NULL,
-                           infoCols = NULL,
+                           # infoCols = NULL,
                            taxaInfo = NULL,
                            bootNum = 1e2,
                            taxaSummary = 'full',
@@ -59,7 +59,7 @@ calc_production = function(taxaSampleListMass = NULL,
   if(is.null(lengthValue)){
     funcList <- list(
       taxaSampleListMass = taxaSampleListMass,
-      infoCols = infoCols,
+      # infoCols = infoCols,
       taxaInfo = taxaInfo,
       lengthValue = lengthValue,
       massValue = massValue,
@@ -79,7 +79,7 @@ calc_production = function(taxaSampleListMass = NULL,
 
   funcList <- list(
     taxaSampleListMass = taxaSampleListMass,
-    infoCols = infoCols,
+    # infoCols = infoCols,
     taxaInfo = taxaInfo,
     lengthValue = lengthValue,
     massValue = massValue,

@@ -1,4 +1,10 @@
 url: https://jimjunker1.github.io/secpRod/
+articles:
+- title: All articles
+  desc: null
+  contents:
+  - '`simple-example`'
+  - '`sampling-simulation`'
 template:
   bootstrap: 5
   includes:

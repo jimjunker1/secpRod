@@ -6,10 +6,12 @@
 \usage{
 pb_prod.sample(
   df = NULL,
-  sizesDf = NULL,
-  massValue = NULL,
-  massLabel = NULL,
+  massValue = "afdm_mg",
+  abunValue = "density",
+  dateCol = "dateID",
+  repCol = "repID",
   pb = NULL,
+  wrap = FALSE,
   full = TRUE,
   ...
 )
@@ -17,13 +19,17 @@ pb_prod.sample(
 \arguments{
 \item{df}{a data.frame of long format returned from \code{convert_length_to_mass()} function}
 
-\item{sizesDf}{a data.frame of the}
-
 \item{massValue}{character string identifying the column name of the mass value}
 
-\item{massLabel}{character string identifying the column name of the mass value}
+\item{abunValue}{character string identifying the column name of the abundance value}
+
+\item{dateCol}{character string identifying the column name of the date column}
+
+\item{repCol}{character string identifying the column name of the replicate column}
 
 \item{pb}{numeric. The production:biomass ratio.}
+
+\item{wrap}{logical. should the calculations be wrapped by adding an additional date to make a full year?}
 
 \item{full}{logical. should the full summary be returned with mean and sd}
 
@@ -33,5 +39,5 @@ pb_prod.sample(
 list object with taxa summary of the sampled data
 }
 \description{
-This function calculates taxa production based on the production:biomass method
+This function calculates sample production based on the production:biomass method
 }

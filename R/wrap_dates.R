@@ -1,7 +1,12 @@
-#'
-#'
-#'
-wrap_dates <- function(df = NULL, dateCol = NULL, wrapDate = TRUE,...) {
+#' @description
+#' This function creates an additional date in the data set to make a full annual cycle
+#' @title wrap_dates
+#' @param df a data.frame of long format returned from \code{convert_length_to_mass()} function
+#' @param dateCol character string identifying the column name of the sampling dates
+#' @param wrapDate logical. should we wrap the dates to make full year?
+#' @return data.frame with sampling dates and intervals, or number of days between
+#' @export
+wrap_dates <- function(df = NULL, dateCol = NULL, wrapDate = TRUE) {
   if(is.null(dateCol)){
     # check if any columns are date
     if(any(unlist(lapply(df, function(x) inherits(x, c("Date","POSIXt")))))){

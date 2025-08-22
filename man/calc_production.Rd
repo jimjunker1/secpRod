@@ -6,7 +6,6 @@
 \usage{
 calc_production(
   taxaSampleListMass = NULL,
-  infoCols = NULL,
   taxaInfo = NULL,
   bootNum = 100,
   taxaSummary = "full",
@@ -20,8 +19,6 @@ calc_production(
 }
 \arguments{
 \item{taxaSampleListMass}{data.frame of sample length-masses and abundances}
-
-\item{infoCols}{integer vector; Any columns in the sizeInfo object that are not the taxonomic ID, sampling metadata, or size class columns}
 
 \item{taxaInfo}{dataframe (or coercible); The taxonomic information for calculating secondary production. This must include a taxonomic ID column with the same name as that of \code{taxaSampleListMass}}
 
@@ -40,6 +37,8 @@ calc_production(
 \item{repCol}{string of the column name containing the replicate information}
 
 \item{...}{additional arguments passed to function}
+
+\item{infoCols}{integer vector; Any columns in the sizeInfo object that are not the taxonomic ID, sampling metadata, or size class columns}
 }
 \description{
 This is the main function of the secpRod package. It will calculate secondary production for all groups based on the methods described in the taxa information object. Depending on input values varying summaries are returned.

@@ -28,7 +28,7 @@ knitr::opts_chunk$set(
 library(secpRod)
 library(dplyr)
 library(tidyr)
-library(purrr)
+# library(purrr)
 library(ggplot2)
 library(ggdist)
 library(knitr)
@@ -36,7 +36,7 @@ library(kableExtra)
 library(gridExtra)
 # library(tidyverse)
 # load the example data set
-data("wbtData", package = 'secpRod')
+# data("wbtData", package = 'secpRod')
 data('singleCohortSim', package = 'secpRod')
 
 ```
@@ -63,17 +63,19 @@ The methods within the package use two main objects, `sampleInfo` the sample-lev
   
   $$P = B_{initial} + \sum_{i = 1}^{t} \overline{N} \Delta W $$
   
-  - 'rs': removal-summation method is similar to the increment-summation method but instead calculates the prodcution *lost* during a sampling interval as the product of the decrease in density, $\Delta N$ and the mean individual mass, $\overline{W}$ plus the increase in biomass, $\Delta B$.
+  - 'rs': removal-summation method is similar to the increment-summation method but instead calculates the production *lost* during a sampling interval as the product of the decrease in density, $\Delta N$ and the mean individual mass, $\overline{W}$ plus the increase in biomass, $\Delta B$.
 
-  - 'sf': size-frequency method
+  - 'sf': size-frequency method. This non-cohort approach assumes the mean size-frequency data from collected samples characterizes the mortality, growth and development of an average cohort. The densities within size classes are averaged across all sampling dates and the decrease in density across sizes classes is calculated similar to the *removal-summation* method. This method assumes a 1-year lifespan. If taxa have an average life span much shorter or longer than 1-year, a correction must be applied. See @benke2007 or @benke1979 for a more complete explanation.
+  
+  - 'igr': instantaneous growth method. This approach is most often applied as a noncohort approach, but can also be used for taxa with identifiable cohorts. It requires the determination of daily instantenous growth rates, *g*. Growth rates can be determined through a number of approaches such as, from growth chambers in the field or laboratory, mark-recapture of individuals, or statistical regression models. See @benke2007, @morin1994, @huryn1986 and the citations therein for more examples of these approaches.
 
-- growthForm: a character string that is coercible to a formula. This formula is parsed and will reference existing information (e.g., size information) if variables are included in the formula.
+- growthForm: growth rates, *g*, to calculate production from the instantaneous growth method. This can take multiple forms 1) a single value, 2) a vector of values the same length as `bootNum`, 3) a string of a distribution to randomly sample, **not** including the `n =` (e.g., 'rnorm(mean = 5, sd = 0.5)', 'runif(min = 3, max = 8)'). The function will automatically sample the `bootNum` values. ***Fair warning***: Currently, you must explicitly name the parameters (e.g., mean, sd, min, max) in the function call string. Possible unwanted and unknown things will happen otherwise. The tests for this feature are still in development, it will not reject any nonsensical values (e.g, negative, NA, or Inf). If your distribution samples negative values you will get negative productions estimates--at least until the `min.growth` feature is implemented. 4) Lastly, a character string that is coercible to a formula. This formula is parsed and will, if necessary, reference existing information (e.g., size information) if variables are included in the formula. The variables in the string must match exactly those in the data (e.g., if massValue == 'afdm_mg', 'afdm_mg' must be in the dataframe). **this method is currently under development to include additional sources of environmental data (e.g. temperature). When complete, additional data passed to `...` will also be referenced to predict growth rates.**
 
 - min.cpi: integer of the minimum estimated cohort production interval for adjusting annual production estimates using the size-frequency method
 
 - max.cpi: integer of the maximum estimated cohort production interval for adjusting annual production estimates using the size-frequency method
 
-- pb: numeric of the production to biomass (PB) ratio for the specific taxa. This can take three forms 1) a single value, 2) a vector of values the same length as `bootNum`, and 3) a string of a distribution to randomly sample, **not** including the `n =` (e.g., 'rnorm(mean = 5, sd = 0.5)', 'runif(min = 3, max = 8)'). The function will automatically sample the `bootNum` values. ***Fair warning***: We suggest you explicitly name the parameters (e.g., mean, sd, min, max) in the function call string. Possible unwanted and unknown things may happen otherwise. The tests for this feature are still under development, it will not reject any nonsensical values (e.g, negative, NA, or Inf). If your distribution samples negative values you will get negative productions estimates--at least until the `min.growth` feature is implemented.
+- pb: numeric of the production to biomass (PB) ratio for the specific taxa. This can take three forms 1) a single value, 2) a vector of values the same length as `bootNum`, and 3) a string of a distribution to randomly sample, **not** including the `n =` (e.g., 'rnorm(mean = 5, sd = 0.5)', 'runif(min = 3, max = 8)'). The function will automatically sample the `bootNum` values. ***Fair warning***: Currently, you must explicitly name the parameters (e.g., mean, sd, min, max) in the function call string. Possible unwanted and unknown things will happen otherwise. The tests for this feature are still under development, it will not reject any nonsensical values (e.g, negative, NA, or Inf). If your distribution samples negative values you will get negative productions estimates--at least until the `min.growth` feature is implemented.
 
 - min.growth: a minimal value of production to assign when density is >0 and production estimates for a taxon are <0. *This is currently not implemented, but is kept for future use.*
 
@@ -258,37 +260,37 @@ calc_production(
 ## Production:Biomass ratio method
 
 ```{r single species PB production,include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
-# taxaInfo <- tibble::tibble(
-#   taxonID = c("sppX"),
-#   massForm = c("afdm_mg~(a*lengthClass^b)*percAsh"),
-#   # a is NA for this example because we simulated mass growth and don't need to convert from length to mass
-#   a = c(NA),
-#   # b is NA for this example because we simulated mass growth and don't need to convert from length to mass
-#   b = c(NA),
-#   # percAsh is NA for this example because we simulated mass growth and don't need to convert from length to mass
-#   percAsh = c(NA),
-#   # method can accept one or more values. This allow comparisons among different methods.
-#   method = 'pb',#list(c("is","pb","sf")),
-#   g.a = c(NA),
-#   growthForm = c("log(g_d) = 1 - 0.25*log(afdm_mg)"),
-#   min.cpi = c(335),
-#   max.cpi = c(365),
-#   pb = c("runif(min = 3, max = 8)"),
-#   min.growth = c(0.001),
-#   wrap = FALSE,
-#   notes = c("This is here for your use. No information will be used, but this column will be maintained in some summaries. See *** for more information.")
-# )
-# 
-# set.seed(1312)
-# calc_production(
-#   taxaSampleListMass = singleCohortSim,
-#   # infoCols = c(1:3),
-#   taxaInfo = taxaInfo,
-#   bootNum = 1e1,
-#   taxaSummary = 'full',
-#   massValue = 'afdm_mg',
-#   abunValue = 'density'
-# )
+taxaInfo <- tibble::tibble(
+  taxonID = c("sppX"),
+  massForm = c("afdm_mg~(a*lengthClass^b)*percAsh"),
+  # a is NA for this example because we simulated mass growth and don't need to convert from length to mass
+  a = c(NA),
+  # b is NA for this example because we simulated mass growth and don't need to convert from length to mass
+  b = c(NA),
+  # percAsh is NA for this example because we simulated mass growth and don't need to convert from length to mass
+  percAsh = c(NA),
+  # method can accept one or more values. This allow comparisons among different methods.
+  method = 'pb',#list(c("is","pb","sf")),
+  g.a = c(NA),
+  growthForm = c("log(g_d) = 1 - 0.25*log(afdm_mg)"),
+  min.cpi = c(335),
+  max.cpi = c(365),
+  pb = c("runif(min = 3, max = 8)"),
+  min.growth = c(0.001),
+  wrap = FALSE,
+  notes = c("This is here for your use. No information will be used, but this column will be maintained in some summaries. See *** for more information.")
+)
+
+
+set.seed(1312)
+calc_production(
+  taxaSampleListMass = singleCohortSim,
+  taxaInfo = taxaInfo,
+  bootNum = 1e1,
+  taxaSummary = 'full',
+  massValue = 'afdm_mg',
+  abunValue = 'density'
+)
 
 ```
 
