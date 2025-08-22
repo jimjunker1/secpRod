@@ -3,8 +3,8 @@ articles:
 - title: All articles
   desc: null
   contents:
-  - '`simple-example`'
-  - '`sampling-simulation`'
+  - simple-example
+  - articles/sampling-simulation
 template:
   bootstrap: 5
   includes:
