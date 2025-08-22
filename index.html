@@ -34,7 +34,15 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="articles/index.html">Articles</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+<li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Get Started</h6></li>
+    <li><a class="dropdown-item" href="articles/simple-example.html">A few simple examples</a></li>
+    <li><a class="dropdown-item" href="articles/sampling-simulation.html">Simulating the sampling of populations</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
@@ -65,10 +73,12 @@
 <div class="section level2">
 <h2 id="status-active-development">Status: Active Development<a class="anchor" aria-label="anchor" href="#status-active-development"></a>
 </h2>
+<p>The <code>secpRod</code> package is currently under development for deployment in conjunction with the ’Secondary Production and Quantitative Food Webs” chapter in the “Methods in Stream Ecology” 5th edition. This initial deployment will include tools to estimate secondary production and its uncertainty through bootstrapping approaches. Future work will include additional inferential frameworks (e.g., Bayesian inference) of these approaches.</p>
 </div>
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
+<p>The basic usage of the main function, <code><a href="reference/calc_production.html">calc_production()</a></code>, is outlined in the <a href="https://jimjunker1.github.io/secpRod/articles/simple-example.html">“A few simple examples” vignette</a>. This article showcases the calculation of secondary production of a <a href="https://jimjunker1.github.io/secpRod/articles/sampling-simulation.html">single simulated population</a>. For a full walkthrough showcasing some of the additional tools for data processing, see the <a href="">“A full example” here</a>.</p>
 <!-- secpRod has XX functions related to data organization: -->
 <!-- - `frac_merge` takes raw count data and provides areal and subsampling adjustments. This function includes QA/QC checks for un-paired fractions and returns size-class abundance standardized to area. -->
 <!-- - `mass_adj` combines  -->
@@ -84,7 +94,11 @@
 <p>Please note that the ‘secpRod’ project is released with a <a href="CODE_OF_CONDUCT.html">Contributor Code of Conduct</a>. By contributing to this project, you agree to abide by its terms.</p>
 <p>If you would like to contribute please see the <a href="CONTRIBUTING.html">contributing document</a>.</p>
 <p>These are heavily borrowed and adapted from the <a href="https://www.weecology.org/" class="external-link">WEEcology lab</a> <a href="https://portal.weecology.org/" class="external-link">Portal project</a> adapted from the <a href="https://www.contributor-covenant.org/" class="external-link">Contributor Covenant</a> and portalr package, respectively.</p>
-<hr>
+</div>
+<div class="section level2">
+<h2 id="acknowledgments">Acknowledgments<a class="anchor" aria-label="anchor" href="#acknowledgments"></a>
+</h2>
+<p>The original code base was inspired by code written by Ben Koch and was further developed by Jim Junker with input from Wyatt Cross, Eric Scholl, Dan Nelson, Mick Demi, and others.</p>
 </div>
 
   </main><aside class="col-md-3"><div class="links">
