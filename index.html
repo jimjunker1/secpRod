@@ -37,8 +37,7 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/model-testing.html">Testing models of secondary production: simple to advanced</a></li>
-    <li><a class="dropdown-item" href="articles/sampling-simulation.html">Simulating the sampling of populations</a></li>
+<li><a class="dropdown-item" href="articles/sampling-simulation.html">Simulating the sampling of populations</a></li>
     <li><a class="dropdown-item" href="articles/simple-example.html">A few simple examples</a></li>
   </ul>
 </li>
@@ -59,30 +58,22 @@
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p><strong>secpRod</strong> is an open source package for the analysis and calculation of secondary production for populations and communities in R. <strong>secpRod</strong> uses data from repeated sampling of population abundance and size structure in a tall data structure and a taxon information sheet as the base objects. In addition to estimating secondary production for communities with multiple methods, <strong>secpRod</strong> also allows the user to visualize population data to assess best methods for secondary production estimation.</p>
+<p><strong>secpRod</strong> is an open source package for the analysis and calculation of secondary production for populations and communities in R. <strong>secpRod</strong> uses data from repeated sampling of population abundance and size structure in a tall data structure and a taxon information sheet as the base objects. In addition to estimating secondary production for communities with multiple methods, <strong>secpRod</strong> also provides a tools to perform data processing actions common in the workflow prior to calculation, such as length to mass conversions using length~mass relationships and visualizing population density and size structure to aid the determination of cohort structure and assess best methods for secondary production estimation.</p>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># To install the latest version Github:</span></span>
-<span><span class="co"># install.packges('devtools')</span></span>
+<span><span class="co"># install.packages('devtools')</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"jimjunker1/secpRod"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="workflow">Workflow<a class="anchor" aria-label="anchor" href="#workflow"></a>
+<h2 id="status-active-development">Status: Active Development<a class="anchor" aria-label="anchor" href="#status-active-development"></a>
 </h2>
-<p>sequence of actions for calculation of community secondary production</p>
-<ul>
-<li><p>split taxa by production method</p></li>
-<li><p>convert length to mass</p></li>
-<li><p>determine date wrap around</p></li>
-<li><p>split taxa into bootstrapped sample lists</p></li>
-<li><p>run production methods</p></li>
-</ul>
 </div>
 <div class="section level2">
-<h2 id="functions">Functions<a class="anchor" aria-label="anchor" href="#functions"></a>
+<h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
 <!-- secpRod has XX functions related to data organization: -->
 <!-- - `frac_merge` takes raw count data and provides areal and subsampling adjustments. This function includes QA/QC checks for un-paired fractions and returns size-class abundance standardized to area. -->
@@ -90,9 +81,15 @@
 <!-- secpRod has XX functions related to data visualization: -->
 <!-- - `len_freq` combines data returned from `frac_merge` to taxon-level histograms -->
 <!-- - `allen_curve` takes  -->
-<p><code>calc_production</code> is the main function. This function estimates bootstrapped secondary production from multiple methods determined in the <code>taxaInfo</code> object.</p>
-<hr>
+<!-- `calc_production` is the main function of secpRod. This function estimates bootstrapped secondary production from multiple methods determined in the `taxaInfo` object. -->
+</div>
+<div class="section level2">
+<h2 id="contributing">Contributing<a class="anchor" aria-label="anchor" href="#contributing"></a>
+</h2>
+<p>This is an actively developing package and we welcome any contributions.</p>
 <p>Please note that the ‘secpRod’ project is released with a <a href="CODE_OF_CONDUCT.html">Contributor Code of Conduct</a>. By contributing to this project, you agree to abide by its terms.</p>
+<p>If you would like to contribute please see the <a href="CONTRIBUTING.html">contributing document</a>.</p>
+<p>These are heavily borrowed and adapted from the <a href="https://www.weecology.org/" class="external-link">WEEcology lab</a> <a href="https://portal.weecology.org/" class="external-link">Portal project</a> adapted from the <a href="https://www.contributor-covenant.org/" class="external-link">Contributor Covenant</a> and portalr package, respectively.</p>
 <hr>
 </div>
 
@@ -112,6 +109,13 @@
 </ul>
 </div>
 
+<div class="community">
+<h2 data-toc-skip>Community</h2>
+<ul class="list-unstyled">
+<li><a href="CONTRIBUTING.html">Contributing guide</a></li>
+<li><a href="CODE_OF_CONDUCT.html">Code of conduct</a></li>
+</ul>
+</div>
 
 <div class="citation">
 <h2 data-toc-skip>Citation</h2>
