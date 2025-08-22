@@ -51,8 +51,10 @@
 <span>  dateDf <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  taxaSummary <span class="op">=</span> <span class="st">"full"</span>,</span>
 <span>  wrap <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  massValue <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  massLabel <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  massValue <span class="op">=</span> <span class="st">"afdm_mg"</span>,</span>
+<span>  abunValue <span class="op">=</span> <span class="st">"density"</span>,</span>
+<span>  dateCol <span class="op">=</span> <span class="st">"dateID"</span>,</span>
+<span>  repCol <span class="op">=</span> <span class="st">"repID"</span>,</span>
 <span>  bootList <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -90,16 +92,16 @@
 <dd><p>string. What is the mass value and units of the production</p></dd>
 
 
-<dt id="arg-masslabel">massLabel<a class="anchor" aria-label="anchor" href="#arg-masslabel"></a></dt>
-<dd><p>string. What label should the output units be. It is possible this will default to 'massValue' in the future.</p></dd>
-
-
 <dt id="arg-bootlist">bootList<a class="anchor" aria-label="anchor" href="#arg-bootlist"></a></dt>
 <dd><p>list of bootstraps from [prep_boots()].</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>additional arguments to be passed to the function</p></dd>
+
+
+<dt id="arg-masslabel">massLabel<a class="anchor" aria-label="anchor" href="#arg-masslabel"></a></dt>
+<dd><p>string. What label should the output units be. It is possible this will default to 'massValue' in the future.</p></dd>
 
 </dl></div>
     <div class="section level2">
