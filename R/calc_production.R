@@ -2,7 +2,7 @@
 #' @title calc_production
 #' @description This is the main function of the secpRod package. It will calculate secondary production for all groups based on the methods described in the taxa information object. Depending on input values varying summaries are returned.
 #' @param taxaSampleListMass data.frame of sample length-masses and abundances
-#' @param infoCols integer vector; Any columns in the sizeInfo object that are not the taxonomic ID, sampling metadata, or size class columns
+#' @param infoCols integer vector; Any columns in the sizeInfo object that are not the taxonomic ID, sampling metadata, or size class columns. ** This is soft-deprecated and is not currently used. It may go away soon **
 #' @param taxaInfo dataframe (or coercible); The taxonomic information for calculating secondary production. This must include a taxonomic ID column with the same name as that of \code{taxaSampleListMass}
 #' @param bootNum integer. The number of bootstrapped samples to create
 #' @param taxaSummary string of \code{'short'}, \code{'full'}, or \code{'none'} to distinguish the information returned
@@ -102,19 +102,18 @@ calc_production = function(taxaSampleListMass = NULL,
     funcList[['method']] = unlist(taxaInfo$method)
   }
 
+# are there notes in the taxaInfo object?
+  if(!is.null(taxaInfo$notes)){
+    notes = taxaInfo$notes
+  } else notes = NULL
+
 ## calculated production based on methods
+
 ### increment summation
   if('is' %in% funcList$method){
-    # debugonce(calc_prod_is)
-    # debugonce(is_prod.sample)
     is_prod = do.call(calc_prod_is, args = funcList)
-    # browser()
     return(is_prod)
   }
-  # is_prod = calc_prod_is()
-
-  # return(sf_prod)
-  # return(pb_prod)
 ### size frequency
   if('sf' %in% funcList$method){
 #   debugonce(sf_prod.sample)
@@ -125,7 +124,7 @@ calc_production = function(taxaSampleListMass = NULL,
 ### instantaneous growth
   # igr_prod = do.call(calc_prod_igr, args = funcList)
   } else if('pb' %in% taxaInfo$method){
-### pb
+### production:biomass method
   pb_prod = do.call(calc_prod_pb, args =funcList)
   return(pb_prod)
   }

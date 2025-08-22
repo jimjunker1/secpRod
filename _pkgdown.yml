@@ -1,9 +1,13 @@
 url: https://jimjunker1.github.io/secpRod/
 articles:
-- title: All articles
+- title: Getting Started
   desc: null
+  navbar: Get Started
   contents:
   - simple-example
+- title: Additional Resources
+  desc: null
+  navbar: ~
   - articles/sampling-simulation
 template:
   bootstrap: 5
