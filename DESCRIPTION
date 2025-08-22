@@ -18,7 +18,8 @@ Imports:
   tidyr,
   dplyr,
   rlang,
-  ggplot2
+  ggplot2,
+  zoo
 Suggests:
     knitr,
     purrr,
