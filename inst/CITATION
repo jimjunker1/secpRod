@@ -3,10 +3,10 @@ citHeader("To cite secpRod in publications use:")
 citEntry(
   entry    = "Manual",
   title    = "{secpRod}: An {R} package for calculating secondary production of animal populations.",
-  author   = personList(as.person("Jim Junker")),
+  author   = personList(as.person("James R. Junker")),
   url      = "https://www.github.io/jimjunker1/secpRod",
   textVersion =
-  paste("Jim Junker (2023).",
+  paste("Jim Junker (2025).",
   "secpRod: An R package for calculating secondary production of animal populations.",
   "URL https://www.github.io/jimjunker1/secpRod"
   )

@@ -10,49 +10,54 @@ of secondary production for populations and communities in R.
 **secpRod** uses data from repeated sampling of population abundance and
 size structure in a tall data structure and a taxon information sheet as
 the base objects. In addition to estimating secondary production for
-communities with multiple methods, **secpRod** also allows the user to
-visualize population data to assess best methods for secondary
-production estimation.
+communities with multiple methods, **secpRod** also provides a tools to
+perform data processing actions common in the workflow prior to
+calculation, such as length to mass conversions using length~mass
+relationships and visualizing population density and size structure to
+aid the determination of cohort structure and assess best methods for
+secondary production estimation.
 
 ## Installation
 
 ``` r
 # To install the latest version Github:
-# install.packges('devtools')
+# install.packages('devtools')
 devtools::install_github("jimjunker1/secpRod")
 ```
 
-## Workflow
+## Status: Active Development
 
-sequence of actions for calculation of community secondary production
-
-- split taxa by production method
-
-- convert length to mass
-
-- determine date wrap around
-
-- split taxa into bootstrapped sample lists
-
-- run production methods
-
-## Functions
+## Usage
 
 <!-- secpRod has XX functions related to data organization: -->
+
 <!-- - `frac_merge` takes raw count data and provides areal and subsampling adjustments. This function includes QA/QC checks for un-paired fractions and returns size-class abundance standardized to area. -->
+
 <!-- - `mass_adj` combines  -->
+
 <!-- secpRod has XX functions related to data visualization: -->
+
 <!-- - `len_freq` combines data returned from `frac_merge` to taxon-level histograms -->
+
 <!-- - `allen_curve` takes  -->
 
-`calc_production` is the main function. This function estimates
-bootstrapped secondary production from multiple methods determined in
-the `taxaInfo` object.
+<!-- `calc_production` is the main function of secpRod. This function estimates bootstrapped secondary production from multiple methods determined in the `taxaInfo` object. -->
 
-------------------------------------------------------------------------
+## Contributing
+
+This is an actively developing package and we welcome any contributions.
 
 Please note that the ‘secpRod’ project is released with a [Contributor
 Code of Conduct](.github/CODE_OF_CONDUCT.md). By contributing to this
 project, you agree to abide by its terms.
+
+If you would like to contribute please see the [contributing
+document](.github/CONTRIBUTING.md).
+
+These are heavily borrowed and adapted from the [WEEcology
+lab](https://www.weecology.org/) [Portal
+project](https://portal.weecology.org/) adapted from the [Contributor
+Covenant](https://www.contributor-covenant.org/) and portalr package,
+respectively.
 
 ------------------------------------------------------------------------

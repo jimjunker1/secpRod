@@ -21,20 +21,26 @@ sf_prod.sample(
 \arguments{
 \item{df}{a data.frame of long format returned from \code{convert_length_to_mass()} function}
 
-\item{sizesDf}{a data.frame of the}
+\item{sizesDf}{a data.frame of the size class including lengthClass, massClass, bin_min, bin_max, midpoint}
 
 \item{massValue}{character string identifying the column name of the mass value}
+
+\item{abunValue}{character string identifying the column name of the density value}
+
+\item{dateCol}{character string identifying the column name of the sample date information. This is distinguished from *Value parameters in that Values may be used to maintain units provenance in the future. This may also change.}
+
+\item{repCol}{character string identifying the column name of the replicate information.}
+
+\item{wrap}{logical. should the calculations be wrapped by adding an additional date to make a full year?}
 
 \item{cpi}{integer. The cohort production interval.}
 
 \item{full}{logical. should the full summary be returned with mean and sd}
 
 \item{...}{additional arguments passed to function}
-
-\item{massLabel}{character string identifying the column name of the mass value}
 }
 \value{
-list object with taxa summary of the sampled data
+list object with annual production, mean biomass, and mean abundance
 }
 \description{
 This function calculates taxa production based on the size-frequency method

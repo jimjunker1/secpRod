@@ -2,13 +2,18 @@
 #' @title sf_prod.sample
 #' @description This function calculates taxa production based on the size-frequency method
 #' @param df a data.frame of long format returned from \code{convert_length_to_mass()} function
-#' @param sizesDf a data.frame of the
+#' @param sizesDf a data.frame of the size class including lengthClass, massClass, bin_min, bin_max, midpoint
 #' @param massValue character string identifying the column name of the mass value
-#' @param massLabel character string identifying the column name of the mass value
-#' @param full logical. should the full summary be returned with mean and sd
+#' @param abunValue character string identifying the column name of the density value
+#' @param dateCol character string identifying the column name of the sample date information. This is distinguished from *Value parameters in that Values may be used to maintain units provenance in the future. This may also change.
+#' @param repCol character string identifying the column name of the replicate information.
+#' @param wrap logical. should the calculations be wrapped by adding an additional date to make a full year?
 #' @param cpi integer. The cohort production interval.
+#' @param full logical. should the full summary be returned with mean and sd
 #' @param ... additional arguments passed to function
-#' @return list object with taxa summary of the sampled data
+#' @return list object with annual production, mean biomass, and mean abundance
+#' @importFrom stats filter
+#' @importFrom stats aggregate
 #' @export
 sf_prod.sample <- function(df = NULL,
                            sizesDf = NULL,
