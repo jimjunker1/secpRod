@@ -30,7 +30,10 @@ devtools::install_github("jimjunker1/secpRod")
 The `secpRod` package is currently under development for deployment in
 conjunction with the ’Secondary Production and Quantitative Food Webs”
 chapter in the “Methods in Stream Ecology” 5th edition. This initial
-deployment will
+deployment will include tools to estimate secondary production and its
+uncertainty through bootstrapping approaches. Future work will include
+additional inferential frameworks (e.g., Bayesian inference) of these
+approaches.
 
 ## Usage
 
@@ -40,7 +43,8 @@ vignette](https://jimjunker1.github.io/secpRod/articles/simple-example.html).
 This article showcases the calculation of secondary production of a
 [single simulated
 population](https://jimjunker1.github.io/secpRod/articles/sampling-simulation.html).
-For a full walkthrough, see the “A full example”
+For a full walkthrough showcasing some of the additional tools for data
+processing, see the [“A full example” here]().
 
 <!-- secpRod has XX functions related to data organization: -->
 
