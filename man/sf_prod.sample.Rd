@@ -7,8 +7,12 @@
 sf_prod.sample(
   df = NULL,
   sizesDf = NULL,
-  massValue = NULL,
-  massLabel = NULL,
+  lengthValue = NULL,
+  massValue = "afdm_mg",
+  abunValue = "density",
+  dateCol = "dateID",
+  repCol = "repID",
+  wrap = FALSE,
   cpi = NULL,
   full = TRUE,
   ...
@@ -21,13 +25,13 @@ sf_prod.sample(
 
 \item{massValue}{character string identifying the column name of the mass value}
 
-\item{massLabel}{character string identifying the column name of the mass value}
-
 \item{cpi}{integer. The cohort production interval.}
 
 \item{full}{logical. should the full summary be returned with mean and sd}
 
 \item{...}{additional arguments passed to function}
+
+\item{massLabel}{character string identifying the column name of the mass value}
 }
 \value{
 list object with taxa summary of the sampled data

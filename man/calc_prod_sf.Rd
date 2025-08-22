@@ -11,6 +11,7 @@ calc_prod_sf(
   dateDf = NULL,
   taxaSummary = "full",
   wrap = FALSE,
+  lengthValue = NULL,
   massValue = "afdm_mg",
   abunValue = "density",
   dateCol = "dateID",

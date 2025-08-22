@@ -28,17 +28,17 @@ sf_prod.sample <- function(df = NULL,
   df[["biomass"]] <- df[[abunValue]] * df[[massValue]]
   N.ann.list = estimate_ann_stats(df = df,
                                   var = abunValue,
-                                  massValue = 'afdm_mg',
-                                  abunValue = 'density',
-                                  dateCol = 'dateID',
-                                  repCol = 'repID',
+                                  massValue = massValue,
+                                  abunValue = abunValue,
+                                  dateCol = dateCol,
+                                  repCol = repCol,
                                   wrap = wrap)
   B.ann.list = estimate_ann_stats(df = df,
                                   var = "biomass",
-                                  massValue = 'afdm_mg',
-                                  abunValue = 'density',
-                                  dateCol = 'dateID',
-                                  repCol = 'repID',
+                                  massValue = massValue,
+                                  abunValue = abunValue,
+                                  dateCol = dateCol,
+                                  repCol = repCol,
                                   wrap = wrap)
  # df[["biomass_mean"]] <- NULL
  if(B.ann.list[["biomass_mean"]] == 0){
@@ -57,7 +57,38 @@ sf_prod.sample <- function(df = NULL,
 
  } else{
 
+   df$lengthClass <- NA_real_
+   df$massClass <- NA_real_
+ if(is.null(lengthValue)){
 
+   if(all(is.na(sizesDf$bin_min))){
+     df$massClass <- df[[massValue]]
+   }else{
+        # x  <- sapply(df[[massValue]], FUN = function(a) sizesDf[apply(sizesDf,1,FUN = function(b) between(a,b[['bin_min']], b[['bin_max']])),'massClass'])
+        breaks <- c(sizesDf$bin_min, tail(sizesDf$bin_max, 1))
+        df$massClass <- sizesDf$massClass[findInterval(df[[massValue]], breaks, rightmost.closed = TRUE)]
+        df$massClass[is.na(df$massClass)] <- NA
+   }
+ } else{
+   df$lengthClass <- df[[lengthValue]]
+   df$massClass <- df[[massValue]]
+ }
+   classedDf <- c()
+   if(all(is.na(df$lengthClass))){
+     densityRepAggForm <- paste0(abunValue,"~taxonID+massClass+",repCol)
+   } else{
+     densityRepAggForm <- paste0(abunValue,"~taxonID+lengthClass+massClass+",repCol)
+   }
+   repClassedDf <- stats::aggregate(formula(densityRepAggForm), data = df, FUN = sum, na.action = na.omit)
+   densityAggForm <- gsub(paste0("\\+",repCol), "", densityRepAggForm)
+   classedDf[[abunValue]] <- stats::aggregate(formula(densityAggForm), data = repClassedDf, FUN = mean)[[abunValue]]
+
+   if(all(is.na(df$lengthClass))){
+     massAggForm <- paste0(massValue,"~taxonID+massClass")
+   } else{
+     massAggForm <- paste0(massValue,"~taxonID+lengthClass+massClass")
+   }
+   # classedDf[[massValue]] <- stats::aggregate(formula())
   #### calculate SAMPLE annual production ####
   # Create a matrix with these 8 columns:
   # [1] size class (mm or mass),
@@ -68,51 +99,64 @@ sf_prod.sample <- function(df = NULL,
   # [6] mass at loss (mean mass between size classes),
   # [7] biomass loss,
   # [8] multiply by # of size classes
-  sfTab <- data.frame(matrix(0, length(unique(unlist(df$lengthClass))), 8))
-  names(sfTab) <- c(size, abunValue, 'ind.mass', paste0(abunValue,'.loss'),'biomass','mass.at.loss','biomass.loss','multiply.by.no.sizes')
 
-  SF[, c(1,3)] <- c(
-    sizesDf[[1]], # lengthClass
-    sizesDf[[2]] # massClass
-  )
-  SF[, 2] <- unname(unlist(aggregate(df$n_m2, by = list(df$lengthClass), mean, na.rm = TRUE)[2]))
-  SF[, 4] <- SF[, 2] * SF[, 3]
+  # 0) create the matrix object
+  sfTab <- data.frame(matrix(NA_real_, nrow(sizesDf)+1, 9))
+  names(sfTab) <- c('lengthClass','massClass', abunValue, 'ind.mass', paste0(abunValue,'.loss'),'biomass','mass.at.loss','biomass.loss','multiply.by.no.sizes')
 
-  # Create a matrix with these 4 columns: number lost (number m^-2), individual mass at loss (mg AFDM), biomass lost (mg AFDM m^-2), and biomass lost * number size classes (mg AFDM m^-2) for each transistion between size classes (rows)
-  SF.int <- matrix(0, length(unique(unlist(df$lengthClass))), 4)
-  # Calculate the number lost between size classes, but subtract zero from the mean number in the largest size class for the "final" transition out of the largest size class
-  SF.int[, 1] <- c(-diff(SF[, 2]), (SF[dim(SF)[1], 2] - 0))
-  # Calculate the geometric mean of individual masses between size classes, but use the individual mass of the largest size class for the "final" transition out of the largest size class, as Benke & Huryn (2007) suggest
-  SF.int[, 2] <- c((SF[(1:(dim(SF)[1] - 1)), 3] * SF[(2:dim(SF)[1]), 3])^(1 / 2), SF[dim(SF)[1], 3])
-  SF.int[, 3] <- SF.int[, 1] * SF.int[, 2]
-  SF.int[, 4] <- SF.int[, 3] * max(sizesDf[[1]])
-  # If the first value in the column of biomass * number of size classes (mg AFDM m^-2) is negative, set it to zero
-  if (SF.int[1, 4] < 0) {
-    SF.int[1, 4] <- 0
-  }
+  # 1) & 2) add lengthClass and massClass columns
+  sfTab[,1] <- c(sizesDf[[1]],NA)
+  sfTab[,2] <- c(sizesDf[[2]],NA)
+
+  # 3) add in the density column
+  sfTab[,3] <- c(classedDf[[abunValue]],NA)
+
+  # 4) add in ind.mass column
+  sfTab[,4] <- c(sizesDf[[2]],NA)
+
+  # 5) add in the density.loss column
+  sfTab[,5] <- c(NA, (diff(sfTab[,3]) *-1))
+  sfTab[nrow(sfTab),5] <- sfTab[(nrow(sfTab)-1),3]
+
+  # 6) add in the biomass column
+  sfTab[,6] <- sfTab[['ind.mass']] * sfTab[[abunValue]]
+
+  # 7) add in mass at loss column
+  sfTab[,7] <- stats::filter(sfTab[['ind.mass']], c(1,1)/2, sides = 1)
+  sfTab[nrow(sfTab),7] <- sfTab[(nrow(sfTab)-1),4]
+
+  # 8) add in the biomass loss
+  sfTab[,8] <- sfTab[['mass.at.loss']] * sfTab[[paste0(abunValue,'.loss')]]
+
+  # 9) multiply by # of size classes
+  sfTab[,9] <- sfTab[["biomass.loss"]] * (nrow(sizesDf)-1)
+  # if the first biomass.loss x size classes column is negative, set to 0 as suggested by Benke, Huryn, and Junker 2026
+  if(sfTab[2,9] < 0) sfTab[2,9] <- 0
+
   # Set negative values to zero only if no positive values precede them and they occur below a non-positive value (i.e., negative or zero) in the column of biomass * number of size classes (mg AFDM m^-2) as Benke & Huryn (2007) suggest
-  for (s in 2:dim(SF.int)[1]) {
-    if (SF.int[s, 4] < 0 & sum(SF.int[1:(s - 1), 4] > 0) == 0) {
-      SF.int[s, 4] <- 0
-    }
-  }
-
-  # Calculate "uncorrected" production by summing all values in the the column of biomass * number of size classes (mg AFDM m^-2)
-  P.uncorr.samp <- sum(SF.int[, 4])
+  # for (s in 2:dim(SF.int)[1]) {
+  #   if (SF.int[s, 4] < 0 & sum(SF.int[1:(s - 1), 4] > 0) == 0) {
+  #     SF.int[s, 4] <- 0
+  #   }
+  # }
+  # Calculate "uncorrected" production by summing all values in the the column of biomass * number of size classes
+  P.uncorr.samp <- sum(sfTab[, 9], na.rm = TRUE)
   # Calculate annual production using the cohort production interval (cpi) given in days for this taxon
   P.ann.samp <- P.uncorr.samp * (365 / cpi)
+
 }
   if(full == TRUE){
     return(list(P.ann.samp = P.ann.samp,
                 P.uncorr.samp = P.uncorr.samp,
-                B.ann.mean = B.ann.list[[paste0(massLabel,"_mean")]],
-                B.ann.sd = B.ann.list[[paste0(massLabel,"_sd")]],
-                N.ann.mean = N.ann.list$n_m2_mean,
-                N.ann.sd = N.ann.list$n_m2_sd))
+                B.ann.mean = B.ann.list[["biomass_mean"]],
+                B.ann.sd = B.ann.list[["biomass_sd"]],
+                N.ann.mean = N.ann.list[[paste0(abunValue,"_mean")]],
+                N.ann.sd = N.ann.list[[paste0(abunValue,"_sd")]]))
   } else{
     return(list(P.ann.samp = P.ann.samp,
-                B.ann.samp = B.ann.list[[paste0(massLabel,"_mean")]],
-                N.ann.samp = N.ann.list$n_m2_mean))
+                P.uncorr.samp = P.uncorr.samp,
+                B.ann.samp = B.ann.list[["biomass_mean"]],
+                N.ann.samp = N.ann.list[[paste0(abunValue,"_mean")]]))
   }
   # #### create SAMPLE information to export as summary ####
   # # summarise sample sizes across dates

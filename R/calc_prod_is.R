@@ -30,7 +30,8 @@ calc_prod_is <- function(taxaSampleListMass= NULL,
                          abunValue = 'density',
                          dateCol = 'dateID',
                          repCol = 'repID',
-                         bootList = NULL,...) {
+                         bootList = NULL,
+                         ...) {
 
   ## tests ##
 
@@ -40,12 +41,13 @@ calc_prod_is <- function(taxaSampleListMass= NULL,
   # ### make a list of key variables to pass to sample function
   funcList = list(
     df = taxaSampleListMass,
-    # sizesDf = unique(taxaSampleListMass[, c("lengthClass", rev(names(taxaSampleListMass))[1])])
-    # sizesDf = unique(taxaSampleListMass[, c(eval(lengthValue), eval(massValue))]),
+    dateDf = dateDf,
     massValue = massValue,
     abunValue = abunValue,
-    dateDf = dateDf,
-    dateCol = dateCol# massLabel = massLabel
+    dateCol = dateCol,
+    repCol = repCol,
+    wrap = wrap,
+    full = TRUE
   )
 
   # calculate the production from the full samples
@@ -88,14 +90,13 @@ calc_prod_is <- function(taxaSampleListMass= NULL,
   }
 
 ## perform the bootstrap procedure
+  # P.boots = vector('list', length = bootNum)
   P.boots = mapply(FUN = is_prod.sample,
                    df = bootList,
-                   # sizesDf = lapply(1:bootNum, function(x) funcList$sizesDf),
                    massValue = massValue,
                    abunValue = abunValue,
-                   # dateDf = dateDf,
-                   # dateDf = lapply(1:bootNum, function(x) dateDf),
                    dateCol = dateCol,
+                   repCol = repCol,
                    full = FALSE,
                    MoreArgs = list(dateDf = dateDf))
 
@@ -108,68 +109,7 @@ calc_prod_is <- function(taxaSampleListMass= NULL,
                                     dateCol = dateCol,
                                     repCol = repCol,
                                     ...)
-  # # summarise sample sizes across dates
-  # ## count the number of replicates across dates
-  # sampDatesInfo <- stats::setNames(stats::aggregate(taxaSampleListMass[[repCol]], by = list(taxaSampleListMass[[dateCol]]), FUN = function(x) length(unique(x))), c("dateID", "N"))
-  # if (wrap) {
-  #   temp <- wrap_dates(df = taxaSampleListMass, dateCol = dateCol, wrapDate = TRUE)[dateCol]
-  #   temp[["N"]] <- NA
-  #   sampDatesInfo <- rbind(sampDatesInfo, temp[nrow(temp),])
-  #   temp[["N"]] <- NULL
-  # }
-  # ## get sample abundance across dates dates
-  # densityAgg <- aggregate(formula(paste0(abunValue,"~",dateCol,"+",repCol)), data = taxaSampleListMass, FUN = sum, na.rm = TRUE)
-  # ## then take the mean and sd for each date
-  # Nmean <- stats::setNames(aggregate(formula(paste0(abunValue,"~",dateCol)), data = densityAgg, FUN = mean, na.rm = TRUE), nm = c("dateID", paste0(abunValue,"_mean")))
-  # Nsd <- stats::setNames(aggregate(formula(paste0(abunValue,"~",dateCol)), data = densityAgg, FUN = stats::sd, na.rm = TRUE), nm = c("dateID", paste0(abunValue,"_sd")))
-  # # bind them together
-  # Nbind <- merge(Nmean, Nsd, by = dateCol)
-  # # Nbind$lengthClass <- factor(Nbind$lengthClass, levels = unique(Nbind$lengthClass))
-  # # NmeanTab <- as.data.frame.matrix(stats::xtabs(n_m2_mean ~ dateID + lengthClass, Nbind))
-  # # NsdTab <- as.data.frame.matrix(stats::xtabs(n_m2_sd ~ dateID + lengthClass, Nbind))
-  # # NdatesInfo <- stats::setNames(stats::aggregate(Nmean[[paste0(abunValue,"_mean")]], by = list(Nmean[[dateCol]]), sum, na.rm = TRUE), nm = c("dateID", "n_m2_mean"))
-  # # if wrap equals true create another
-  # if (wrap) {
-  #   temp[[paste0(abunValue,"_mean")]] <- temp[[paste0(abunValue,"_sd")]] <- NA
-  #   temp[nrow(temp), paste0(abunValue,"_mean")] <- (Nbind[1,paste0(abunValue,"_mean")] + Nbind[(nrow(Nbind)-1),paste0(abunValue,"_mean")])/2
-  #   temp[nrow(temp), paste0(abunValue,"_sd")] <- sqrt((Nbind[1,paste0(abunValue,"_sd")]^2) + (Nbind[(nrow(Nbind)-1), paste0(abunValue,"_sd")]^2))
-  #   Nbind <- rbind(Nbind, temp[nrow(temp),])
-  #   temp[[paste0(abunValue,"_mean")]] <- temp[[paste0(abunValue,"_sd")]] <- NULL
-  # }
-  # # summarise the sample biomasses across all dates and size classes
-  # # create the sizeclass biomass for all rows
-  # taxaSampleListMass[["biomass"]] <- unlist(taxaSampleListMass[, abunValue]) * unlist(taxaSampleListMass[, massValue])
-  # ## convert biomass NAs to 0
-  # taxaSampleListMass[,"biomass"][is.na(taxaSampleListMass[,"biomass"])] <- 0
-  # # do the aggregating
-  # ## get sample abundance across dates dates
-  # biomassAgg <- aggregate(formula(paste0("biomass~",dateCol,"+",repCol)), data = taxaSampleListMass, FUN = sum, na.rm = TRUE)
-  # ## then take the mean and sd for each date
-  # Bmean <- stats::setNames(aggregate(formula(paste0("biomass~",dateCol)), data = biomassAgg, FUN = mean, na.rm = TRUE), nm = c("dateID", "biomass_mean"))
-  # Bsd <- stats::setNames(aggregate(formula(paste0("biomass~",dateCol)), data = biomassAgg, FUN = stats::sd, na.rm = TRUE), nm = c("dateID", "biomass_sd"))
-  # # bind them together
-  # Bbind <- merge(Bmean, Bsd, by = dateCol)
-  # # Bmean <- stats::setNames(cleanAggDf(stats::aggregate(taxaSampleListMass[c("dateID", "lengthClass", massLabel)], by = list(taxaSampleListMass$dateID, taxaSampleListMass$lengthClass), mean, na.rm = TRUE)), nm = c("dateID", "lengthClass", paste0(massLabel, "_mean")))
-  # # Bsd <- stats::setNames(cleanAggDf(stats::aggregate(taxaSampleListMass[massLabel], by = list(taxaSampleListMass$dateID, taxaSampleListMass$lengthClass), stats::sd, na.rm = TRUE)), nm = paste0(massLabel, "_sd"))
-  # # Bbind <- cbind(Bmean, Bsd)
-  # # Bbind$lengthClass <- factor(Bbind$lengthClass, levels = unique(Bbind$lengthClass))
-  # # meanBform <- stats::as.formula(paste0(massLabel, "_mean ~ dateID + lengthClass"))
-  # # sdBform <- stats::as.formula(paste0(massLabel, "_sd ~ dateID + lengthClass"))
-  # # BmeanTab <- as.data.frame.matrix(stats::xtabs(meanBform, Bbind))
-  # # BsdTab <- as.data.frame.matrix(stats::xtabs(sdBform, Bbind))
-  # # BdatesInfo <- stats::setNames(stats::aggregate(Bmean[paste0(massLabel, "_mean")], by = list(Nmean$dateID), sum, na.rm = TRUE), nm = c("dateID", paste0(massLabel, "_mean")))
-  # # if wrap equals true
-  # if (wrap) {
-  #   temp[["biomass_mean"]] <- temp[["biomass_sd"]] <- NA
-  #   temp[nrow(temp), "biomass_mean"] <- (Bbind[1,"biomass_mean"] + Bbind[(nrow(Bbind)-1),"biomass_mean"])/2
-  #   temp[nrow(temp), "biomass_sd"] <- sqrt((Bbind[1,"biomass_sd"]^2) + (Bbind[(nrow(Bbind)-1), "biomass_sd"]^2))
-  #   Bbind <- rbind(Bbind, temp[nrow(temp),])
-  #   temp[["biomass_mean"]] <- temp[["biomass_sd"]] <- NULL
-  # }
-  # # create the full summary
-  # datesInfo <- Reduce(function(x, y) merge(x, y, all = TRUE), list(sampDatesInfo, Nbind, Bbind))
-  # #estimate the sample PB
-  # pb = P.samp$P.ann.samp/mean(unlist(datesInfo[["biomass_mean"]]))
+
   #estimate the sample PB
   pb = P.samp$P.ann.samp/P.samp$B.ann.mean
   if(taxaSummary == "none"){

@@ -31,7 +31,8 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
                          abunValue = 'density',
                          dateCol = 'dateID',
                          repCol = 'repID',
-                         bootList = NULL,...) {
+                         bootList = NULL,
+                         ...) {
 
   ## tests ##
 
@@ -47,34 +48,61 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
       # determine the number of unique size classes relative to total density?
       numSizes = length(unique(taxaSampleListMass[[massValue]]))
       totalDensity = sum(taxaSampleListMass[[abunValue]], na.rm = TRUE)
-      if(numSizes/totalDensity > 0.5){
+      if(any(numSizes/totalDensity > 0.2 | numSizes > 30)){
       # If continuous, bin the masses into X bins
       # X should be as large as possible, but not too big that there are bins with 0s
       sizes = as.numeric(taxaSampleListMass[[massValue]])
       # get min and max sizes
-      min_size = min(sizes);max_size = max(sizes)
+      min_size = min(sizes, na.rm = TRUE);max_size = max(sizes, na.rm = TRUE)
       # set breaks for equally spaced bins within this range with a minimum of 6
 
       zeroBins = sapply(15:6, FUN = function(x){
         breaks = seq(min_size, max_size, length.out = x +1)
         bins = cut(sizes, breaks = breaks, include.lowest = TRUE)
-        zeros = any(unlist(table(bins)) == 0)
-        return(zeros)
+        zeros = !any(unlist(table(bins)) == 0)
+        negative = all(diff(unname(table(bins))) < 0)
+        return(data.frame(zeros = list(zeros),
+                          negative = list(negative)))
         })
+      suppressWarnings(
+        # if all bins have either zeros or non-negative changes
+        # set at minimum of 6. Warnings are suppressed for coercing list to logical
+        if(all((15:6)[apply(zeroBins,2, function(x) all(x))])){
+        b = 6
+      } else{
+        b = (15:6)[which.max(apply(zeroBins,2, function(x) all(x)))]
+      }
+      )
+
+      breaks = seq(min_size, max_size, length.out = b+1)
+      bins = cut(sizes, breaks = breaks, include.lowest = TRUE)
+      sizesDf = get_bin_widths(levels(bins))
+      sizesDf$lengthClass <- NA
+      sizesDf$massClass <- as.numeric(unlist(sizesDf$midpoint))
+      sizesDf = sizesDf[,c('lengthClass','massClass','bin_min','bin_max')]
+
+      } else{ # if the data appear to be already in classes
+      sizesDf$lengthClass <- sizesDf$bin_min <- sizesDf$bin_max <- NA
+      sizesDf$massClass = unique(taxaSampleListMass[, c(eval(massValue))])
+      sizesDf = sizesDf[,c('lengthClass','massClass','bin_min','bin_max')]
 
       }
+    } else{
+
+      sizesDf = unique(taxaSampleListMass[, c(eval(lengthValue), eval(massValue))])
+      sizesDf$bin_min <- sizesDf$bin_max <- NA
+      sizesDf = sizesDf[,c('lengthClass','massClass','bin_min','bin_max')]
+
     }
 
+  ## set the funcList to pass to sample production function
   funcList = list(
     df = taxaSampleListMass,
-    # sizesDf = unique(taxaSampleListMass[, c("lengthClass", rev(names(taxaSampleListMass))[1])])
-    sizesDf = unique(taxaSampleListMass[, c(eval(lengthValue), eval(massValue))]),
+    sizesDf = sizesDf,
     massValue = massValue,
     abunValue = abunValue,
-    dateDf = dateDf,
-    dateCol = dateCol
-  )}
-
+    wrap = wrap
+  )
   # calculate the production from the full samples
   taxaCPI <- mean(c(taxaInfo$min.cpi, taxaInfo$max.cpi))
   funcList = c(funcList, list(cpi = taxaCPI))
@@ -121,14 +149,35 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
 
   cpiBoots = sample(seq.int(from = as.integer(taxaInfo$min.cpi), to = as.integer(taxaInfo$max.cpi), by = 1), as.integer(bootNum), replace = TRUE)
 
+
+  # P.boots = vector('list', length = bootNum)
+  # for(i in 1:length(bootList)){
+  #   P.boots[[i]] = sf_prod.sample(
+  #                  df = bootList[[i]],
+  #                  sizesDf = sizesDf,
+  #                  lengthValue = lengthValue,
+  #                  massValue = massValue,
+  #                  abunValue = abunValue,
+  #                  dateCol = dateCol,
+  #                  repCol = repCol,
+  #                  cpi = cpiBoots[i],
+  #                  wrap = wrap,
+  #                  full = FALSE,
+  #                  )
+  # }
+  # debug(sf_prod.sample)
   P.boots = mapply(FUN = sf_prod.sample,
                    df = bootList,
-                   # sizesDf = lapply(1:bootNum, function(x) funcList$sizesDf),
+                   # lengthValue = lengthValue,
                    massValue = massValue,
-                   massLabel = massLabel,
+                   abunValue = abunValue,
+                   dateCol = dateCol,
+                   repCol = repCol,
                    cpi = cpiBoots,
-                   full = FALSE, MoreArgs = list(sizesDf = sizesDf,
-                                                 dateDf = dateDf))
+                   wrap = wrap,
+                   full = FALSE,
+                   MoreArgs = list(sizesDf = sizesDf))
+
   #### create SAMPLE information to export as summary ####
   sampSummary = create_sample_summary(df = taxaSampleListMass,
                                       wrap = wrap,
@@ -137,53 +186,11 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
                                       dateCol = dateCol,
                                       repCol = repCol,
                                       ...)
-  # # summarise sample sizes across dates
-  # sampDatesInfo <- stats::setNames(unique(stats::aggregate(taxaSampleListMass[c("repID")], by = list(taxaSampleListMass$dateID, taxaSampleListMass$lengthClass), vers_count)[c(1, 3)]), c("dateID", "N"))
-  # if (wrap) {
-  #   temp <- data.frame(dateID = dateDf[nrow(dateDf), "dateID"])
-  #   temp[["N"]] <- NA
-  #   sampDatesInfo <- rbind(sampDatesInfo, temp)
-  # }
-  # # summarise the sample abundance N across all dates and size classes
-  # Nmean <- stats::setNames(cleanAggDf(stats::aggregate(taxaSampleListMass, by = list(taxaSampleListMass$dateID, taxaSampleListMass$lengthClass), mean, na.rm = TRUE)), nm = c("dateID", "lengthClass", "n_m2_mean"))
-  # Nsd <- stats::setNames(cleanAggDf(stats::aggregate(taxaSampleListMass["n_m2"], by = list(taxaSampleListMass$dateID, taxaSampleListMass$lengthClass), stats::sd, na.rm = TRUE)), nm = "n_m2_sd")
-  # Nbind <- cbind(Nmean, Nsd)
-  # Nbind$lengthClass <- factor(Nbind$lengthClass, levels = unique(Nbind$lengthClass))
-  # NmeanTab <- as.data.frame.matrix(stats::xtabs(n_m2_mean ~ dateID + lengthClass, Nbind))
-  # NsdTab <- as.data.frame.matrix(stats::xtabs(n_m2_sd ~ dateID + lengthClass, Nbind))
-  # NdatesInfo <- stats::setNames(stats::aggregate(Nmean["n_m2_mean"], by = list(Nmean$dateID), sum, na.rm = TRUE), nm = c("dateID", "n_m2_mean"))
-  # # if wrap equals true create another
-  # if (wrap) {
-  #   temp <- data.frame(dateID = dateDf[nrow(dateDf), "dateID"])
-  #   temp[["n_m2_mean"]] <- mean(c(NdatesInfo[1, "n_m2_mean"], NdatesInfo[nrow(NdatesInfo), "n_m2_mean"]))
-  #   NdatesInfo <- rbind(NdatesInfo, temp)
-  # }
-  # # summarise the sample biomasses across all dates and size classes
-  # # create the sizeclass biomass for all rows
-  # taxaSampleListMass[[massLabel]] <- unlist(taxaSampleListMass[, "n_m2"]) * unlist(taxaSampleListMass[, massValue])
-  # # do the aggregating
-  # Bmean <- stats::setNames(cleanAggDf(stats::aggregate(taxaSampleListMass[c("dateID", "lengthClass", massLabel)], by = list(taxaSampleListMass$dateID, taxaSampleListMass$lengthClass), mean, na.rm = TRUE)), nm = c("dateID", "lengthClass", paste0(massLabel, "_mean")))
-  # Bsd <- stats::setNames(cleanAggDf(stats::aggregate(taxaSampleListMass[massLabel], by = list(taxaSampleListMass$dateID, taxaSampleListMass$lengthClass), stats::sd, na.rm = TRUE)), nm = paste0(massLabel, "_sd"))
-  # Bbind <- cbind(Bmean, Bsd)
-  # Bbind$lengthClass <- factor(Bbind$lengthClass, levels = unique(Bbind$lengthClass))
-  # meanBform <- stats::as.formula(paste0(massLabel, "_mean ~ dateID + lengthClass"))
-  # sdBform <- stats::as.formula(paste0(massLabel, "_sd ~ dateID + lengthClass"))
-  # BmeanTab <- as.data.frame.matrix(stats::xtabs(meanBform, Bbind))
-  # BsdTab <- as.data.frame.matrix(stats::xtabs(sdBform, Bbind))
-  # BdatesInfo <- stats::setNames(stats::aggregate(Bmean[paste0(massLabel, "_mean")], by = list(Nmean$dateID), sum, na.rm = TRUE), nm = c("dateID", paste0(massLabel, "_mean")))
-  # # if wrap equals true
-  # if (wrap) {
-  #   temp <- data.frame(dateID = dateDf[nrow(dateDf), "dateID"])
-  #   temp[[eval(paste0(massLabel, "_mean"))]] <- mean(c(BdatesInfo[1, eval(paste0(massLabel, "_mean"))], BdatesInfo[nrow(BdatesInfo), eval(paste0(massLabel, "_mean"))]))
-  #
-  #   BdatesInfo <- rbind(BdatesInfo, temp)
-  # }
-  # # create the full summary
-  # datesInfo <- Reduce(function(x, y) merge(x, y, all = TRUE), list(sampDatesInfo, NdatesInfo, BdatesInfo))
-  #estimate the sample PB
-  pb = P.samp$P.ann.samp/mean(unlist(datesInfo[[eval(paste0(massLabel, "_mean"))]]))
-  if(taxaSummary == "none"){
+ #estimate the sample PB
+  pb = P.samp$P.ann.samp/P.samp$B.ann.mean
 
+  if(taxaSummary == "none"){
+   taxaSummary <- NULL
   } else if (taxaSummary == "full") {
     # # create a list for output
     taxaSummary <- list(
@@ -197,10 +204,6 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
       meanN = P.samp$N.ann.mean,
       meanB = P.samp$B.ann.mean,
       meanIndMass = P.samp$B.ann.mean/ P.samp$N.ann.mean,
-      # Nmean = NmeanTab,
-      # Nsd = NsdTab,
-      # Bmean = BmeanTab,
-      # Bsd = BsdTab,
       datesInfo = sampSummary
     )
   } else if(taxaSummary == "short"){
@@ -217,14 +220,6 @@ calc_prod_sf <- function(taxaSampleListMass= NULL,
       datesInfo = sampSummary
     )
   }
-  #   assign(taxaInfo$taxonID, list())
-  # # add taxainformation
-  #   assign(taxaInfo$taxonID,
-  #          within(eval(as.symbol(taxaInfo$taxonID)),{
-  #            taxaInfo <- taxaInfo
-  #            }
-  #            )
-  #          )
 
   return(assign(speciesName, list(P.boots = P.boots,
               taxaSummary = taxaSummary)))

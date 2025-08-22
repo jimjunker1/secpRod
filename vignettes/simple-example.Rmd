@@ -205,12 +205,11 @@ This will output a lot of information though it has a simple structure:
 ### Increment-summation
 
 ```{r single species IS production,include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
-debug(calc_prod_is)
+# debug(calc_prod_is)
 set.seed(1312)
 debugonce(calc_production)
 calc_production(
   taxaSampleListMass = singleCohortSim,
-  # infoCols = c(1:3),
   taxaInfo = taxaInfo,
   bootNum = 1e1,
   taxaSummary = 'full',
@@ -236,23 +235,19 @@ taxaInfo <- tibble::tibble(
   method = 'sf',#list(c("is","pb","sf")),
   g.a = c(NA),
   growthForm = c("log(g_d) = 1 - 0.25*log(afdm_mg)"),
-  min.cpi = c(335),
-  max.cpi = c(365),
+  min.cpi = c(290),
+  max.cpi = c(310),
   pb = c("runif(min = 3, max = 8)"),
   min.growth = c(0.001),
   wrap = FALSE,
   notes = c("This is here for your use. No information will be used, but this column will be maintained in some summaries. See *** for more information.")
 )
 
-debugonce(calc_production)
-debugonce(calc_prod_sf)
-debug(sf_prod.sample)
 set.seed(1312)
 calc_production(
   taxaSampleListMass = singleCohortSim,
-  # infoCols = c(1:3),
   taxaInfo = taxaInfo,
-  bootNum = 1e1,
+  bootNum = 2,
   taxaSummary = 'full',
   massValue = 'afdm_mg',
   abunValue = 'density'

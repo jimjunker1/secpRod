@@ -190,6 +190,15 @@ string_agg = function(df, colString = NULL){
 #'
 #'
 #'
+get_bin_widths = function(x){
+  boundsString = sapply(unlist(x), FUN = function(x) gsub("\\[|\\]|\\(","",x))
+  boundsSplit = stats::setNames(data.frame(t(sapply(sapply(boundsString, function(x) strsplit(x,",")), as.numeric))), nm = c('bin_min','bin_max'))
+  boundsSplit$midpoint = as.character(round(apply(boundsSplit,1, FUN = function(x) mean(c(x[1],x[2]))),3))
+  rownames(boundsSplit) <- NULL
+  return(boundsSplit)
+}
+
+#'
 # recode_boot_dates = function(a = NULL, b = NULL){
 #
 # }
