@@ -8,6 +8,7 @@ articles:
 - title: Additional Resources
   desc: null
   navbar: ~
+  contents:
   - articles/sampling-simulation
 template:
   bootstrap: 5

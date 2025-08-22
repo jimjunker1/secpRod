@@ -79,7 +79,6 @@ respectively.
 
 ## Acknowledgments
 
-The original code base was inspired by code written by [Ben
-Koch](https://scholar.google.com/citations?user=30HVNGEAAAAJ&hl=en) and
-was further developed by Jim Junker with input from Wyatt F. Cross, Dan
-Nelson, L. Mick Demi, and others.
+The original code base was inspired by code written by Ben Koch and was
+further developed by Jim Junker with input from Wyatt Cross, Eric
+Scholl, Dan Nelson, Mick Demi, and others.
