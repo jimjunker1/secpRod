@@ -46,20 +46,6 @@ population](https://jimjunker1.github.io/secpRod/articles/sampling-simulation.ht
 For a full walkthrough showcasing some of the additional tools for data
 processing, see the [“A full example” here]().
 
-<!-- secpRod has XX functions related to data organization: -->
-
-<!-- - `frac_merge` takes raw count data and provides areal and subsampling adjustments. This function includes QA/QC checks for un-paired fractions and returns size-class abundance standardized to area. -->
-
-<!-- - `mass_adj` combines  -->
-
-<!-- secpRod has XX functions related to data visualization: -->
-
-<!-- - `len_freq` combines data returned from `frac_merge` to taxon-level histograms -->
-
-<!-- - `allen_curve` takes  -->
-
-<!-- `calc_production` is the main function of secpRod. This function estimates bootstrapped secondary production from multiple methods determined in the `taxaInfo` object. -->
-
 ## Contributing
 
 This is an actively developing package and we welcome any contributions.
