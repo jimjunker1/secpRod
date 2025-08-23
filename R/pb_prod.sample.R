@@ -10,13 +10,13 @@
 #' @param wrap logical. should the calculations be wrapped by adding an additional date to make a full year?
 #' @param full logical. should the full summary be returned with mean and sd
 #' @param ... additional arguments passed to function
-#' @return list object with taxa summary of the sampled data
+#' @return list object with annual production, mean biomass, and mean abundance of the sample
 #' @export
 pb_prod.sample <- function(df = NULL,
-                           massValue = 'afdm_mg',
-                           abunValue = 'density',
-                           dateCol = 'dateID',
-                           repCol = 'repID',
+                           massValue = massValue,
+                           abunValue = abunValue,
+                           dateCol = dateCol,
+                           repCol = repCol,
                            pb = NULL,
                            wrap = FALSE,
                            full = TRUE,

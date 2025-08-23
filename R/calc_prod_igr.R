@@ -7,14 +7,21 @@
 #' @param taxaInfo The taxa info data.frame
 #' @param bootNum integer. The number of bootstrap samples to produce.
 #' @param dateDf data frame of date information with external predictors for each month. There should be a column name identical to all variables in the growth equation found in taxaInfo data.frame.
-#' @param taxaSummary string of 'short', 'full', or 'none'. What type of summary information should be returned.
+#' @param taxaSummary logical. If TRUE (default) the taxaSummary will be with annual summary information will be returned.
 #' @param wrap logical. Should the dates wrap to create a full year?
-#' @param massValue string. What is the mass value and units of the production
-#' @param massLabel string. What label should the output units be. It is possible this will default to 'massValue' in the future.
-#' @param ... additional arguments to pass to the function
-#' @returns returns a list of 2 objects
-#' @importFrom dplyr count
-#' @importFrom stats xtabs
+#' @param lengthValue string of the column name containing the length class measurements
+#' @param massValue string of the column name containing the mass measurement
+#' @param abunValue string of the column name containing the abundance or density measurement
+#' @param dateCol string of the column name containing the date information. This can be either a recognized date object (e.g., Date, POSIX) or numeric.
+#' @param repCol string of the column name containing the replicate information
+#' @param bootList list. This is the bootstrapped samples passed from \code{calc_production()}
+#' @param ... additional arguments to be passed to the function
+#' @returns returns a list of 2 objects:
+#' @returns P.boots: the boostrapped estimates of production, abundance, and biomass.
+#' @returns taxaSummary: is the summary of the sample production, abundance, and biomass
+#' @importFrom stats formula
+#' @importFrom formula.tools lhs rhs
+#' @importFrom rlang :=
 #' @importFrom stats aggregate
 #' @importFrom stats sd
 #' @importFrom stats setNames
@@ -25,113 +32,111 @@ calc_prod_igr <- function(taxaSampleListMass= NULL,
                          taxaInfo = NULL,
                          bootNum = NULL,
                          dateDf = NULL,
-                         taxaSummary = 'full',
-                         wrap = TRUE,
-                         massValue = NULL,
-                         massLabel = NULL,...) {
+                         taxaSummary = TRUE,
+                         wrap = FALSE,
+                         lengthValue = NULL,
+                         massValue = 'mass',
+                         abunValue = 'density',
+                         dateCol = 'dateID',
+                         repCol = 'repID',
+                         bootList = NULL,
+                         ...) {
 
   ## tests ##
+  # make sure all the variables in the growth formula are in dateDf or taxaSampleListMass
+  ## remove white space to each parsing
+  growthFormula = stats::formula(gsub(" ","", taxaInfo$growthForm))
 
+  # get the left hand side and confirm "g_d" is present
+  growthUnits <- formula.tools::lhs(growthFormula)
+  if(!any(grepl('g_d', growthUnits))) stop("Error: the left hand side of `growthForm` must contain 'g_d'.")
+
+  # get the right hand side and confirm all variables in dateDf or taxaSampleListMass
+  growthRHS <- formula.tools::rhs(growthFormula)
+  # remove code calls, e.g. +, -, ^ , log(), etc.
+  charRHS <- deparse(growthRHS)
+  # split on punctuation to extract just variable names
+  allGrowthVars <- sapply(unlist(strsplit(charRHS, "[[:punct:]]")), trimws)
+  # remove any blank spaces from the vector
+  allGrowthVars <- allVars[grepl("\\w", allGrowthVars)]
+  # remove any numeric
+  allGrowthCharVars = na.omit(allGrowthVars[(suppressWarnings(is.na(as.numeric(allGrowthVars))))])
+  # remove "log" if present
+  allGrowhtCharVars = allGrowthCharVars[!grepl("log",allGrowthCharVars)]
+  # check that all growth variables are present in the data
+  allDataVars <- c(names(taxaSampleListMass),names(dateDf))
+  missing <- allGrowthCharVars %in% allDataVars
+  if(sum(missing) > 0) stop(paste0("Error: ",paste(allGrowhtCharVars[missing], collapse = ",")," are missing from sample info and environmental data."))
   ## end tests ##
   speciesName = unique(taxaSampleListMass$taxonID)
   # ## function prep ##
   # ### make a list of key variables to pass to sample function
   funcList = list(
     df = taxaSampleListMass,
-    sizesDf = unique(taxaSampleListMass[, c("lengthClass", rev(names(taxaSampleListMass))[1])])
-
+    dateDf = dateDf,
   )
 
-  # calculate the production from the full samples
-  taxaCPI <- mean(c(taxaInfo$min.cpi, taxaInfo$max.cpi))
-  funcList = c(funcList, list(cpi = taxaCPI))
-  P.samp = do.call(sf_prod.sample, args = funcList)
+  # calculate the production from the observed samples
+  P.samp = do.call(igr_prod.sample, args = funcList)
+  if(P.samp$P.ann.samp == 0){
+    if(taxaSummary == FALSE){
+      taxaSummary <- NULL
+    } else if (taxaSummary == TRUE) {
+      # # create a list for output
+      taxaSummary <- list(
+        taxonID = taxaInfo$taxonID,
+        method = "igr",
+        P.ann.samp = 0,
+        P.uncorr.samp = 0,
+        cpi = NA_real_,
+        pb = NA_real_,
+        meanN = 0,
+        meanB = 0,
+        meanIndMass = 0,
+        Nmean = 0,
+        Nsd = 0,
+        Bmean = 0,
+        Bsd = 0,
+        datesInfo = NULL
+      )
+    }
+    return(assign(speciesName, list(P.boots = P.samp,
+                                    taxaSummary = taxaSummary)))
+  }
 
-  # prep boots
-  bootList = prep_boots(df = taxaSampleListMass,
-                         bootNum = bootNum)
-
-  P.boots = lapply(bootList, sf_prod.sample,
-                   sizesDf = funcList$sizesDf,
-                   cpi = funcList$cpi,
+  P.boots = mapply(FUN = igr_prod.sample,
+                   df = bootList,
+                   massValue = massValue,
+                   abunValue = abunValue,
+                   dateCol = dateCol,
+                   repCol = repCol,
+                   wrap = wrap,
                    full = FALSE)
 
   #### create SAMPLE information to export as summary ####
-  # summarise sample sizes across dates
-  sampDatesInfo <- stats::setNames(unique(stats::aggregate(taxaSampleListMass[c("repID")], by = list(taxaSampleListMass$dateID, taxaSampleListMass$lengthClass), count)[c(1, 3)]), c("dateID", "N"))
-  if (wrap) {
-    temp <- data.frame(dateID = dateDf[nrow(dateDf), "dateID"])
-    temp[["N"]] <- NA
-    sampDatesInfo <- rbind(sampDatesInfo, temp)
-  }
-  # summarise the sample abundance N across all dates and size classes
-  Nmean <- stats::setNames(cleanAggDf(stats::aggregate(taxaSampleListMass, by = list(taxaSampleListMass$dateID, taxaSampleListMass$lengthClass), mean, na.rm = TRUE)), nm = c("dateID", "lengthClass", "n_m2_mean"))
-  Nsd <- stats::setNames(cleanAggDf(stats::aggregate(taxaSampleListMass["n_m2"], by = list(taxaSampleListMass$dateID, taxaSampleListMass$lengthClass), stats::sd, na.rm = TRUE)), nm = "n_m2_sd")
-  Nbind <- cbind(Nmean, Nsd)
-  Nbind$lengthClass <- factor(Nbind$lengthClass, levels = unique(Nbind$lengthClass))
-  NmeanTab <- as.data.frame.matrix(stats::xtabs(n_m2_mean ~ dateID + lengthClass, Nbind))
-  NsdTab <- as.data.frame.matrix(stats::xtabs(n_m2_sd ~ dateID + lengthClass, Nbind))
-  NdatesInfo <- stats::setNames(stats::aggregate(Nmean["n_m2_mean"], by = list(Nmean$dateID), sum, na.rm = TRUE), nm = c("dateID", "n_m2_mean"))
-  # if wrap equals true create another
-  if (wrap) {
-    temp <- data.frame(dateID = dateDf[nrow(dateDf), "dateID"])
-    temp[["n_m2_mean"]] <- mean(c(NdatesInfo[1, "n_m2_mean"], NdatesInfo[nrow(NdatesInfo), "n_m2_mean"]))
-    NdatesInfo <- rbind(NdatesInfo, temp)
-  }
-  # summarise the sample biomasses across all dates and size classes
-  # create the sizeclass biomass for all rows
-  taxaSampleListMass[[massLabel]] <- unlist(taxaSampleListMass[, "n_m2"]) * unlist(taxaSampleListMass[, massValue])
-  # do the aggregating
-  Bmean <- stats::setNames(cleanAggDf(stats::aggregate(taxaSampleListMass[c("dateID", "lengthClass", massLabel)], by = list(taxaSampleListMass$dateID, taxaSampleListMass$lengthClass), mean, na.rm = TRUE)), nm = c("dateID", "lengthClass", paste0(massLabel, "_mean")))
-  Bsd <- stats::setNames(cleanAggDf(stats::aggregate(taxaSampleListMass[massLabel], by = list(taxaSampleListMass$dateID, taxaSampleListMass$lengthClass), stats::sd, na.rm = TRUE)), nm = paste0(massLabel, "_sd"))
-  Bbind <- cbind(Bmean, Bsd)
-  Bbind$lengthClass <- factor(Bbind$lengthClass, levels = unique(Bbind$lengthClass))
-  meanBform <- stats::as.formula(paste0(massLabel, "_mean ~ dateID + lengthClass"))
-  sdBform <- stats::as.formula(paste0(massLabel, "_sd ~ dateID + lengthClass"))
-  BmeanTab <- as.data.frame.matrix(stats::xtabs(meanBform, Bbind))
-  BsdTab <- as.data.frame.matrix(stats::xtabs(sdBform, Bbind))
-  BdatesInfo <- stats::setNames(stats::aggregate(Bmean[paste0(massLabel, "_mean")], by = list(Nmean$dateID), sum, na.rm = TRUE), nm = c("dateID", paste0(massLabel, "_mean")))
-  # if wrap equals true
-  if (wrap) {
-    temp <- data.frame(dateID = dateDf[nrow(dateDf), "dateID"])
-    temp[[eval(paste0(massLabel, "_mean"))]] <- mean(c(BdatesInfo[1, eval(paste0(massLabel, "_mean"))], BdatesInfo[nrow(BdatesInfo), eval(paste0(massLabel, "_mean"))]))
+  sampSummary = create_sample_summary(df = taxaSampleListMass,
+                                      wrap = wrap,
+                                      abunValue = abunValue,
+                                      massValue = massValue,
+                                      dateCol = dateCol,
+                                      repCol = repCol,
+                                      ...)
+  #estimate the sample PB
+  pb = P.samp$P.ann.samp/P.samp$B.ann.mean
 
-    BdatesInfo <- rbind(BdatesInfo, temp)
-  }
-  # create the full summary
-  datesInfo <- Reduce(function(x, y) merge(x, y, all = TRUE), list(sampDatesInfo, NdatesInfo, BdatesInfo))
-
-  if(taxaSummary == "none"){
-
-  } else if (taxaSummary == "full") {
+  if(taxaSummary == FALSE){
+    taxaSummary <- NULL
+  } else if (taxaSummary == TRUE) {
     # # create a list for output
     taxaSummary <- list(
-      summaryType = "full",
       taxonID = taxaInfo$taxonID,
-      method = "sf",
+      method = "igr",
       P.ann.samp = P.samp$P.ann.samp,
-      P.uncorr.samp = P.samp$P.uncorr.samp,
-      cpi = taxaCPI,
-      meanN = mean(unlist(datesInfo$n_m2_mean)),
-      meanB = mean(unlist(datesInfo[[eval(paste0(massLabel, "_mean"))]])),
-      meanIndMass = mean(unlist(datesInfo[[eval(paste0(massLabel, "_mean"))]])) / mean(unlist(datesInfo$n_m2_mean)),
-      Nmean = NmeanTab,
-      Nsd = NsdTab,
-      Bmean = BmeanTab,
-      Bsd = BsdTab,
-      datesInfo = datesInfo
-    )
-  } else if(taxaSummary == "short"){
-    taxaSummary <- list(
-      summaryType = "short",
-      taxonID = taxaInfo$taxonID,
-      method = "sf",
-      P.ann.samp = P.samp$P.ann.samp,
-      cpi = taxaCPI,
-      meanN = mean(unlist(datesInfo$n_m2_mean)),
-      meanB = mean(unlist(datesInfo[[eval(paste0(massLabel, "_mean"))]])),
-      meanIndMass = mean(unlist(datesInfo[[eval(paste0(massLabel, "_mean"))]])) / mean(unlist(datesInfo$n_m2_mean)),
-      datesInfo = datesInfo
+      pb = pb,
+      meanN = P.samp$N.ann.mean,
+      meanB = P.samp$B.ann.mean,
+      meanIndMass = P.samp$B.ann.mean/ P.samp$N.ann.mean,
+      datesInfo = sampSummary
     )
   }
   #   assign(taxaInfo$taxonID, list())

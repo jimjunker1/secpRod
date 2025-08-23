@@ -6,9 +6,13 @@
 \usage{
 igr_prod.sample(
   df = NULL,
-  sizesDf = NULL,
-  massValue = NULL,
-  massLabel = NULL,
+  dateDf = NULL,
+  lengthValue = NULL,
+  massValue = massValue,
+  abunValue = abunValue,
+  dateCol = dateCol,
+  repCol = repCol,
+  wrap = FALSE,
   full = TRUE,
   ...
 )
@@ -16,18 +20,26 @@ igr_prod.sample(
 \arguments{
 \item{df}{a data.frame of long format returned from \code{convert_length_to_mass()} function}
 
-\item{sizesDf}{a data.frame of the}
+\item{lengthValue}{string of the column name containing the length class measurements}
 
 \item{massValue}{character string identifying the column name of the mass value}
 
-\item{massLabel}{character string identifying the column name of the mass value}
+\item{abunValue}{character string identifying the column name of the density value}
+
+\item{dateCol}{character string identifying the column name of the sample date information. This is distinguished from *Value parameters in that Values may be used to maintain units provenance in the future. This may also change.}
+
+\item{repCol}{character string identifying the column name of the replicate information.}
+
+\item{wrap}{logical. should the calculations be wrapped by adding an additional date to make a full year?}
 
 \item{full}{logical. should the full summary be returned with mean and sd.}
 
 \item{...}{additional arguments passed to function, including variables to predict growth rate from growth function}
+
+\item{sizesDf}{a data.frame of the sizes}
 }
 \value{
-list object with taxa summary of the sampled data
+list object with annual production, mean biomass, and mean abundance of the sample
 }
 \description{
 This function calculates taxa production based on the instantaneous growth method

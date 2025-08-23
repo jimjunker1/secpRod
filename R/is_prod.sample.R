@@ -2,12 +2,14 @@
 #' @title is_prod.sample
 #' @description This function calculates taxa production based on the increment-summation method
 #' @param df a data.frame of long format returned from \code{convert_length_to_mass()} function
-#' @param sizesDf a data.frame of the
-#' @param massValue character string identifying the column name of the mass value
-#' @param massLabel character string identifying the column name of the mass value
-#' @param full logical. should the full summary be returned with mean and sd
+#' @param dateDf data frame of date information sampling date such as interval length in days.
+#' @param massValue string of the column name containing the mass measurement
+#' @param abunValue string of the column name containing the abundance or density measurement
+#' @param dateCol string of the column name containing the date information. This can be either a recognized date object (e.g., Date, POSIX) or numeric.
+#' @param repCol string of the column name containing the replicate information
+#' @param full logical. should the summary be returned with mean and sd
 #' @param ... additional arguments passed to function
-#' @return list object with taxa summary of the sampled data
+#' @return list object with annual production, mean biomass, and mean abundance of the sample
 #' @importFrom stats filter
 #' @importFrom stats aggregate
 #' @importFrom zoo na.approx
@@ -28,17 +30,17 @@ is_prod.sample <- function(df = NULL,
   # calculate mean biomass and abundance across all dates for summaries
   df[["biomass"]] <- df[[abunValue]] * df[[massValue]]
   N.ann.list = estimate_ann_stats(df, var = abunValue,
-                                  massValue = 'afdm_mg',
-                                  abunValue = 'density',
-                                  dateCol = 'dateID',
-                                  repCol = 'repID',
+                                  massValue = massValue,
+                                  abunValue = abunValue,
+                                  dateCol = dateCol,
+                                  repCol = repCol,
                                   wrap = wrap)
 
   B.ann.list = estimate_ann_stats(df, var = "biomass",
-                                  massValue = 'afdm_mg',
-                                  abunValue = 'density',
-                                  dateCol = 'dateID',
-                                  repCol = 'repID',
+                                  massValue = massValue,
+                                  abunValue = abunValue,
+                                  dateCol = dateCol,
+                                  repCol = repCol,
                                   wrap = wrap)
 
  if(B.ann.list[["biomass_mean"]] == 0){
@@ -93,7 +95,7 @@ is_prod.sample <- function(df = NULL,
   ### calculate the weights for each size class based on relative density
   dateMerge[['weights']] <- dateMerge$density.x/dateMerge$density.y
   ### weight the size class by relative weights
-  dateMerge[['w.mass']] <- dateMerge$afdm_mg * dateMerge$weights
+  dateMerge[['w.mass']] <- dateMerge[[massValue]] * dateMerge$weights
   ### sum the weighted size class within sampling date
   massAgg <- setNames(aggregate(formula(paste0('w.mass ~',dateCol)), data = dateMerge, FUN = sum, na.action = na.omit), nm = c(dateCol, 'w.mass'))
   massAgg <- merge(isTab[dateCol], massAgg, by = dateCol, all.x = TRUE)

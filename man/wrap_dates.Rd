@@ -4,10 +4,12 @@
 \alias{wrap_dates}
 \title{wrap_dates}
 \usage{
-wrap_dates(df = NULL, dateCol = NULL, wrapDate = TRUE)
+wrap_dates(df = NULL, envData = NULL, dateCol = NULL, wrapDate = TRUE)
 }
 \arguments{
 \item{df}{a data.frame of long format returned from \code{convert_length_to_mass()} function}
+
+\item{envData}{(optional) a data.frame of the environmental data. The number of rows should be the same as the number of sampling dates.}
 
 \item{dateCol}{character string identifying the column name of the sampling dates}
 

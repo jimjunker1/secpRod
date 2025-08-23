@@ -6,10 +6,10 @@
 \usage{
 pb_prod.sample(
   df = NULL,
-  massValue = "afdm_mg",
-  abunValue = "density",
-  dateCol = "dateID",
-  repCol = "repID",
+  massValue = massValue,
+  abunValue = abunValue,
+  dateCol = dateCol,
+  repCol = repCol,
   pb = NULL,
   wrap = FALSE,
   full = TRUE,
@@ -36,7 +36,7 @@ pb_prod.sample(
 \item{...}{additional arguments passed to function}
 }
 \value{
-list object with taxa summary of the sampled data
+list object with annual production, mean biomass, and mean abundance of the sample
 }
 \description{
 This function calculates sample production based on the production:biomass method

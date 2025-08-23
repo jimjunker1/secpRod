@@ -9,9 +9,9 @@ calc_prod_pb(
   taxaInfo = NULL,
   bootNum = NULL,
   dateDf = NULL,
-  taxaSummary = "full",
+  taxaSummary = TRUE,
   wrap = TRUE,
-  massValue = "afdm_mg",
+  massValue = "mass",
   abunValue = "density",
   dateCol = "dateID",
   repCol = "repID",
@@ -28,17 +28,21 @@ calc_prod_pb(
 
 \item{dateDf}{data frame of date information with external predictors for each month. There should be a column name identical to all variables in the growth equation found in taxaInfo data.frame.}
 
-\item{taxaSummary}{string of 'short', 'full', or 'none'. What type of summary information should be returned.}
+\item{taxaSummary}{logical. If TRUE (default) the taxaSummary will be with annual summary information will be returned.}
 
 \item{wrap}{logical. Should the dates wrap to create a full year?}
 
-\item{massValue}{string. What is the mass value and units of the production}
+\item{massValue}{string of the column name containing the mass measurement}
 
-\item{bootList}{list of bootstraps data sets from \code{prep_boots()}.}
+\item{abunValue}{string of the column name containing the abundance or density measurement}
+
+\item{dateCol}{string of the column name containing the date information. This can be either a recognized date object (e.g., Date, POSIX) or numeric.}
+
+\item{repCol}{string of the column name containing the replicate information}
+
+\item{bootList}{list. This is the bootstrapped samples passed from \code{calc_production()}}
 
 \item{...}{additional arguments to be passed to the function}
-
-\item{massLabel}{string. What label should the output units be. It is possible this will default to 'massValue' in the future.}
 }
 \value{
 returns a list of 2 objects:

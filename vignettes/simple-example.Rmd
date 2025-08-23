@@ -49,7 +49,7 @@ The methods within the package use two main objects, `sampleInfo` the sample-lev
 
 - taxonID: a character string that matches the name of taxonID from sampleInfo
 
-- massForm: a character string that is coercible to a formula for the conversion from length to mass (e.g., `afdm_mg~(a*lengthClass^b)`)
+- massForm: a character string that is coercible to a formula for the conversion from length to mass (e.g., `mass~(a*lengthClass^b)`)
 
 - a: numeric variable for the coefficients used in massForm
 
@@ -67,21 +67,21 @@ The methods within the package use two main objects, `sampleInfo` the sample-lev
 
   - 'sf': size-frequency method. This non-cohort approach assumes the mean size-frequency data from collected samples characterizes the mortality, growth and development of an average cohort. The densities within size classes are averaged across all sampling dates and the decrease in density across sizes classes is calculated similar to the *removal-summation* method. This method assumes a 1-year lifespan. If taxa have an average life span much shorter or longer than 1-year, a cohort production interval (CPI) correction must be applied. See @benke2007 or @benke1979 for a more complete explanation. The CPI must be provided in the `min.cpi` and `max.cpi` variables of the `taxaInfo` object.
   
-  - 'igr': instantaneous growth method. This approach is most often applied as a noncohort approach, but can also be used for taxa with identifiable cohorts. It requires the determination of daily instantenous growth rates, *g*, specificed in `growthForm`. Growth rates can be determined through a number of approaches such as, from growth chambers in the field or laboratory, mark-recapture of individuals, or statistical regression models. See @benke2007, @morin1994, @huryn1986 and the citations therein for more examples of these approaches.
+  - 'igr': instantaneous growth method. This approach is most often applied as a noncohort approach, but can also be used for taxa with identifiable cohorts. It requires the determination of daily instantaneous growth rates, *g_d*, specificed in `growthForm`. Growth rates can be determined through a number of approaches such as, from growth chambers in the field or laboratory, mark-recapture of individuals, or statistical regression models. See @benke2007, @morin1994, @huryn1986 and the citations therein for more examples of these approaches.
   
   - 'pb': production:biomass ratio method. This approach calculates production by multiplying annual biomass by a value of production:biomass ratio (P:B). The P:B must be supplied in the `pb` variable of the `taxaInfo` object. 
 
-- growthForm: growth rates, *g*, to calculate production from the instantaneous growth method. This can take multiple forms 1) a single value, 2) a vector of values the same length as `bootNum`, 3) a string of a distribution to randomly sample, **not** including the `n =` (e.g., 'rnorm(mean = 5, sd = 0.5)', 'runif(min = 3, max = 8)'). The function will automatically sample the `bootNum` values. ***Fair warning***: Currently, you must explicitly name the parameters (e.g., mean, sd, min, max) in the function call string. Possible unwanted and unknown things will happen otherwise. The tests for this feature are still in development, it will not reject any nonsensical values (e.g, negative, NA, or Inf). If your distribution samples negative values you will get negative productions estimates--at least until the `min.growth` feature is implemented. 4) Lastly, a character string that is coercible to a formula. This formula is parsed and will, if necessary, reference existing information (e.g., size information) if variables are included in the formula. The variables in the string must match exactly those in the data (e.g., if massValue == 'afdm_mg', 'afdm_mg' must be in the dataframe). **this method is currently under development to include additional sources of environmental data (e.g. temperature). When complete, additional data passed to `...` will also be referenced to predict growth rates.**
+- growthForm: daily growth rates, *g_d*, to calculate production from the instantaneous growth method. This take the form of a character string that is coercible to a formula. This formula is parsed and will, if necessary, reference existing information (e.g., size information) if variables are included in the formula. The variables in the string must match exactly those in the data (e.g., if massValue == 'mass', 'mass' must be in the dataframe). **this method is currently under development to include additional sources of environmental data (e.g. temperature). When complete, additional data passed to `envData` will also be referenced to predict growth rates.** ***Fair warning***: Currently, the tests for this feature are still in development, it will not reject any nonsensical values (e.g, negative, NA, or Inf). If your equation predicts negative values you may get negative production estimates--at least until the `min.growth` feature is implemented. 
 
 - min.cpi: integer of the minimum estimated cohort production interval for adjusting annual production estimates using the size-frequency method
 
 - max.cpi: integer of the maximum estimated cohort production interval for adjusting annual production estimates using the size-frequency method
 
-- pb: numeric of the production to biomass (PB) ratio for the specific taxa. This can take three forms 1) a single value, 2) a vector of values the same length as `bootNum`, and 3) a string of a distribution to randomly sample, **not** including the `n =` (e.g., 'rnorm(mean = 5, sd = 0.5)', 'runif(min = 3, max = 8)'). The function will automatically sample the `bootNum` values. ***Fair warning***: Currently, you must explicitly name the parameters (e.g., mean, sd, min, max) in the function call string. Possible unwanted and unknown things will happen otherwise. The tests for this feature are still under development, it will not reject any nonsensical values (e.g, negative, NA, or Inf). If your distribution samples negative values you will get negative productions estimates--at least until the `min.growth` feature is implemented.
+- pb: numeric of the production to biomass (PB) ratio for the specific taxa. This can take three forms 1) a single value, 2) a vector of values the same length as `bootNum`, and 3) a string of a distribution to randomly sample, **not** including the `n =` (e.g., 'rnorm(mean = 5, sd = 0.5)', 'runif(min = 3, max = 8)'). The function will automatically sample the `bootNum` values. ***Fair warning***: Currently, you must explicitly name the parameters in the distribution call string (e.g., mean, sd, min, max). Possible unwanted and unknown things will happen otherwise. The tests for this feature are still under development, it will not reject any nonsensical values (e.g, negative, NA, or Inf). If your distribution samples negative values you will get negative production estimates--at least until the `min.growth` feature is implemented.
 
-- min.growth: a minimal value of production to assign when density is >0 and production estimates for a taxon are <0. *This is currently not implemented, but is kept for future use.*
+- min.growth: a minimal growth rate value of *g_d* to assign when density is >0 and growth estimates for a taxon are <0. *This is currently not implemented, but is kept for future use.*
 
-- wrap: logical (or coercible) indicating whether the production estimate should wrap the first and last dates to create a full annual cycle. If TRUE, this will create an additional sampling interval using the mean densities and masses to create a full annual data set. The default is FALSE.
+- wrap: logical (or coercible) indicating whether the production estimate should wrap the first and last dates to create a full annual cycle. If TRUE, this will create an additional sampling interval using the mean densities and masses of the first and last sampling events to create a full annual data set. The default is FALSE.
 
 - notes: notes for researcher use. This column will be maintained in output summaries.
 
@@ -90,7 +90,7 @@ The methods within the package use two main objects, `sampleInfo` the sample-lev
 ```{r simulation-taxa-info, eval = TRUE, echo = TRUE}
 taxaInfo <- tibble::tibble(
   taxonID = c("sppX"),
-  massForm = c("afdm_mg~(a*lengthClass^b)*percAsh"),
+  massForm = c("mass~(a*lengthClass^b)*percAsh"),
   # a is NA for this example because we simulated mass growth and don't need to convert from length to mass
   a = c(NA),
   # b is NA for this example because we simulated mass growth and don't need to convert from length to mass
@@ -99,8 +99,7 @@ taxaInfo <- tibble::tibble(
   percAsh = c(NA),
   # method can accept one or more values. This allow comparisons among different methods.
   method = 'is',#list(c("is","pb","sf")),
-  g.a = c(NA),
-  growthForm = c("log(g_d) = 1 - 0.25*log(afdm_mg)"),
+  growthForm = c("log(g_d) ~ log(0.01) - 0.25*log(mass) + 0.01*log(tempC)"),
   min.cpi = c(335),
   max.cpi = c(365),
   pb = c("runif(min = 3, max = 8)"),
@@ -112,7 +111,7 @@ taxaInfo <- tibble::tibble(
 
 ## A multi-method comparison with simulated data
 
-First, we load and visualize the simulated cohort data set, which contains a single species and follows the progression of density and distribution of individual masses through it life cycle.
+First, we load and visualize the simulated cohort data set, which contains a single species and follows the progression of density and the distribution of individual masses through it life cycle.
 
 The data set is available within the `secpRod` package with:
 
@@ -130,7 +129,7 @@ head(singleCohortSim, 10)
 
 this object can be a data.frame (or coercible) or a tibble (if list-cols are used) which contains the following columns:
 
-- taxonID: a character string that matches the name of taxonID from sampleInfo
+- taxonID: (required) a character string that matches the name of taxonID from taxaInfo
 
 - dateID: a column representing the date identifier. This can be a julian date (as in this case) or a recognized date object (e.g., Date class, POSIXct, etc.)
 
@@ -138,9 +137,11 @@ this object can be a data.frame (or coercible) or a tibble (if list-cols are use
 
 - density: organism density of each length or mass class in the replicate
 
-- afdm_mg: individual mass. This is the mass class with a corresponding density. The density of each mass class sums to the total sample density currently.
+- mass: individual mass. This is the mass class with a corresponding density. The density of each mass class sums to the total sample density.
 
-We can summarise and visualize this data set further.
+These columns names above are the default column names. The exact names of these some columns (and additional optional columns such as length information) can be modified within the \code{calc_production()} function. See ["A full example"]() for more information on customizing this main function further.
+
+We can summarize and visualize this data set further.
 
 <details>
 
@@ -149,8 +150,8 @@ We can summarise and visualize this data set further.
 summary_stats <- singleCohortSim %>%
   dplyr::mutate(density = sum(density, na.rm = TRUE), .by = c('taxonID','dateID','repID')) %>% 
   dplyr::summarise(
-    massMean = mean(afdm_mg, na.rm = TRUE),
-    massSD= sd(afdm_mg, na.rm = TRUE),
+    massMean = mean(mass, na.rm = TRUE),
+    massSD= sd(mass, na.rm = TRUE),
     larvalDensityMean = mean(density, na.rm = TRUE), .by = 'dateID'
   )
 
@@ -159,7 +160,7 @@ ggplot(summary_stats, aes(x = dateID)) +
   stat_halfeye(data = singleCohortSim %>% 
                  dplyr::summarise(density = sum(density, na.rm = TRUE), .by = c('taxonID','dateID','repID')), aes(x = dateID, y = density),
                color = 'green')+
-  stat_halfeye(data = singleCohortSim, aes(x = dateID, y = afdm_mg*100),
+  stat_halfeye(data = singleCohortSim, aes(x = dateID, y = mass*100),
                color = 'red')+
   geom_path(aes(y = larvalDensityMean), color = 'green') +
   geom_path(aes(y = massMean * 100), color = 'red') +
@@ -183,7 +184,7 @@ suppressWarnings(print(sim_plot))
 
 ```
 
-We use this data set to calculate secondary production with different methods. First, we start with cohort-based methods. The main function of `secpRod` is \code{calc_production()} which is the workhorse function that will estimate community production. 
+We use this data set to calculate secondary production with different methods. First, we start with cohort-based methods. The main function of `secpRod` is \code{calc_production()} which is the workhorse function that will estimate population and/or community production. 
 
 To apply it to our single species example, we input the sample information and taxa information along with how many bootstraps we would like, as:
 
@@ -193,31 +194,31 @@ calc_production(
   taxaSampleListMass = singleCohortSim,
   taxaInfo = taxaInfo,
   bootNum = 1e1,
-  taxaSummary = 'full',
-  massValue = 'afdm_mg',
+  taxaSummary = TRUE,
+  massValue = 'mass',
   abunValue = 'density'
 )
 
 ```
 
-This will output a lot of information though it has a simple structure:
+This will output an object with bootstrapped estimates as well as a summary of the sample. It has a simple structure:
 
 1) P.boots--vectors of bootstrapped estimates of annual production, annual biomass, and annual abundance. 
 
-2) taxaSummary--this comes in 'full' and 'short' versions. As you see above the full can be a lot. The 'short' is a paired down version of this. 
+2) taxaSummary--this can be turned off by setting `taxaSummary` to FALSE. 
 
 ### Increment-summation
 
 ```{r single species IS production,include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
 # debug(calc_prod_is)
 set.seed(1312)
-debugonce(calc_production)
+# debugonce(calc_production)
 calc_production(
   taxaSampleListMass = singleCohortSim,
   taxaInfo = taxaInfo,
   bootNum = 1e1,
-  taxaSummary = 'full',
-  massValue = 'afdm_mg',
+  taxaSummary = TRUE,
+  massValue = 'mass',
   abunValue = 'density'
 )
 
@@ -228,7 +229,7 @@ calc_production(
 ```{r single species SF production,include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
 taxaInfo <- tibble::tibble(
   taxonID = c("sppX"),
-  massForm = c("afdm_mg~(a*lengthClass^b)*percAsh"),
+  massForm = c("mass~(a*lengthClass^b)*percAsh"),
   # a is NA for this example because we simulated mass growth and don't need to convert from length to mass
   a = c(NA),
   # b is NA for this example because we simulated mass growth and don't need to convert from length to mass
@@ -237,8 +238,7 @@ taxaInfo <- tibble::tibble(
   percAsh = c(NA),
   # method can accept one or more values. This allow comparisons among different methods.
   method = 'sf',#list(c("is","pb","sf")),
-  g.a = c(NA),
-  growthForm = c("log(g_d) = 1 - 0.25*log(afdm_mg)"),
+  growthForm = c("log(g_d) ~ log(0.01) - 0.25*log(mass) + 0.01*log(tempC)"),
   min.cpi = c(290),
   max.cpi = c(310),
   pb = c("runif(min = 3, max = 8)"),
@@ -252,19 +252,19 @@ calc_production(
   taxaSampleListMass = singleCohortSim,
   taxaInfo = taxaInfo,
   bootNum = 2,
-  taxaSummary = 'full',
-  massValue = 'afdm_mg',
+  taxaSummary = TRUE,
+  massValue = 'mass',
   abunValue = 'density'
 )
 
 ```
 
-## Production:Biomass ratio method
+## Production:Biomass ratio 
 
 ```{r single species PB production,include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
 taxaInfo <- tibble::tibble(
   taxonID = c("sppX"),
-  massForm = c("afdm_mg~(a*lengthClass^b)*percAsh"),
+  massForm = c("mass~(a*lengthClass^b)*percAsh"),
   # a is NA for this example because we simulated mass growth and don't need to convert from length to mass
   a = c(NA),
   # b is NA for this example because we simulated mass growth and don't need to convert from length to mass
@@ -273,8 +273,7 @@ taxaInfo <- tibble::tibble(
   percAsh = c(NA),
   # method can accept one or more values. This allow comparisons among different methods.
   method = 'pb',#list(c("is","pb","sf")),
-  g.a = c(NA),
-  growthForm = c("log(g_d) = 1 - 0.25*log(afdm_mg)"),
+  growthForm = c("log(g_d) ~ log(0.01) - 0.25*log(mass) + 0.01*log(tempC)"),
   min.cpi = c(335),
   max.cpi = c(365),
   pb = c("runif(min = 3, max = 8)"),
@@ -283,15 +282,59 @@ taxaInfo <- tibble::tibble(
   notes = c("This is here for your use. No information will be used, but this column will be maintained in some summaries. See *** for more information.")
 )
 
-
 set.seed(1312)
 calc_production(
   taxaSampleListMass = singleCohortSim,
   taxaInfo = taxaInfo,
   bootNum = 1e1,
-  taxaSummary = 'full',
-  massValue = 'afdm_mg',
+  taxaSummary = TRUE,
+  massValue = 'mass',
   abunValue = 'density'
+)
+
+```
+
+## Instantaneous growth rate (IGR)
+
+The instantaneous growth rate method allows for additional data to be passed to the production function. This additional data can inform growth rates. See (#Introduction) above for more details on the structure of this variable. In this example, we showcase the use of a growth fixed growth equation that gives reasonable mass-dependence of growth rates and an additional variable `tempC` which is meant to represent environmental temperature. We fix temperature in this example just to showcase functionality when a growth equation uses a variable found in the main sample data object `taxaSampleListMass` and in the additional environmental data provided in `envData`.
+
+```{r single species IGR production,include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+taxaInfo <- tibble::tibble(
+  taxonID = c("sppX"),
+  massForm = c("mass~(a*lengthClass^b)*percAsh"),
+  # a is NA for this example because we simulated mass growth and don't need to convert from length to mass
+  a = c(NA),
+  # b is NA for this example because we simulated mass growth and don't need to convert from length to mass
+  b = c(NA),
+  # percAsh is NA for this example because we simulated mass growth and don't need to convert from length to mass
+  percAsh = c(NA),
+  # method can accept one or more values. This allow comparisons among different methods.
+  method = "igr",#list(c("is","pb","sf","igr")),
+  growthForm = c("log(g_d) ~ log(0.01) - 0.25*log(mass) + 0.01*log(tempC)"),
+  min.cpi = c(335),
+  max.cpi = c(365),
+  pb = c("runif(min = 3, max = 8)"),
+  min.growth = c(0.001),
+  wrap = TRUE,
+  notes = c("This is here for your use. No information will be used, but this column will be maintained in some summaries. See *** for more information.")
+)
+
+envData <- data.frame(
+  dateID = unique(singleCohortSim$dateID),
+  tempC = rep(5, length(unique(singleCohortSim$dateID)))
+)
+
+debugonce(calc_production)
+debugonce(wrap_dates)
+set.seed(1312)
+calc_production(
+  taxaSampleListMass = singleCohortSim,
+  taxaInfo = taxaInfo,
+  bootNum = 1e1,
+  taxaSummary = TRUE,
+  massValue = 'mass',
+  abunValue = 'density',
+  envData = envData
 )
 
 ```
@@ -322,13 +365,13 @@ calc_production(
 
 <!-- taxaInfo <- data.frame( -->
 <!--   taxonID = c("sppA"), -->
-<!--   massForm = c("afdm_mg~(a*lengthClass^b)*percAsh"), -->
+<!--   massForm = c("mass~(a*lengthClass^b)*percAsh"), -->
 <!--   a = c(0.0025), -->
 <!--   b = c(2.692), -->
 <!--   percAsh = c(0.958), -->
 <!--   method = c("sf"), -->
 <!--   g.a = c(NA), -->
-<!--   growthForm = c("log(g_d) = 1 - 0.25*log(afdm_mg) - "), -->
+<!--   growthForm = c("log(g_d) = 1 - 0.25*log(mass) - "), -->
 <!--   min.cpi = c(335), -->
 <!--   max.cpi = c(365), -->
 <!--   pb = c("runif(min = 3, max = 8)"), -->
@@ -342,7 +385,7 @@ calc_production(
 
 <!-- - taxonID: a character string that matches the name of taxonID from sampleInfo -->
 
-<!-- - massForm: a character string that is coercible to a formula for the conversion from length to mass (e.g., `afdm_mg~(a*lengthClass^b)`) -->
+<!-- - massForm: a character string that is coercible to a formula for the conversion from length to mass (e.g., `mass~(a*lengthClass^b)`) -->
 
 <!-- - a: numeric variable for the coefficients used in massForm -->
 
@@ -429,7 +472,7 @@ calc_production(
 
 <!-- plot_cohorts(taxaSampleListMass = acentrellaMass, -->
 <!--              param = 'length', -->
-<!--              massClass = 'afdm_mg') -->
+<!--              massClass = 'mass') -->
 
 <!-- ``` -->
 

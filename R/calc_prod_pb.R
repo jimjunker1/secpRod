@@ -5,11 +5,13 @@
 #' @param taxaInfo data frame of taxonomic information for calculating production
 #' @param bootNum integer. How many bootstrap samples should be constructed
 #' @param dateDf data frame of date information with external predictors for each month. There should be a column name identical to all variables in the growth equation found in taxaInfo data.frame.
-#' @param taxaSummary string of 'short', 'full', or 'none'. What type of summary information should be returned.
+#' @param taxaSummary logical. If TRUE (default) the taxaSummary will be with annual summary information will be returned.
 #' @param wrap logical. Should the dates wrap to create a full year?
-#' @param massValue string. What is the mass value and units of the production
-#' @param massLabel string. What label should the output units be. It is possible this will default to 'massValue' in the future.
-#' @param bootList list of bootstraps data sets from \code{prep_boots()}.
+#' @param massValue string of the column name containing the mass measurement
+#' @param abunValue string of the column name containing the abundance or density measurement
+#' @param dateCol string of the column name containing the date information. This can be either a recognized date object (e.g., Date, POSIX) or numeric.
+#' @param repCol string of the column name containing the replicate information
+#' @param bootList list. This is the bootstrapped samples passed from \code{calc_production()}
 #' @param ... additional arguments to be passed to the function
 #' @returns returns a list of 2 objects:
 #' @returns P.boots: the boostrapped estimates of production, abundance, and biomass.
@@ -24,9 +26,9 @@ calc_prod_pb <- function(taxaSampleListMass= NULL,
                          taxaInfo = NULL,
                          bootNum = NULL,
                          dateDf = NULL,
-                         taxaSummary = 'full',
+                         taxaSummary = TRUE,
                          wrap = TRUE,
-                         massValue = 'afdm_mg',
+                         massValue = 'mass',
                          abunValue = 'density',
                          dateCol = 'dateID',
                          repCol = 'repID',
@@ -77,12 +79,11 @@ calc_prod_pb <- function(taxaSampleListMass= NULL,
   funcList = c(funcList, list(pb = taxaPB))
   P.samp = do.call(pb_prod.sample, args = funcList)
   if(P.samp$P.ann.samp == 0){
-    if(taxaSummary == "none"){
+    if(taxaSummary == FALSE){
       taxaSummary <- NULL
-    } else if (taxaSummary == "full") {
+    } else if (taxaSummary == TRUE) {
       # # create a list for output
       taxaSummary <- list(
-        summaryType = "full",
         taxonID = taxaInfo$taxonID,
         method = "pb",
         P.ann.samp = 0,
@@ -94,18 +95,6 @@ calc_prod_pb <- function(taxaSampleListMass= NULL,
         Nsd = 0,
         Bmean = 0,
         Bsd = 0,
-        datesInfo = NULL
-      )
-    } else if(taxaSummary == "short"){
-      taxaSummary <- list(
-        summaryType = "short",
-        taxonID = taxaInfo$taxonID,
-        method = "pb",
-        P.ann.samp = 0,
-        pb = NA_real_,
-        meanN = 0,
-        meanB = 0,
-        meanIndMass = 0,
         datesInfo = NULL
       )
     }
@@ -157,12 +146,11 @@ calc_prod_pb <- function(taxaSampleListMass= NULL,
 
   #estimate the sample PB
   pb = P.samp$P.ann.samp/P.samp$B.ann.mean
-  if(taxaSummary == "none"){
+  if(taxaSummary == FALSE){
 
-  } else if (taxaSummary == "full") {
+  } else if (taxaSummary == TRUE) {
     # # create a list for output
     taxaSummary <- list(
-      summaryType = "full",
       taxonID = taxaInfo$taxonID,
       method = "pb",
       P.ann.samp = P.samp$P.ann.samp,
@@ -170,18 +158,6 @@ calc_prod_pb <- function(taxaSampleListMass= NULL,
       meanN = P.samp$N.ann.mean,
       meanB = P.samp$B.ann.mean,
       meanIndMass = P.samp$B.ann.mean /P.samp$N.ann.mean,
-      datesInfo = sampSummary
-    )
-  } else if(taxaSummary == "short"){
-    taxaSummary <- list(
-      summaryType = "short",
-      taxonID = taxaInfo$taxonID,
-      method = "pb",
-      P.ann.samp = P.samp$P.ann.samp,
-      pb = pb,
-      meanN = P.samp$N.ann.mean,
-      meanB = P.samp$B.ann.mean,
-      meanIndMass = P.samp$B.ann.mean / P.samp$N.ann.mean,
       datesInfo = sampSummary
     )
   }

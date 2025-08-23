@@ -2,11 +2,12 @@
 #' This function creates an additional date in the data set to make a full annual cycle
 #' @title wrap_dates
 #' @param df a data.frame of long format returned from \code{convert_length_to_mass()} function
+#' @param envData (optional) a data.frame of the environmental data. The number of rows should be the same as the number of sampling dates.
 #' @param dateCol character string identifying the column name of the sampling dates
 #' @param wrapDate logical. should we wrap the dates to make full year?
 #' @return data.frame with sampling dates and intervals, or number of days between
 #' @export
-wrap_dates <- function(df = NULL, dateCol = NULL, wrapDate = TRUE) {
+wrap_dates <- function(df = NULL, envData = NULL, dateCol = NULL, wrapDate = TRUE) {
   if(is.null(dateCol)){
     # check if any columns are date
     if(any(unlist(lapply(df, function(x) inherits(x, c("Date","POSIXt")))))){
@@ -32,7 +33,7 @@ wrap_dates <- function(df = NULL, dateCol = NULL, wrapDate = TRUE) {
       returnDf[[dateCol]] <- as.Date(date1, origin = as.Date("1970-01-01"))
       returnDf[["julianDate"]] <- julian(date1, origin = as.Date("1970-01-01"))
       returnDf[["int_days"]] <- t.int
-      return(as.data.frame(returnDf))
+      # return(as.data.frame(returnDf))
       # check if any of the columns are coercible to date format
     } else if(!any(unlist(lapply(df, function(x) dateCoercible(x))))){
       stop("`dateCol` is not a date or coercible.")
@@ -57,7 +58,7 @@ wrap_dates <- function(df = NULL, dateCol = NULL, wrapDate = TRUE) {
       returnDf[[dateCol]] <- as.Date(date1, origin = as.Date("1970-01-01"))
       returnDf[["julianDate"]] <- julian(date1, origin = as.Date("1970-01-01"))
       returnDf[["int_days"]] <- t.int
-      return(as.data.frame(returnDf))
+      # return(as.data.frame(returnDf))
     }
   } else{
     if('numeric' %in% class(df[[dateCol]])){
@@ -77,8 +78,19 @@ wrap_dates <- function(df = NULL, dateCol = NULL, wrapDate = TRUE) {
       returnDf[[dateCol]] <- t
       # returnDf[["julianDate"]] <- julian(date1, origin = as.Date("1970-01-01"))
       returnDf[["int_days"]] <- t.int
-      return(as.data.frame(returnDf))
+      # return(as.data.frame(returnDf))
     }
-
+  }
+  if(is.null(envData)){
+    return(as.data.frame(returnDf))
+  } else{
+    ## tests ##
+    ### are all dates present in the envData object?
+    if(!all(unlist(unique(returnDf[[dateCol]]))) %in% unlist(unique(envData[[dateCol]]))){
+      stop("Error: all sampling dates are not present in envData object")
+    }
+    ## end tests ##
+    returnDf <- merge(returnDf, envData, by = eval(dateCol))
+    return(as.data.frame(returnDf))
   }
 }

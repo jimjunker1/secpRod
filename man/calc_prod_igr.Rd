@@ -9,10 +9,14 @@ calc_prod_igr(
   taxaInfo = NULL,
   bootNum = NULL,
   dateDf = NULL,
-  taxaSummary = "full",
-  wrap = TRUE,
-  massValue = NULL,
-  massLabel = NULL,
+  taxaSummary = TRUE,
+  wrap = FALSE,
+  lengthValue = NULL,
+  massValue = "mass",
+  abunValue = "density",
+  dateCol = "dateID",
+  repCol = "repID",
+  bootList = NULL,
   ...
 )
 }
@@ -25,18 +29,30 @@ calc_prod_igr(
 
 \item{dateDf}{data frame of date information with external predictors for each month. There should be a column name identical to all variables in the growth equation found in taxaInfo data.frame.}
 
-\item{taxaSummary}{string of 'short', 'full', or 'none'. What type of summary information should be returned.}
+\item{taxaSummary}{logical. If TRUE (default) the taxaSummary will be with annual summary information will be returned.}
 
 \item{wrap}{logical. Should the dates wrap to create a full year?}
 
-\item{massValue}{string. What is the mass value and units of the production}
+\item{lengthValue}{string of the column name containing the length class measurements}
 
-\item{massLabel}{string. What label should the output units be. It is possible this will default to 'massValue' in the future.}
+\item{massValue}{string of the column name containing the mass measurement}
 
-\item{...}{additional arguments to pass to the function}
+\item{abunValue}{string of the column name containing the abundance or density measurement}
+
+\item{dateCol}{string of the column name containing the date information. This can be either a recognized date object (e.g., Date, POSIX) or numeric.}
+
+\item{repCol}{string of the column name containing the replicate information}
+
+\item{bootList}{list. This is the bootstrapped samples passed from \code{calc_production()}}
+
+\item{...}{additional arguments to be passed to the function}
 }
 \value{
-returns a list of 2 objects
+returns a list of 2 objects:
+
+P.boots: the boostrapped estimates of production, abundance, and biomass.
+
+taxaSummary: is the summary of the sample production, abundance, and biomass
 }
 \description{
 This function calculates production using the instantaneous growth rate method.

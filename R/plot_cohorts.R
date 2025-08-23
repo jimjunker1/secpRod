@@ -3,7 +3,7 @@
 #' @description This function plots size-frequency data of a single taxon over time
 #' @param taxaSampleListMass a data.frame of long format returned from \code{convert_length_to_mass()} function
 #' @param param character. A string of 'length' or 'mass' that describes what measurement should be plotted
-#' @param massClass character. The column name of the mass measurement (e.g., afdm_mg, dm_mg, etc.)
+#' @param massValue character. The column name of the mass measurement (e.g., afdm_mg, dm_mg, etc.)
 #' @param ... additional arguments passed to function
 #' @return returns a histogram of the plot of the relative frequency of size or mass classes for a single taxon for all sampling dates
 #' @importFrom magrittr %>%

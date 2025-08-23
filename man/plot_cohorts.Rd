@@ -16,9 +16,9 @@ plot_cohorts(
 
 \item{param}{character. A string of 'length' or 'mass' that describes what measurement should be plotted}
 
-\item{massClass}{character. The column name of the mass measurement (e.g., afdm_mg, dm_mg, etc.)}
-
 \item{...}{additional arguments passed to function}
+
+\item{massValue}{character. The column name of the mass measurement (e.g., afdm_mg, dm_mg, etc.)}
 }
 \value{
 returns a histogram of the plot of the relative frequency of size or mass classes for a single taxon for all sampling dates

@@ -8,10 +8,10 @@ sf_prod.sample(
   df = NULL,
   sizesDf = NULL,
   lengthValue = NULL,
-  massValue = "afdm_mg",
-  abunValue = "density",
-  dateCol = "dateID",
-  repCol = "repID",
+  massValue = massValue,
+  abunValue = abunValue,
+  dateCol = dateCol,
+  repCol = repCol,
   wrap = FALSE,
   cpi = NULL,
   full = TRUE,
@@ -22,6 +22,8 @@ sf_prod.sample(
 \item{df}{a data.frame of long format returned from \code{convert_length_to_mass()} function}
 
 \item{sizesDf}{a data.frame of the size class including lengthClass, massClass, bin_min, bin_max, midpoint}
+
+\item{lengthValue}{string of the column name containing the length class measurements}
 
 \item{massValue}{character string identifying the column name of the mass value}
 
@@ -40,7 +42,7 @@ sf_prod.sample(
 \item{...}{additional arguments passed to function}
 }
 \value{
-list object with annual production, mean biomass, and mean abundance
+list object with annual production, mean biomass, and mean abundance of the sample
 }
 \description{
 This function calculates taxa production based on the size-frequency method

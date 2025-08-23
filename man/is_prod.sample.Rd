@@ -19,18 +19,22 @@ is_prod.sample(
 \arguments{
 \item{df}{a data.frame of long format returned from \code{convert_length_to_mass()} function}
 
-\item{massValue}{character string identifying the column name of the mass value}
+\item{dateDf}{data frame of date information sampling date such as interval length in days.}
 
-\item{full}{logical. should the full summary be returned with mean and sd}
+\item{massValue}{string of the column name containing the mass measurement}
+
+\item{abunValue}{string of the column name containing the abundance or density measurement}
+
+\item{dateCol}{string of the column name containing the date information. This can be either a recognized date object (e.g., Date, POSIX) or numeric.}
+
+\item{repCol}{string of the column name containing the replicate information}
+
+\item{full}{logical. should the summary be returned with mean and sd}
 
 \item{...}{additional arguments passed to function}
-
-\item{sizesDf}{a data.frame of the}
-
-\item{massLabel}{character string identifying the column name of the mass value}
 }
 \value{
-list object with taxa summary of the sampled data
+list object with annual production, mean biomass, and mean abundance of the sample
 }
 \description{
 This function calculates taxa production based on the increment-summation method

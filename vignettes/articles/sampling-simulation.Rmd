@@ -191,19 +191,19 @@ for (t in seq(sample_start, sample_end, by = sample_interval)) {
 ## clean to consistent naming
 daily_sampling <- bind_rows(sampling_results) %>%
   dplyr::mutate(taxonID = 'sppX', repID = 1:n(), .by = c('day')) %>%
-  rename(density = larvalDensity, afdm_mg = massDistribution, dateID = day)
+  rename(density = larvalDensity, mass = massDistribution, dateID = day)
 
 zeroFills = expand.grid(taxonID = 'sppX',
                         dateID = unique(daily_sampling$dateID),
                         repID = 1:10,
-                        density = 0, afdm_mg = NA)
+                        density = 0, mass = NA)
 
 daily_sampling = daily_sampling %>%
   select(-x,-y) %>%
   full_join(.,zeroFills, by = c('taxonID','dateID','repID')) %>%
   mutate(density = ifelse(is.na(density.x), density.y, density.x),
-         afdm_mg = ifelse(is.na(afdm_mg.x), afdm_mg.y, afdm_mg.x)) %>%
-  select(taxonID, dateID, repID, density, afdm_mg)
+         mass = ifelse(is.na(mass.x), mass.y, mass.x)) %>%
+  select(taxonID, dateID, repID, density, mass)
 
 ```
 
@@ -215,18 +215,18 @@ daily_sampling = daily_sampling %>%
 data("singleCohortSim", package = 'secpRod')
 
 summaryStats <- singleCohortSim %>%
-  unnest(afdm_mg, keep_empty = TRUE) %>%
+  unnest(mass, keep_empty = TRUE) %>%
   group_by(dateID) %>%
   dplyr::summarise(
-    massMean = mean(afdm_mg, na.rm = TRUE),
-    massSD = sd(afdm_mg, na.rm = TRUE),
+    massMean = mean(mass, na.rm = TRUE),
+    massSD = sd(mass, na.rm = TRUE),
     larvalDensityMean = mean(density, na.rm = TRUE)
   )
 
 ggplot(summaryStats, aes(x = dateID)) +
   stat_halfeye(data = singleCohortSim, aes(x = dateID, y = density),
                color = 'green')+
-  stat_halfeye(data = singleCohortSim %>% unnest(afdm_mg), aes(x = dateID, y = afdm_mg*100),
+  stat_halfeye(data = singleCohortSim %>% unnest(mass), aes(x = dateID, y = mass*100),
                color = 'red')+
   geom_line(aes(y = larvalDensityMean), color = 'green') +
   geom_line(aes(y = massMean * 100), color = 'red') +
@@ -361,19 +361,19 @@ for (t in seq(sample_start, sample_end, by = sample_interval)) {
 ## clean to consistent naming
 daily_sampling <- bind_rows(sampling_results)%>%
   dplyr::mutate(taxonID = 'sppX', repID = 1:n(), .by = c('day')) %>%
-  rename(density = larvalDensity, afdm_mg = massDistribution, dateID = day)
+  rename(density = larvalDensity, mass = massDistribution, dateID = day)
 
 zeroFills = expand.grid(taxonID = 'sppX',
                         dateID = unique(daily_sampling$dateID),
                         repID = 1:10,
-                        density = 0, afdm_mg = NA)
+                        density = 0, mass = NA)
 
 daily_sampling = daily_sampling %>%
   select(-x,-y) %>%
   full_join(.,zeroFills, by = c('taxonID','dateID','repID')) %>%
   mutate(density = ifelse(is.na(density.x), density.y, density.x),
-         afdm_mg = ifelse(is.na(afdm_mg.x), afdm_mg.y, afdm_mg.x)) %>%
-  select(taxonID, dateID, repID, density, afdm_mg)
+         mass = ifelse(is.na(mass.x), mass.y, mass.x)) %>%
+  select(taxonID, dateID, repID, density, mass)
 ```
 
 </details>
@@ -385,18 +385,18 @@ daily_sampling = daily_sampling %>%
 data("splitCohortSim", package = 'secpRod')
 
 summary_stats <- splitCohortSim %>%
-  unnest(afdm_mg) %>%
+  unnest(mass) %>%
   group_by(dateID) %>%
   dplyr::summarise(
-    massMean = mean(afdm_mg, na.rm = TRUE),
-    massSD= sd(afdm_mg, na.rm = TRUE),
+    massMean = mean(mass, na.rm = TRUE),
+    massSD= sd(mass, na.rm = TRUE),
     larvalDensityMean = mean(density, na.rm = TRUE)
   )
 
 ggplot(summary_stats, aes(x = dateID)) +
   stat_halfeye(data = splitCohortSim, aes(x = dateID, y = density),
                color = 'green')+
-  stat_halfeye(data = splitCohortSim %>% unnest(afdm_mg), aes(x = dateID, y = afdm_mg*100),
+  stat_halfeye(data = splitCohortSim %>% unnest(mass), aes(x = dateID, y = mass*100),
                color = 'red')+
   geom_path(aes(y = larvalDensityMean), color = 'green') +
   geom_path(aes(y = massMean * 100), color = 'red') +
@@ -409,9 +409,9 @@ ggplot(summary_stats, aes(x = dateID)) +
   labs(title = "Larval Density and Mean Mass over Time", x = "Day")+
   theme(axis.title.y.right = element_text(color = 'red'))
 
-remappedCohort = reconstruct_split_cohort(df = splitCohortSim %>% unnest(afdm_mg, keep_empty = TRUE),
+remappedCohort = reconstruct_split_cohort(df = splitCohortSim %>% unnest(mass, keep_empty = TRUE),
                                           timeCol = "dateID",
-                                          massCol = "afdm_mg",
+                                          massCol = "mass",
                                           massDropThresh = 0.6,
                                           tStart = 5,
                                           models = c("vbg", "gompertz", "logistic"),
