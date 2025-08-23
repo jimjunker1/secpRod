@@ -6,10 +6,10 @@
 \usage{
 pb_prod.sample(
   df = NULL,
-  massValue = massValue,
-  abunValue = abunValue,
-  dateCol = dateCol,
-  repCol = repCol,
+  massValue = "mass",
+  abunValue = "density",
+  dateCol = "dateID",
+  repCol = "repID",
   pb = NULL,
   wrap = FALSE,
   full = TRUE,

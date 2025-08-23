@@ -16,7 +16,7 @@
 #' @export
 is_prod.sample <- function(df = NULL,
                            dateDf = dateDf,
-                           massValue = 'afdm_mg',
+                           massValue = 'mass',
                            abunValue = 'density',
                            dateCol = 'dateID',
                            repCol = 'repID',

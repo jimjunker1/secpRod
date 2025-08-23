@@ -7,7 +7,7 @@
 is_prod.sample(
   df = NULL,
   dateDf = dateDf,
-  massValue = "afdm_mg",
+  massValue = "mass",
   abunValue = "density",
   dateCol = "dateID",
   repCol = "repID",

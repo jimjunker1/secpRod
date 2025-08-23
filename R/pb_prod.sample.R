@@ -13,10 +13,10 @@
 #' @return list object with annual production, mean biomass, and mean abundance of the sample
 #' @export
 pb_prod.sample <- function(df = NULL,
-                           massValue = massValue,
-                           abunValue = abunValue,
-                           dateCol = dateCol,
-                           repCol = repCol,
+                           massValue = 'mass',
+                           abunValue = 'density',
+                           dateCol = 'dateID',
+                           repCol = 'repID',
                            pb = NULL,
                            wrap = FALSE,
                            full = TRUE,
