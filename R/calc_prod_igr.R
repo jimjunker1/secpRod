@@ -58,22 +58,22 @@ calc_prod_igr <- function(taxaSampleListMass= NULL,
   # split on punctuation to extract just variable names
   allGrowthVars <- sapply(unlist(strsplit(charRHS, "[[:punct:]]")), trimws)
   # remove any blank spaces from the vector
-  allGrowthVars <- allVars[grepl("\\w", allGrowthVars)]
+  allGrowthVars <- allGrowthVars[grepl("\\w", allGrowthVars)]
   # remove any numeric
   allGrowthCharVars = na.omit(allGrowthVars[(suppressWarnings(is.na(as.numeric(allGrowthVars))))])
   # remove "log" if present
-  allGrowhtCharVars = allGrowthCharVars[!grepl("log",allGrowthCharVars)]
+  allGrowthCharVars = allGrowthCharVars[!grepl("log",allGrowthCharVars)]
   # check that all growth variables are present in the data
   allDataVars <- c(names(taxaSampleListMass),names(dateDf))
-  missing <- allGrowthCharVars %in% allDataVars
-  if(sum(missing) > 0) stop(paste0("Error: ",paste(allGrowhtCharVars[missing], collapse = ",")," are missing from sample info and environmental data."))
+  anyMissing <- allGrowthCharVars %ni% allDataVars
+  if(sum(missing) > 0) stop(paste0("Error: ",paste(allGrowthCharVars[!missing], collapse = ",")," are missing from sample info and environmental data."))
   ## end tests ##
   speciesName = unique(taxaSampleListMass$taxonID)
   # ## function prep ##
   # ### make a list of key variables to pass to sample function
   funcList = list(
     df = taxaSampleListMass,
-    dateDf = dateDf,
+    dateDf = dateDf
   )
 
   # calculate the production from the observed samples
