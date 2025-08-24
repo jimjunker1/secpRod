@@ -15,6 +15,7 @@
 #' @export
 igr_prod.sample <- function(df = NULL,
                            dateDf = NULL,
+                           growthDf = NULL,
                            lengthValue = NULL,
                            massValue = "mass",
                            abunValue = "density",
@@ -43,21 +44,31 @@ igr_prod.sample <- function(df = NULL,
                                   repCol = repCol,
                                   wrap = wrap)
 
-  # parse the growth equation to predict growth rates
 
   #### calculate SAMPLE annual production ####
-  # Create a matrix with these 4 columns: individual length (mm), mean density for all samples throughout year (number m^-2), individual mass (mg AFDM), and biomass (mg AFDM m^-2) for each size class (rows)
+  if(wrap == TRUE){
+  # get the detilas of first and final dates with samples
+   firstLast <- dateDf[c(1,(nrow(dateDf)-1)),]
+   wrapSamples <- dplyr::filter(df, df[[dateCol]] %in% unique(unlist(firstLast[[dateCol]])))
+  }
+  # merge the df with the growthDf and calculate size-specific production
+  df <- merge(df, growthDf, by = c(dateCol, massValue))
+  df$production <- df[["biomass"]] * df[["g_d"]] * df[["int_days"]]
+  dfRepAgg <- stats::aggregate(formula(paste0("production~",dateCol,"+",repCol)), data = df, sum, na.rm = TRUE)
+  dfDateAgg <- stats::aggregate(formula(paste0("production~",dateCol)), data = dfRepAgg, mean)
+  P.ann.samp <- sum(dfDateAgg$production)
 
-  return(NULL)
-  # if(full == TRUE){
-  #   return(list(P.ann.samp = P.ann.samp,P.uncorr.samp = P.uncorr.samp,
-  #               B.ann.mean = B.ann.list$afdm_mg_m2_mean,
-  #               B.ann.sd = B.ann.list$afdm_mg_m2_sd,
-  #               N.ann.mean = N.ann.list$n_m2_mean,
-  #               N.ann.sd = N.ann.list$n_m2_sd))
-  # } else{
-  #   return(list(P.ann.samp = P.ann.samp,
-  #               B.ann.samp = B.ann.list$afdm_mg_m2_mean,
-  #               N.ann.samp = N.ann.list$n_m2_mean))
-  # }
+
+  if(full == TRUE){
+    return(list(P.ann.samp = P.ann.samp,
+                B.ann.mean = B.ann.list[["biomass_mean"]],
+                B.ann.sd = B.ann.list[["biomass_sd"]],
+                N.ann.mean = N.ann.list[[paste0(abunValue,"_mean")]],
+                N.ann.sd = N.ann.list[[paste0(abunValue,"_sd")]],
+                dfDateAgg = dfDateAgg))
+  } else{
+    return(list(P.ann.samp = P.ann.samp,
+                B.ann.samp = B.ann.list[["biomass_mean"]],
+                N.ann.samp = N.ann.list[[paste0(abunValue,"_mean")]]))
+  }
 }

@@ -50,7 +50,7 @@ calc_prod_igr <- function(taxaSampleListMass= NULL,
   # get the left hand side and confirm "g_d" is present
   growthUnits <- formula.tools::lhs(growthFormula)
   if(!any(grepl('g_d', growthUnits))) stop("Error: the left hand side of `growthForm` must contain 'g_d'.")
-
+  growthLHS <- deparse(formula.tools::lhs(growthFormula))
   # get the right hand side and confirm all variables in dateDf or taxaSampleListMass
   growthRHS <- formula.tools::rhs(growthFormula)
   # remove code calls, e.g. +, -, ^ , log(), etc.
@@ -62,18 +62,27 @@ calc_prod_igr <- function(taxaSampleListMass= NULL,
   # remove any numeric
   allGrowthCharVars = na.omit(allGrowthVars[(suppressWarnings(is.na(as.numeric(allGrowthVars))))])
   # remove "log" if present
-  allGrowthCharVars = allGrowthCharVars[!grepl("log",allGrowthCharVars)]
+  allGrowthCharVars = allGrowthCharVars[!grepl("log|exp",allGrowthCharVars)]
   # check that all growth variables are present in the data
   allDataVars <- c(names(taxaSampleListMass),names(dateDf))
   anyMissing <- allGrowthCharVars %ni% allDataVars
-  if(sum(missing) > 0) stop(paste0("Error: ",paste(allGrowthCharVars[!missing], collapse = ",")," are missing from sample info and environmental data."))
+  if(sum(anyMissing) > 0) stop(paste0("Error: ",paste(allGrowthCharVars[!anyMissing], collapse = ",")," are missing from sample info and environmental data."))
   ## end tests ##
   speciesName = unique(taxaSampleListMass$taxonID)
-  # ## function prep ##
+  ## function prep ##
+  ### create a data.frame of growth rates by size and date
+  sizeDateAggForm <- paste0(massValue,"~",dateCol)
+  sizesDf <- unnest(stats::aggregate(stats::formula(sizeDateAggForm), data = taxaSampleListMass, FUN = unique), all_of(massValue))
+  ### merge with dateDf to get date, interval length and envData
+  growthFormula <- stats::as.formula(paste(growthLHS,"~",charRHS, collapse = " "))
+  growthDf <- merge(dateDf, sizesDf, by = dateCol)
+  growthDf <- dplyr::mutate(growthDf, !!growthLHS := !!growthRHS)
   # ### make a list of key variables to pass to sample function
   funcList = list(
     df = taxaSampleListMass,
-    dateDf = dateDf
+    dateDf = dateDf,
+    growthDf = growthDf,
+    wrap = wrap
   )
 
   # calculate the production from the observed samples
@@ -93,10 +102,6 @@ calc_prod_igr <- function(taxaSampleListMass= NULL,
         meanN = 0,
         meanB = 0,
         meanIndMass = 0,
-        Nmean = 0,
-        Nsd = 0,
-        Bmean = 0,
-        Bsd = 0,
         datesInfo = NULL
       )
     }
@@ -111,7 +116,8 @@ calc_prod_igr <- function(taxaSampleListMass= NULL,
                    dateCol = dateCol,
                    repCol = repCol,
                    wrap = wrap,
-                   full = FALSE)
+                   full = FALSE,
+                   MoreArgs = list(growthDf = growthDf))
 
   #### create SAMPLE information to export as summary ####
   sampSummary = create_sample_summary(df = taxaSampleListMass,
@@ -121,6 +127,7 @@ calc_prod_igr <- function(taxaSampleListMass= NULL,
                                       dateCol = dateCol,
                                       repCol = repCol,
                                       ...)
+  sampSummary <- merge(sampSummary, P.samp$dfDateAgg, by = dateCol, all.x = TRUE)
   #estimate the sample PB
   pb = P.samp$P.ann.samp/P.samp$B.ann.mean
 
@@ -139,15 +146,6 @@ calc_prod_igr <- function(taxaSampleListMass= NULL,
       datesInfo = sampSummary
     )
   }
-  #   assign(taxaInfo$taxonID, list())
-  # # add taxainformation
-  #   assign(taxaInfo$taxonID,
-  #          within(eval(as.symbol(taxaInfo$taxonID)),{
-  #            taxaInfo <- taxaInfo
-  #            }
-  #            )
-  #          )
-
   return(assign(speciesName, list(P.boots = P.boots,
               taxaSummary = taxaSummary)))
 

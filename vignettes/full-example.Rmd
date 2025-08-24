@@ -1,0 +1,242 @@
+---
+title: "A full example"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{A full example}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+bibliography: secpRod-refs.bib
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(secpRod)
+
+```
+
+Currently, the analysis is fully implemented for multiple methods including: increment-summation,  size-frequency, production:biomass ratio, instantaneous growth rate. This walk through will outline a full example to calculate secondary production using the full workflow from sample data of length classes to the estimation of secondary production for whole communities. First, load the package with `library(secpRod)`.
+
+The package comes with a number of data sets of macroinvertebrate species and community data:
+
+1) simulated data set of a single univoltine species accessed with `data("singleCohortSim")`
+
+2) a full community data set from @junker2014 that can be accessed with `data("wbtData")`
+
+The simulated data set is a single data frame of artificially sampled size-frequency data through time. This is used in the ("A few simple examples" vignette)[https://jimjunker1.github.io/secpRod/articles/simple-example.html]. Here we walk through the full community data set to showcase the full workflow of \code{secpRod}.
+
+First, load the data set with:
+
+```{r load-wbt-data, echo=TRUE, eval=TRUE}
+
+data("wbtData", package="secpRod")
+```
+
+### Single-species walkthrough
+
+A quick walkthrough of the calculation of secondary production for a single species.
+
+```{r single species data prep, echo =TRUE, include=TRUE}
+## isolate a single species data frame from sampleInfo object
+
+chironomid <- wbtData[["sampleInfo"]][["Chironomidae"]]
+
+## let's take a look at the data set
+head(chironomid, 10)
+
+```
+
+The data contain all the replicates of density and body length distributions in long format. This format differs from the simulated data in ("A few simple examples" vignette)[https://jimjunker1.github.io/secpRod/articles/simple-example.html], in three specific ways to showcase the flexibility of data inputs: 1) the date information, `dateID` is input as a POSIX object, 2) the length and density information, `lengthClass` and `n_m2` are non-default column names, and 3) there is no individual mass values associated with the size classes. First, let's load walk through a single taxonomic group. First let's modify the `taxaInfo` associated with this group. 
+
+```{r chiro LM form, echo=TRUE}
+
+taxaInfo = wbtData[['taxaInfo']]
+
+chiroInfo = subset(taxaInfo, taxonID == "Chironomidae")
+
+# remove an old column
+chiroInfo$g.a <- NULL
+
+# let's set the mass formula to a different format
+chiroInfo$massForm <- "mass~(a*lengthClass^b)*percAsh"
+
+# finally, let's set the growth formula to the Huryn 1990
+chiroInfo$growthForm <- "g_d~0.051 - 0.068*log(lengthClass) + 0.006(tempC)"
+
+```
+
+The first step is to convert length to mass for estimating biomass patterns. Here we use the `convert_length_to_mass()` function, which adds a column of the individual masses based on the length-to-mass formula and coefficients in taxaInfo.
+
+We can take a look at what this looks like:
+
+```{r chiro-view}
+
+chiroInfo
+
+```
+
+Information on its use can be viewed with `?convert_length_to_mass`
+
+```{r length to mass, include=TRUE, echo=TRUE}
+
+chiroMass = convert_length_to_mass(taxaSampleList = chironomid,
+                                         taxaInfo = chiroInfo,
+                                         lengthValue = 'lengthClass',
+                                         massValue = 'mass')
+
+head(chiroMass)
+
+```
+
+From here you can view the size frequency histograms using the `plot_cohorts()` function. Check out the function options with `?plot_cohorts`.
+
+```{r plot cohort lengths, include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+plot_cohorts(taxaSampleListMass = chiroMass,
+             param = 'length',
+             lengthValue = 'lengthClass',
+             abunValue = 'n_m2')
+
+```
+
+These figures can be helpful for identifying cohort structures and getting ballpark cohort production intervals (CPI) for species when estimating production using the size-frequency method. In this case, we see there is not much for distinguishable cohort structure, such as clear drops in density and concurrent increases in mass over time. Rather, there is a fairly consistent length structure and variable density over time. 
+
+We can also plot this taxa using mass as the size variable:
+
+```{r plot cohort masses, include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+debugonce(plot_cohorts)
+plot_cohorts(taxaSampleListMass = chiroMass,
+             param = 'mass',
+             massValue = 'mass',
+             abunValue = 'n_m2')
+
+```
+
+This shows a similar lack of structure. This is not surprising given the life history of this taxa. This suggest we should use a non-cohort method for estimating production in this case. Let's use the instantaneous growth rate method, using the growth equation from @huryn1990.
+
+```{r set-IGR-method, eval=TRUE, echo=TRUE}
+# setting the method to 'igr'
+
+chiroInfo$method <- 'igr'
+
+```
+
+The function `calc_production()` is the workhorse function that will estimate population or community production.
+
+To apply it to our single species example, we input the sample information and taxa information along with how many bootstraps we would like, as:
+
+```{r single-species-production,include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+debugonce(wrap_dates)
+calc_production(
+  taxaSampleListMass = chiroMass,
+  taxaInfo = chiroInfo,
+  bootNum = 10,
+  wrap = TRUE,
+  taxaSummary = TRUE,
+  lengthValue = 'lengthClass',
+  massValue = 'mass',
+  abunValue = 'n_m2',
+  dateCol = 'dateID',
+  repCol = 'repID'
+)
+
+```
+
+This will output a lot of information though it has a simple structure:
+
+1) P.boots--vectors of bootstrapped estimates of annual production, annual biomass, and annual abundance.
+
+2) taxaSummary--this comes in 'full' and 'short' versions. As you see above the full can be a lot. The 'short' is a paired down version of this
+
+```{r single species short,include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+
+calc_production(
+  taxaSampleListMass = acentrellaMass,
+  infoCols = c(1:3),
+  taxaInfo = acentrellaInfo,
+  bootNum = 10,
+  wrap = TRUE,
+  taxaSummary = 'short'
+)
+
+```
+
+You can also turn this off with 'none'.
+
+### An example using the PB method
+
+The pb method allows for multiple options to set the production to biomass ratio:
+
+1) A single value. This will use the same value for each bootstrap sample. The variability is derived entirely from resampling the sample units (e.g. surbers).
+
+2) a character string for a distribution from which to sample excluding the `n=`, such as `rnorm(mean = 5, sd = 0.5)`. The function will automatically sample `bootNum` values.
+
+3) a numeric vector the same length as `bootNum`. This is a more explicit option to set all the values of pb that will be used. In the future, if the length $\neq$ `bootNum` an error will be returned for the taxa.
+
+```{r modify taxaInfo, include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+
+acentrellaInfo$method = "pb"
+acentrellaInfo$pb = "runif(min = 3, max = 8)"
+
+calc_production(
+  taxaSampleListMass = acentrellaMass,
+  infoCols = c(1:3),
+  taxaInfo = acentrellaInfo,
+  bootNum = 10,
+  wrap = TRUE,
+  taxaSummary = 'short'
+)
+
+```
+
+## Applying this to multiple taxa
+
+The current internal code to do this with just `calc_production` is still buggy. But you can run production by splitting the full sampleInfo into a list by taxa and using `apply` or functions from the (`purrr` package)[https://purrr.tidyverse.org/]
+
+The code below shows how to accomplish this. Again, only size frequency and pb are accepted currently.
+
+```{r multi species, include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+# load needed packages
+library(magrittr)
+library(purrr)
+
+# The sampleInfo is already a list by taxonID
+str(wbtData[['sampleInfo']], list.len = 5)
+
+# if you have a large data frame with all taxa the code below shows how to do this:
+## install a package to split into a named_list
+# devtools::install_github('jimjunker1/junkR')
+# library(junkR)
+## Convert to data frame
+# sampleInfoDf = wbtData[['sampleInfo']] %>% bind_rows
+## Convert back to named list split by taxonID
+# sampleInfoList = sampleInfoDf %>% junkR::named_group_split(taxonID)
+
+sampleInfoList = wbtData[['sampleInfo']]
+
+sampleInfoListMass = sampleInfoList %>%
+  purrr::map(
+    ~convert_length_to_mass(.x,
+                            taxaInfo = taxaInfo)
+  )
+
+fullProduction = sampleInfoListMass %>%
+  purrr::map2(., list(taxaInfo),
+                     ~calc_production(.x,
+                                      infoCols = c(1:3),
+                                      taxaInfo = .y,
+                                      bootNum = 10,
+                                      wrap = TRUE,
+                                      taxaSummary = 'short'
+                                      )
+                     )
+
+str(fullProduction, list.len = 5)
+
+```
+
+## References

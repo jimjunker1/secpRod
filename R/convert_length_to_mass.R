@@ -68,7 +68,7 @@ convert_length_to_mass <- function(taxaSampleList = NULL, taxaInfo = NULL, lengt
   # remove "poly" for polynomials
   allVars <- allVars[allVars %ni% lengthValue]
   # detect how many variables do not have columns
-  if (sum(allVars %ni% names(taxaSubInfo)) > 1) stop("There are multiple undefined terms in the length-to-mass equation. There should only be a one (1) corresponding to lengthClass.")
+  if (sum(allVars %ni% names(taxaSubInfo)) > 1) stop("There are multiple undefined terms in the length-to-mass equation. There should only be a one (1) corresponding to lengthValue.")
 
   # fill in the named variables L-M equation with their taxon-specific values
   ## create a named list of all variables

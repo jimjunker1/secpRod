@@ -101,6 +101,25 @@ dateCoercible  <- function(x, addformat = NULL, exactformat = NULL){
     MissLt(y,ratio = 1-(1/length(y)))}
 }
 
+#'
+#'
+#'
+weighted.sd <- function(x,w,na.rm = FALSE){
+  if(na.rm == TRUE){
+    # remove all NA values from x & w
+    keep <- !is.na(x) & !is.na(w)
+    x <- x[keep]
+    w <- w[keep]
+  }
+  # calculate the weighted mean
+  weighted_mean = weighted.mean(x,w)
+
+  # calculate the weighed variance
+  weighted.var <- sum(w * (x - weighted_mean)^2) / sum(w)
+
+  # calculate the weighted standard deviation
+  sqrt(weighted.var)
+}
 
 #'
 #'
