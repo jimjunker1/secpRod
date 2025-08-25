@@ -5,6 +5,7 @@ articles:
   navbar: Get Started
   contents:
   - simple-example
+  - full-example
 - title: Additional Resources
   desc: null
   navbar: ~
