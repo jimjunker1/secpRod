@@ -79,6 +79,28 @@ wrap_dates <- function(df = NULL, envData = NULL, dateCol = NULL, wrapDate = TRU
       # returnDf[["julianDate"]] <- julian(date1, origin = as.Date("1970-01-01"))
       returnDf[["int_days"]] <- t.int
       # return(as.data.frame(returnDf))
+    } else{
+      # extract the date column, unlist to vector and maintain class
+      dateCol = names(df[unlist(lapply(df, function(x) inherits(x, c('Date', 'POSIXt'))))])
+      date1 = unname(do.call("c",unique(df[unlist(lapply(df, function(x) dateCoercible(x)))])))
+      # convert to julian dates. Origin is default "1970-01-01"
+      julian1 = julian(date1, origin = as.Date("1970-01-01"))
+
+      t = sort(union(julian1, NULL))
+
+      #Create a vector of durations (days) between successive sampling intervals:
+      t.int = diff(t)
+
+      # Do we want to create a wrap around interval for the last interval to complete a year?
+      if(wrapDate){
+        t.int = c(t.int, (364-sum(t.int)),NA)
+        date1 = c(date1, as.Date(date1[length(date1)])+t.int[length(t.int)-1])
+      }
+      returnDf = list()
+      returnDf[[dateCol]] <- as.Date(date1, origin = as.Date("1970-01-01"))
+      returnDf[["julianDate"]] <- julian(date1, origin = as.Date("1970-01-01"))
+      returnDf[["int_days"]] <- t.int
+      # return(as.data.frame(returnDf))
     }
   }
   if(is.null(envData)){
@@ -86,11 +108,29 @@ wrap_dates <- function(df = NULL, envData = NULL, dateCol = NULL, wrapDate = TRU
   } else{
     ## tests ##
     ### are all dates present in the envData object?
-    if(!all(unlist(unique(returnDf[[dateCol]]))) %in% unlist(unique(envData[[dateCol]]))){
+    if(!all(as.character(unlist(unique(returnDf[[dateCol]])))) %in% as.character(unlist(unique(envData[[dateCol]])))){
       stop("Error: all sampling dates are not present in envData object")
     }
     ## end tests ##
-    returnDf <- merge(returnDf, envData, by = eval(dateCol))
+    if(wrapDate){
+      envCols <-names(envData)[names(envData) %ni% c(dateCol,"julianDate","int_days")]
+      if(nrow(envData) == length(returnDf$dateID)){
+        envNAs <- sapply(envCols, FUN = function(x){
+          is.na(envData[nrow(envData), x])
+        })
+
+        envWrap <- cbind(data.frame(dateCol = returnDf[nrow(returnDf), dateCol]),
+                         sapply(envCols, FUN = function(x){
+                           envVec = unlist(envData[[x]])
+                           wrap = mean(c(envVec[1],envVec[length(envVec)]))
+                           return(wrap)
+                         } ))
+      }
+      # envData <- rbind(envData, NA)
+      # envData[nrow(envData), dateCol] <- returnDf[nrow(returnDf), dateCol]
+
+    }
+    returnDf <- merge(as.data.frame(returnDf), envData, by = eval(dateCol))
     return(as.data.frame(returnDf))
   }
 }

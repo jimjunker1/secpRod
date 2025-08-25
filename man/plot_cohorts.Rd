@@ -7,7 +7,11 @@
 plot_cohorts(
   taxaSampleListMass = NULL,
   param = c("length", "mass"),
-  massClass = "afdm_mg",
+  lengthValue = NULL,
+  massValue = "mass",
+  abunValue = NULL,
+  dateCol = "dateID",
+  repCol = "repID",
   ...
 )
 }
@@ -16,9 +20,17 @@ plot_cohorts(
 
 \item{param}{character. A string of 'length' or 'mass' that describes what measurement should be plotted}
 
-\item{...}{additional arguments passed to function}
+\item{lengthValue}{a character string idenfitying the column name with the length values / length classes}
 
-\item{massValue}{character. The column name of the mass measurement (e.g., afdm_mg, dm_mg, etc.)}
+\item{massValue}{character. The column name of the mass measurement (e.g., mass, afdmMg, etc.)}
+
+\item{abunValue}{a character string identifying the column name with the abundance values.}
+
+\item{dateCol}{a character string identifying the column name with the date information}
+
+\item{repCol}{a character string identifying the column name with the replicate information}
+
+\item{...}{additional arguments passed to function}
 }
 \value{
 returns a histogram of the plot of the relative frequency of size or mass classes for a single taxon for all sampling dates

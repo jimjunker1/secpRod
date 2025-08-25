@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(secpRod)
-
+library(ggdist)
 ```
 
 Currently, the analysis is fully implemented for multiple methods including: increment-summation,  size-frequency, production:biomass ratio, instantaneous growth rate. This walk through will outline a full example to calculate secondary production using the full workflow from sample data of length classes to the estimation of secondary production for whole communities. First, load the package with `library(secpRod)`.
@@ -67,6 +67,8 @@ chiroInfo$massForm <- "mass~(a*lengthClass^b)*percAsh"
 
 # finally, let's set the growth formula to the Huryn 1990
 chiroInfo$growthForm <- "g_d~0.051 - 0.068*log(lengthClass) + 0.006(tempC)"
+
+chiroInfo$wrap <- TRUE
 
 ```
 
@@ -127,9 +129,16 @@ chiroInfo$method <- 'igr'
 
 The function `calc_production()` is the workhorse function that will estimate population or community production.
 
-To apply it to our single species example, we input the sample information and taxa information along with how many bootstraps we would like, as:
+To apply it to our single species example, we input the sample information and taxa information along with how many bootstraps we would like. Further, because we are using the instantaneous growth method, we also provide some environmental data to inform the growth rates, in this case mean monthly temperature, `tempC`.
 
-```{r single-species-production,include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+```{r single-species-production,include=TRUE, echo=TRUE, warning=FALSE, message=FALSE, eval = FALSE}
+
+envData <- data.frame(
+  dateID = as.Date(unique(unlist(chiroMass$dateID))),
+  tempC = c(13.69,9.45,4.03,0.78,0.14,0.21,1.28,4,7.33,10.51)
+  )
+
+debugonce(calc_production)
 debugonce(wrap_dates)
 calc_production(
   taxaSampleListMass = chiroMass,
@@ -141,102 +150,103 @@ calc_production(
   massValue = 'mass',
   abunValue = 'n_m2',
   dateCol = 'dateID',
-  repCol = 'repID'
+  repCol = 'repID',
+  envData = envData
 )
 
 ```
 
-This will output a lot of information though it has a simple structure:
+<!-- This will output a lot of information though it has a simple structure: -->
 
-1) P.boots--vectors of bootstrapped estimates of annual production, annual biomass, and annual abundance.
+<!-- 1) P.boots--vectors of bootstrapped estimates of annual production, annual biomass, and annual abundance. -->
 
-2) taxaSummary--this comes in 'full' and 'short' versions. As you see above the full can be a lot. The 'short' is a paired down version of this
+<!-- 2) taxaSummary--this comes in 'full' and 'short' versions. As you see above the full can be a lot. The 'short' is a paired down version of this -->
 
-```{r single species short,include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+<!-- ```{r single species short,include=TRUE, echo=TRUE, warning=FALSE, message=FALSE} -->
 
-calc_production(
-  taxaSampleListMass = acentrellaMass,
-  infoCols = c(1:3),
-  taxaInfo = acentrellaInfo,
-  bootNum = 10,
-  wrap = TRUE,
-  taxaSummary = 'short'
-)
+<!-- calc_production( -->
+<!--   taxaSampleListMass = acentrellaMass, -->
+<!--   infoCols = c(1:3), -->
+<!--   taxaInfo = acentrellaInfo, -->
+<!--   bootNum = 10, -->
+<!--   wrap = TRUE, -->
+<!--   taxaSummary = 'short' -->
+<!-- ) -->
 
-```
+<!-- ``` -->
 
-You can also turn this off with 'none'.
+<!-- You can also turn this off with 'none'. -->
 
-### An example using the PB method
+<!-- ### An example using the PB method -->
 
-The pb method allows for multiple options to set the production to biomass ratio:
+<!-- The pb method allows for multiple options to set the production to biomass ratio: -->
 
-1) A single value. This will use the same value for each bootstrap sample. The variability is derived entirely from resampling the sample units (e.g. surbers).
+<!-- 1) A single value. This will use the same value for each bootstrap sample. The variability is derived entirely from resampling the sample units (e.g. surbers). -->
 
-2) a character string for a distribution from which to sample excluding the `n=`, such as `rnorm(mean = 5, sd = 0.5)`. The function will automatically sample `bootNum` values.
+<!-- 2) a character string for a distribution from which to sample excluding the `n=`, such as `rnorm(mean = 5, sd = 0.5)`. The function will automatically sample `bootNum` values. -->
 
-3) a numeric vector the same length as `bootNum`. This is a more explicit option to set all the values of pb that will be used. In the future, if the length $\neq$ `bootNum` an error will be returned for the taxa.
+<!-- 3) a numeric vector the same length as `bootNum`. This is a more explicit option to set all the values of pb that will be used. In the future, if the length $\neq$ `bootNum` an error will be returned for the taxa. -->
 
-```{r modify taxaInfo, include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+<!-- ```{r modify taxaInfo, include=TRUE, echo=TRUE, warning=FALSE, message=FALSE} -->
 
-acentrellaInfo$method = "pb"
-acentrellaInfo$pb = "runif(min = 3, max = 8)"
+<!-- acentrellaInfo$method = "pb" -->
+<!-- acentrellaInfo$pb = "runif(min = 3, max = 8)" -->
 
-calc_production(
-  taxaSampleListMass = acentrellaMass,
-  infoCols = c(1:3),
-  taxaInfo = acentrellaInfo,
-  bootNum = 10,
-  wrap = TRUE,
-  taxaSummary = 'short'
-)
+<!-- calc_production( -->
+<!--   taxaSampleListMass = acentrellaMass, -->
+<!--   infoCols = c(1:3), -->
+<!--   taxaInfo = acentrellaInfo, -->
+<!--   bootNum = 10, -->
+<!--   wrap = TRUE, -->
+<!--   taxaSummary = 'short' -->
+<!-- ) -->
 
-```
+<!-- ``` -->
 
-## Applying this to multiple taxa
+<!-- ## Applying this to multiple taxa -->
 
-The current internal code to do this with just `calc_production` is still buggy. But you can run production by splitting the full sampleInfo into a list by taxa and using `apply` or functions from the (`purrr` package)[https://purrr.tidyverse.org/]
+<!-- The current internal code to do this with just `calc_production` is still buggy. But you can run production by splitting the full sampleInfo into a list by taxa and using `apply` or functions from the (`purrr` package)[https://purrr.tidyverse.org/] -->
 
-The code below shows how to accomplish this. Again, only size frequency and pb are accepted currently.
+<!-- The code below shows how to accomplish this. Again, only size frequency and pb are accepted currently. -->
 
-```{r multi species, include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
-# load needed packages
-library(magrittr)
-library(purrr)
+<!-- ```{r multi species, include=TRUE, echo=TRUE, warning=FALSE, message=FALSE} -->
+<!-- # load needed packages -->
+<!-- library(magrittr) -->
+<!-- library(purrr) -->
 
-# The sampleInfo is already a list by taxonID
-str(wbtData[['sampleInfo']], list.len = 5)
+<!-- # The sampleInfo is already a list by taxonID -->
+<!-- str(wbtData[['sampleInfo']], list.len = 5) -->
 
-# if you have a large data frame with all taxa the code below shows how to do this:
-## install a package to split into a named_list
-# devtools::install_github('jimjunker1/junkR')
-# library(junkR)
-## Convert to data frame
-# sampleInfoDf = wbtData[['sampleInfo']] %>% bind_rows
-## Convert back to named list split by taxonID
-# sampleInfoList = sampleInfoDf %>% junkR::named_group_split(taxonID)
+<!-- # if you have a large data frame with all taxa the code below shows how to do this: -->
+<!-- ## install a package to split into a named_list -->
+<!-- # devtools::install_github('jimjunker1/junkR') -->
+<!-- # library(junkR) -->
+<!-- ## Convert to data frame -->
+<!-- # sampleInfoDf = wbtData[['sampleInfo']] %>% bind_rows -->
+<!-- ## Convert back to named list split by taxonID -->
+<!-- # sampleInfoList = sampleInfoDf %>% junkR::named_group_split(taxonID) -->
 
-sampleInfoList = wbtData[['sampleInfo']]
+<!-- sampleInfoList = wbtData[['sampleInfo']] -->
 
-sampleInfoListMass = sampleInfoList %>%
-  purrr::map(
-    ~convert_length_to_mass(.x,
-                            taxaInfo = taxaInfo)
-  )
+<!-- sampleInfoListMass = sampleInfoList %>% -->
+<!--   purrr::map( -->
+<!--     ~convert_length_to_mass(.x, -->
+<!--                             taxaInfo = taxaInfo) -->
+<!--   ) -->
 
-fullProduction = sampleInfoListMass %>%
-  purrr::map2(., list(taxaInfo),
-                     ~calc_production(.x,
-                                      infoCols = c(1:3),
-                                      taxaInfo = .y,
-                                      bootNum = 10,
-                                      wrap = TRUE,
-                                      taxaSummary = 'short'
-                                      )
-                     )
+<!-- fullProduction = sampleInfoListMass %>% -->
+<!--   purrr::map2(., list(taxaInfo), -->
+<!--                      ~calc_production(.x, -->
+<!--                                       infoCols = c(1:3), -->
+<!--                                       taxaInfo = .y, -->
+<!--                                       bootNum = 10, -->
+<!--                                       wrap = TRUE, -->
+<!--                                       taxaSummary = 'short' -->
+<!--                                       ) -->
+<!--                      ) -->
 
-str(fullProduction, list.len = 5)
+<!-- str(fullProduction, list.len = 5) -->
 
-```
+<!-- ``` -->
 
 ## References

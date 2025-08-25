@@ -7,6 +7,7 @@
 igr_prod.sample(
   df = NULL,
   dateDf = NULL,
+  growthDf = NULL,
   lengthValue = NULL,
   massValue = "mass",
   abunValue = "density",
