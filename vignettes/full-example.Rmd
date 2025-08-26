@@ -28,7 +28,7 @@ The package comes with a number of data sets of macroinvertebrate species and co
 
 2) a full community data set from @junker2014 that can be accessed with `data("wbtData")`
 
-The simulated data set is a single data frame of artificially sampled size-frequency data through time. This is used in the ("A few simple examples" vignette)[https://jimjunker1.github.io/secpRod/articles/simple-example.html]. Here we walk through the full community data set to showcase the full workflow of \code{secpRod}.
+The simulated data set is a single data frame of artificially sampled size-frequency data through time. This is used in the ["A few simple examples" vignette](https://jimjunker1.github.io/secpRod/articles/simple-example.html). Here we walk through the full community data set to showcase the full workflow of \code{secpRod}.
 
 First, load the data set with:
 
@@ -51,7 +51,7 @@ head(chironomid, 10)
 
 ```
 
-The data contain all the replicates of density and body length distributions in long format. This format differs from the simulated data in ("A few simple examples" vignette)[https://jimjunker1.github.io/secpRod/articles/simple-example.html], in three specific ways to showcase the flexibility of data inputs: 1) the date information, `dateID` is input as a POSIX object, 2) the length and density information, `lengthClass` and `n_m2` are non-default column names, and 3) there is no individual mass values associated with the size classes. First, let's load walk through a single taxonomic group. First let's modify the `taxaInfo` associated with this group. 
+The data contain all the replicates of density and body length distributions in long format. This format differs from the simulated data in ["A few simple examples" vignette](https://jimjunker1.github.io/secpRod/articles/simple-example.html), in three specific ways to showcase the flexibility of data inputs: 1) the date information, `dateID` is input as a POSIX object, 2) the length and density information, `lengthClass` and `n_m2` are non-default column names, and 3) there is no individual mass values associated with the size classes. First, let's load walk through a single taxonomic group. First let's modify the `taxaInfo` associated with this group. 
 
 ```{r chiro LM form, echo=TRUE}
 
