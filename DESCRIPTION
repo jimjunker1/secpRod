@@ -12,7 +12,6 @@ Description: A set of functions to move from raw data to estimates of animal pop
     estimates and variability around estimates are calculated using a variation of the bootstrap 
     approach outlined by Huryn and Benke in Lamberti and Castillo "Methods in Stream Ecology".
 Imports:
-  graphics,
   formula.tools,
   magrittr,
   tidyr,
@@ -29,7 +28,7 @@ Suggests:
     gridExtra,
     rmarkdown,
     tibble
-License: MIT + file LICENSE
+License: MIT
 VignetteBuilder: knitr
 Encoding: UTF-8
 LazyData: true
