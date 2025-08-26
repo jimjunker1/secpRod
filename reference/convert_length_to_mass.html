@@ -21,6 +21,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Get Started</h6></li>
     <li><a class="dropdown-item" href="../articles/simple-example.html">A few simple examples</a></li>
+    <li><a class="dropdown-item" href="../articles/full-example.html">A full example</a></li>
     <li><a class="dropdown-item" href="../articles/sampling-simulation.html">Simulating the sampling of populations</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -48,6 +49,8 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">convert_length_to_mass</span><span class="op">(</span></span>
 <span>  taxaSampleList <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  taxaInfo <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  lengthValue <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  massValue <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  reduce <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -58,15 +61,23 @@
 
 
 <dl><dt id="arg-taxasamplelist">taxaSampleList<a class="anchor" aria-label="anchor" href="#arg-taxasamplelist"></a></dt>
-<dd><p>data.frame in long format for a single taxa. The data.frame should contain a species identifier column `taxonID` and a column of length bin categories `lengthClass`. `lengthClass` values must be numeric or coercible.</p></dd>
+<dd><p>data.frame in long format for a single taxa. The data.frame should contain a species identifier column `taxonID` and a column of length bin categories lengthValue.</p></dd>
 
 
 <dt id="arg-taxainfo">taxaInfo<a class="anchor" aria-label="anchor" href="#arg-taxainfo"></a></dt>
 <dd><p>a data.frame of the information to convert length to mass for all taxa. The taxa specified in `taxaSampleList` will be subset from here. This data.frame must contain a `taxonID` column, the length-to-mass equation formula, `massForm`, which must contain `lengthClass` as a variable (e.g., `afdm_mg~a*lengthClass^b`). Additional columns are necessary based on the length-mass formula. All other non-`lengthClass` variables on the right hand side (RHS) must have unique columns named the variable name. For example, the above formula structure, `afdm_mg~a*lengthClass^b`, the RHS is `a*lengthClass^b`. `lengthClass` is a required column, but optionally necessary columns are `a` and `b` for the other variables. The formula will be parsed and species-specific `a` and `b` coefficients will be inserted for conversion.</p></dd>
 
 
+<dt id="arg-lengthvalue">lengthValue<a class="anchor" aria-label="anchor" href="#arg-lengthvalue"></a></dt>
+<dd><p>a character string identifying the column name for the length class. The data should be numeric or coercible</p></dd>
+
+
+<dt id="arg-massvalue">massValue<a class="anchor" aria-label="anchor" href="#arg-massvalue"></a></dt>
+<dd><p>a character string to name the mass variable. This should not contain any punctuation (e.g., .,_,-, etc.).</p></dd>
+
+
 <dt id="arg-reduce">reduce<a class="anchor" aria-label="anchor" href="#arg-reduce"></a></dt>
-<dd><p>logical. If TRUE (default) the mass column will be added to `taxaSampleList`. The name of the mass column will be parsed from the left hand side (LHS) of the `massForm` provided in `taxaInfo`. For example, in `afdm_mg~a*lengthClass^b` the mass column will be named `afdm_mg`. This data.frame is returned if reduce == TRUE</p></dd>
+<dd><p>logical. If TRUE (default) the mass column will be added to `taxaSampleList`. The name of the mass column will be parsed from the left hand side (LHS) of the `massForm` provided in `taxaInfo`. For example, in `mass~a*lengthValue^b` the mass column will be named based on the massValue column. This data.frame is returned if reduce == TRUE</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>

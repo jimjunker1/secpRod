@@ -21,6 +21,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Get Started</h6></li>
     <li><a class="dropdown-item" href="../articles/simple-example.html">A few simple examples</a></li>
+    <li><a class="dropdown-item" href="../articles/full-example.html">A full example</a></li>
     <li><a class="dropdown-item" href="../articles/sampling-simulation.html">Simulating the sampling of populations</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -45,7 +46,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">wrap_dates</span><span class="op">(</span>df <span class="op">=</span> <span class="cn">NULL</span>, dateCol <span class="op">=</span> <span class="cn">NULL</span>, wrapDate <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">wrap_dates</span><span class="op">(</span>df <span class="op">=</span> <span class="cn">NULL</span>, envData <span class="op">=</span> <span class="cn">NULL</span>, dateCol <span class="op">=</span> <span class="cn">NULL</span>, wrapDate <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -54,6 +55,10 @@
 
 <dl><dt id="arg-df">df<a class="anchor" aria-label="anchor" href="#arg-df"></a></dt>
 <dd><p>a data.frame of long format returned from <code><a href="convert_length_to_mass.html">convert_length_to_mass()</a></code> function</p></dd>
+
+
+<dt id="arg-envdata">envData<a class="anchor" aria-label="anchor" href="#arg-envdata"></a></dt>
+<dd><p>(optional) a data.frame of the environmental data. The number of rows should be the same as the number of sampling dates.</p></dd>
 
 
 <dt id="arg-datecol">dateCol<a class="anchor" aria-label="anchor" href="#arg-datecol"></a></dt>

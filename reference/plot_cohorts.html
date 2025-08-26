@@ -21,6 +21,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Get Started</h6></li>
     <li><a class="dropdown-item" href="../articles/simple-example.html">A few simple examples</a></li>
+    <li><a class="dropdown-item" href="../articles/full-example.html">A full example</a></li>
     <li><a class="dropdown-item" href="../articles/sampling-simulation.html">Simulating the sampling of populations</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -48,7 +49,11 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_cohorts</span><span class="op">(</span></span>
 <span>  taxaSampleListMass <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  param <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"length"</span>, <span class="st">"mass"</span><span class="op">)</span>,</span>
-<span>  massClass <span class="op">=</span> <span class="st">"afdm_mg"</span>,</span>
+<span>  lengthValue <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  massValue <span class="op">=</span> <span class="st">"mass"</span>,</span>
+<span>  abunValue <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  dateCol <span class="op">=</span> <span class="st">"dateID"</span>,</span>
+<span>  repCol <span class="op">=</span> <span class="st">"repID"</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -65,8 +70,24 @@
 <dd><p>character. A string of 'length' or 'mass' that describes what measurement should be plotted</p></dd>
 
 
-<dt id="arg-massclass">massClass<a class="anchor" aria-label="anchor" href="#arg-massclass"></a></dt>
-<dd><p>character. The column name of the mass measurement (e.g., afdm_mg, dm_mg, etc.)</p></dd>
+<dt id="arg-lengthvalue">lengthValue<a class="anchor" aria-label="anchor" href="#arg-lengthvalue"></a></dt>
+<dd><p>a character string idenfitying the column name with the length values / length classes</p></dd>
+
+
+<dt id="arg-massvalue">massValue<a class="anchor" aria-label="anchor" href="#arg-massvalue"></a></dt>
+<dd><p>character. The column name of the mass measurement (e.g., mass, afdmMg, etc.)</p></dd>
+
+
+<dt id="arg-abunvalue">abunValue<a class="anchor" aria-label="anchor" href="#arg-abunvalue"></a></dt>
+<dd><p>a character string identifying the column name with the abundance values.</p></dd>
+
+
+<dt id="arg-datecol">dateCol<a class="anchor" aria-label="anchor" href="#arg-datecol"></a></dt>
+<dd><p>a character string identifying the column name with the date information</p></dd>
+
+
+<dt id="arg-repcol">repCol<a class="anchor" aria-label="anchor" href="#arg-repcol"></a></dt>
+<dd><p>a character string identifying the column name with the replicate information</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>

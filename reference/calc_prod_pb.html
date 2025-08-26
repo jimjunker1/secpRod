@@ -21,6 +21,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Get Started</h6></li>
     <li><a class="dropdown-item" href="../articles/simple-example.html">A few simple examples</a></li>
+    <li><a class="dropdown-item" href="../articles/full-example.html">A full example</a></li>
     <li><a class="dropdown-item" href="../articles/sampling-simulation.html">Simulating the sampling of populations</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -50,9 +51,9 @@
 <span>  taxaInfo <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  bootNum <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  dateDf <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  taxaSummary <span class="op">=</span> <span class="st">"full"</span>,</span>
+<span>  taxaSummary <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  wrap <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  massValue <span class="op">=</span> <span class="st">"afdm_mg"</span>,</span>
+<span>  massValue <span class="op">=</span> <span class="st">"mass"</span>,</span>
 <span>  abunValue <span class="op">=</span> <span class="st">"density"</span>,</span>
 <span>  dateCol <span class="op">=</span> <span class="st">"dateID"</span>,</span>
 <span>  repCol <span class="op">=</span> <span class="st">"repID"</span>,</span>
@@ -82,7 +83,7 @@
 
 
 <dt id="arg-taxasummary">taxaSummary<a class="anchor" aria-label="anchor" href="#arg-taxasummary"></a></dt>
-<dd><p>string of 'short', 'full', or 'none'. What type of summary information should be returned.</p></dd>
+<dd><p>logical. If TRUE (default) the taxaSummary will be with annual summary information will be returned.</p></dd>
 
 
 <dt id="arg-wrap">wrap<a class="anchor" aria-label="anchor" href="#arg-wrap"></a></dt>
@@ -90,19 +91,27 @@
 
 
 <dt id="arg-massvalue">massValue<a class="anchor" aria-label="anchor" href="#arg-massvalue"></a></dt>
-<dd><p>string. What is the mass value and units of the production</p></dd>
+<dd><p>string of the column name containing the mass measurement</p></dd>
+
+
+<dt id="arg-abunvalue">abunValue<a class="anchor" aria-label="anchor" href="#arg-abunvalue"></a></dt>
+<dd><p>string of the column name containing the abundance or density measurement</p></dd>
+
+
+<dt id="arg-datecol">dateCol<a class="anchor" aria-label="anchor" href="#arg-datecol"></a></dt>
+<dd><p>string of the column name containing the date information. This can be either a recognized date object (e.g., Date, POSIX) or numeric.</p></dd>
+
+
+<dt id="arg-repcol">repCol<a class="anchor" aria-label="anchor" href="#arg-repcol"></a></dt>
+<dd><p>string of the column name containing the replicate information</p></dd>
 
 
 <dt id="arg-bootlist">bootList<a class="anchor" aria-label="anchor" href="#arg-bootlist"></a></dt>
-<dd><p>list of bootstraps data sets from <code><a href="prep_boots.html">prep_boots()</a></code>.</p></dd>
+<dd><p>list. This is the bootstrapped samples passed from <code><a href="calc_production.html">calc_production()</a></code></p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>additional arguments to be passed to the function</p></dd>
-
-
-<dt id="arg-masslabel">massLabel<a class="anchor" aria-label="anchor" href="#arg-masslabel"></a></dt>
-<dd><p>string. What label should the output units be. It is possible this will default to 'massValue' in the future.</p></dd>
 
 </dl></div>
     <div class="section level2">
