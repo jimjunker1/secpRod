@@ -92,10 +92,9 @@ Cross (2014)</span> that can be accessed with
 <code>data("wbtData")</code></p></li>
 </ol>
 <p>The simulated data set is a single data frame of artificially sampled
-size-frequency data through time. This is used in the (“A few simple
-examples” vignette)[<a href="https://jimjunker1.github.io/secpRod/articles/simple-example.html" class="uri">https://jimjunker1.github.io/secpRod/articles/simple-example.html</a>].
-Here we walk through the full community data set to showcase the full
-workflow of .</p>
+size-frequency data through time. This is used in the <a href="https://jimjunker1.github.io/secpRod/articles/simple-example.html">“A
+few simple examples” vignette</a>. Here we walk through the full
+community data set to showcase the full workflow of .</p>
 <p>First, load the data set with:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
@@ -127,14 +126,15 @@ single species.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> Chironomidae     1 2008-07-17 <span style="color: #949494;">00:00:00</span>         9     0</span></span></code></pre></div>
 <p>The data contain all the replicates of density and body length
 distributions in long format. This format differs from the simulated
-data in (“A few simple examples” vignette)[<a href="https://jimjunker1.github.io/secpRod/articles/simple-example.html" class="uri">https://jimjunker1.github.io/secpRod/articles/simple-example.html</a>],
-in three specific ways to showcase the flexibility of data inputs: 1)
-the date information, <code>dateID</code> is input as a POSIX object, 2)
-the length and density information, <code>lengthClass</code> and
-<code>n_m2</code> are non-default column names, and 3) there is no
-individual mass values associated with the size classes. First, let’s
-load walk through a single taxonomic group. First let’s modify the
-<code>taxaInfo</code> associated with this group.</p>
+data in <a href="https://jimjunker1.github.io/secpRod/articles/simple-example.html">“A
+few simple examples” vignette</a>, in three specific ways to showcase
+the flexibility of data inputs: 1) the date information,
+<code>dateID</code> is input as a POSIX object, 2) the length and
+density information, <code>lengthClass</code> and <code>n_m2</code> are
+non-default column names, and 3) there is no individual mass values
+associated with the size classes. First, let’s load walk through a
+single taxonomic group. First let’s modify the <code>taxaInfo</code>
+associated with this group.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">taxaInfo</span> <span class="op">=</span> <span class="va">wbtData</span><span class="op">[[</span><span class="st">'taxaInfo'</span><span class="op">]</span><span class="op">]</span></span>
