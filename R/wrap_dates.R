@@ -33,7 +33,7 @@ wrap_dates <- function(df = NULL, envData = NULL, dateCol = NULL, wrapDate = TRU
       returnDf[[dateCol]] <- as.Date(date1, origin = as.Date("1970-01-01"))
       returnDf[["julianDate"]] <- julian(date1, origin = as.Date("1970-01-01"))
       returnDf[["int_days"]] <- t.int
-      # return(as.data.frame(returnDf))
+      returnDf <- as.data.frame(returnDf)
       # check if any of the columns are coercible to date format
     } else if(!any(unlist(lapply(df, function(x) dateCoercible(x))))){
       stop("`dateCol` is not a date or coercible.")
@@ -58,7 +58,7 @@ wrap_dates <- function(df = NULL, envData = NULL, dateCol = NULL, wrapDate = TRU
       returnDf[[dateCol]] <- as.Date(date1, origin = as.Date("1970-01-01"))
       returnDf[["julianDate"]] <- julian(date1, origin = as.Date("1970-01-01"))
       returnDf[["int_days"]] <- t.int
-      # return(as.data.frame(returnDf))
+      returnDf <- as.data.frame(returnDf)
     }
   } else{
     if('numeric' %in% class(df[[dateCol]])){
@@ -78,7 +78,7 @@ wrap_dates <- function(df = NULL, envData = NULL, dateCol = NULL, wrapDate = TRU
       returnDf[[dateCol]] <- t
       # returnDf[["julianDate"]] <- julian(date1, origin = as.Date("1970-01-01"))
       returnDf[["int_days"]] <- t.int
-      # return(as.data.frame(returnDf))
+      returnDf <- as.data.frame(returnDf)
     } else{
       # extract the date column, unlist to vector and maintain class
       dateCol = names(df[unlist(lapply(df, function(x) inherits(x, c('Date', 'POSIXt'))))])
@@ -100,37 +100,46 @@ wrap_dates <- function(df = NULL, envData = NULL, dateCol = NULL, wrapDate = TRU
       returnDf[[dateCol]] <- as.Date(date1, origin = as.Date("1970-01-01"))
       returnDf[["julianDate"]] <- julian(date1, origin = as.Date("1970-01-01"))
       returnDf[["int_days"]] <- t.int
-      # return(as.data.frame(returnDf))
+      returnDf <- as.data.frame(returnDf)
     }
   }
   if(is.null(envData)){
-    return(as.data.frame(returnDf))
+    return(returnDf)
   } else{
-    ## tests ##
-    ### are all dates present in the envData object?
-    if(!all(as.character(unlist(unique(returnDf[[dateCol]])))) %in% as.character(unlist(unique(envData[[dateCol]])))){
-      stop("Error: all sampling dates are not present in envData object")
-    }
-    ## end tests ##
+
     if(wrapDate){
       envCols <-names(envData)[names(envData) %ni% c(dateCol,"julianDate","int_days")]
-      if(nrow(envData) == length(returnDf$dateID)){
+      # does the environmental data have the same length as the wrapped data
+      if(nrow(envData) == length(returnDf[[dateCol]])){
+        # if same length, is the last row just NA?
         envNAs <- sapply(envCols, FUN = function(x){
           is.na(envData[nrow(envData), x])
         })
-
-        envWrap <- cbind(data.frame(dateCol = returnDf[nrow(returnDf), dateCol]),
-                         sapply(envCols, FUN = function(x){
-                           envVec = unlist(envData[[x]])
-                           wrap = mean(c(envVec[1],envVec[length(envVec)]))
-                           return(wrap)
-                         } ))
+        # if yes, wrap and average the first and last sampling date values.
+        if(sum(envNAs) > 0){
+          for(i in 1:length(envCols)){
+            input <- (envData[evnCols[i], 1] + envData[envCols[i],(nrow(envData)-1)])/2
+            envData[envCols[i], nrow(envData)] <- input
+          }
+          returnDf <- merge(returnDf, envData, by = dateCol, all.x = TRUE)
+        }
+      } else if(nrow(envData) == (length(returnDf[[dateCol]])-1)){
+        envWrap <- c()
+        envWrap[[dateCol]] <- returnDf[nrow(returnDf), dateCol]
+        for(i in 1:length(envCols)){
+          input <- (envData[1,envCols[i]] + envData[(nrow(envData)), envCols[i]])/2
+          envWrap[[envCols[i]]] <- input
+        }
+        returnDf <- merge(returnDf, as.data.frame(envData), by = dateCol, all.x = TRUE)
       }
-      # envData <- rbind(envData, NA)
-      # envData[nrow(envData), dateCol] <- returnDf[nrow(returnDf), dateCol]
-
-    }
-    returnDf <- merge(as.data.frame(returnDf), envData, by = eval(dateCol))
-    return(as.data.frame(returnDf))
+     }
   }
+  ## tests ##
+  ### are all dates present in the envData object?
+  # if(!all(as.character(unlist(unique(returnDf[[dateCol]])))) %in% as.character(unlist(unique(envData[[dateCol]])))){
+  #   stop("Error: all sampling dates are not present in envData object")
+  # }
+  ## end tests ##
+  # returnDf <- merge(returnDf, envData, by = eval(dateCol))
+  return(as.data.frame(returnDf))
 }

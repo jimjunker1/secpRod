@@ -19,13 +19,10 @@
 #' @returns returns a list of 2 objects:
 #' @returns P.boots: the boostrapped estimates of production, abundance, and biomass.
 #' @returns taxaSummary: is the summary of the sample production, abundance, and biomass
-#' @importFrom stats formula
+#' @importFrom stats formula aggregate
 #' @importFrom formula.tools lhs rhs
-#' @importFrom rlang :=
-#' @importFrom stats aggregate
-#' @importFrom stats sd
-#' @importFrom stats setNames
-#' @importFrom stats as.formula
+#' @importFrom rlang := sym
+#' @importFrom tidyr unnest
 #' @export
 
 calc_prod_igr <- function(taxaSampleListMass= NULL,
@@ -66,13 +63,16 @@ calc_prod_igr <- function(taxaSampleListMass= NULL,
   # check that all growth variables are present in the data
   allDataVars <- c(names(taxaSampleListMass),names(dateDf))
   anyMissing <- allGrowthCharVars %ni% allDataVars
-  if(sum(anyMissing) > 0) stop(paste0("Error: ",paste(allGrowthCharVars[!anyMissing], collapse = ",")," are missing from sample info and environmental data."))
+  if(sum(anyMissing) > 0) stop(paste0("Error: ",paste(allGrowthCharVars[anyMissing], collapse = ",")," are missing from sample info and environmental data."))
   ## end tests ##
   speciesName = unique(taxaSampleListMass$taxonID)
   ## function prep ##
   ### create a data.frame of growth rates by size and date
-  sizeDateAggForm <- paste0(massValue,"~",dateCol)
-  sizesDf <- unnest(stats::aggregate(stats::formula(sizeDateAggForm), data = taxaSampleListMass, FUN = unique), all_of(massValue))
+  ### remove all size classes with density of 0
+  taxaSampleListMassNOzeros <- dplyr::filter(taxaSampleListMass, !!rlang::sym(abunValue) > 0)
+  sizeValue <- allGrowthCharVars[allGrowthCharVars %in% c(lengthValue, massValue)]
+  sizeDateAggForm <- paste0(sizeValue,"~",dateCol)
+  sizesDf <- tidyr::unnest(stats::aggregate(stats::formula(sizeDateAggForm), data = taxaSampleListMassNOzeros, FUN = unique), cols = !!rlang::sym(sizeValue))
   ### merge with dateDf to get date, interval length and envData
   growthFormula <- stats::as.formula(paste(growthLHS,"~",charRHS, collapse = " "))
   growthDf <- merge(dateDf, sizesDf, by = dateCol)
@@ -82,6 +82,11 @@ calc_prod_igr <- function(taxaSampleListMass= NULL,
     df = taxaSampleListMass,
     dateDf = dateDf,
     growthDf = growthDf,
+    lengthValue = lengthValue,
+    massValue = massValue,
+    abunValue = abunValue,
+    dateCol = dateCol,
+    repCol = repCol,
     wrap = wrap
   )
 

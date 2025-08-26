@@ -324,9 +324,7 @@ envData <- data.frame(
   tempC = rep(20, length(unique(singleCohortSim$dateID)))
 )
 
-debugonce(calc_production)
-debugonce(calc_prod_igr)
-debugonce(igr_prod.sample)
+debugonce(wrap_dates)
 set.seed(1312)
 calc_production(
   taxaSampleListMass = singleCohortSim,

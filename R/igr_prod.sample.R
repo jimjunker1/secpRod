@@ -50,9 +50,16 @@ igr_prod.sample <- function(df = NULL,
   # get the detilas of first and final dates with samples
    firstLast <- dateDf[c(1,(nrow(dateDf)-1)),]
    wrapSamples <- dplyr::filter(df, df[[dateCol]] %in% unique(unlist(firstLast[[dateCol]])))
+   wrapSamples$taxonID <- NULL
+   wrapForm_1 <- paste0(".~",dateCol,"+",lengthValue,"+",massValue)
+   wrapAgg_first <- stats::aggregate(formula(wrapForm_1), data = wrapSamples, na.rm = TRUE,  FUN = mean)
+   wrapAgg_first[[dateCol]] <- NULL
+   wrapForm_2 <- gsub(dateCol, "",wrapForm_1)
+   wrapAgg_second <- stats::aggregate(formula(wrapForm_2), data = wrapAgg_first, na.rm = TRUE, FUN = mean)
   }
   # merge the df with the growthDf and calculate size-specific production
-  df <- merge(df, growthDf, by = c(dateCol, massValue))
+  # find all columns in both growthDf and df
+  df <- merge(df, growthDf)#, by = c(dateCol, massValue,lengthValue))
   df$production <- df[["biomass"]] * df[["g_d"]] * df[["int_days"]]
   dfRepAgg <- stats::aggregate(formula(paste0("production~",dateCol,"+",repCol)), data = df, sum, na.rm = TRUE)
   dfDateAgg <- stats::aggregate(formula(paste0("production~",dateCol)), data = dfRepAgg, mean)

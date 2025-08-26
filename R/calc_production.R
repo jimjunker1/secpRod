@@ -43,6 +43,10 @@ calc_production = function(taxaSampleListMass = NULL,
     badMethod = unique(unlist(taxaInfo$method)[which(unlist(taxaInfo$method) %ni% c('is','sf','pb','igr'))])
     stop(paste0("Error: ",badMethod," is not a recognized method. Available values are 'is','sf','pb','igr'. See documentation for more information."))
   }
+  # is the date object a POSIX? convert to Date for merging.
+  if(inherits(taxaSampleListMass[[dateCol]], c("POSIXt"))){
+    taxaSampleListMass[[dateCol]] <- as.Date(taxaSampleListMass[[dateCol]])
+  }
   ### end tests ###
   # prep size-abundance bootstraps. these are fixed across methods if multiple methods passed for comparisons
   bootList = vector('list', length = bootNum)

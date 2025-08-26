@@ -66,7 +66,7 @@ chiroInfo$g.a <- NULL
 chiroInfo$massForm <- "mass~(a*lengthClass^b)*percAsh"
 
 # finally, let's set the growth formula to the Huryn 1990
-chiroInfo$growthForm <- "g_d~0.051 - 0.068*log(lengthClass) + 0.006(tempC)"
+chiroInfo$growthForm <- "g_d~0.051 - 0.068*log(lengthClass) + 0.006*tempC"
 
 chiroInfo$wrap <- TRUE
 
@@ -110,7 +110,6 @@ These figures can be helpful for identifying cohort structures and getting ballp
 We can also plot this taxa using mass as the size variable:
 
 ```{r plot cohort masses, include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
-debugonce(plot_cohorts)
 plot_cohorts(taxaSampleListMass = chiroMass,
              param = 'mass',
              massValue = 'mass',
@@ -138,8 +137,8 @@ envData <- data.frame(
   tempC = c(13.69,9.45,4.03,0.78,0.14,0.21,1.28,4,7.33,10.51)
   )
 
-debugonce(calc_production)
-debugonce(wrap_dates)
+debugonce(igr_prod.sample)
+# debugonce(wrap_dates)
 calc_production(
   taxaSampleListMass = chiroMass,
   taxaInfo = chiroInfo,
