@@ -13,8 +13,8 @@
 #' @param full logical. should the full summary be returned with mean and sd
 #' @param ... additional arguments passed to function
 #' @return list object with annual production, mean biomass, and mean abundance of the sample
-#' @importFrom stats filter
-#' @importFrom stats aggregate
+#' @importFrom stats filter aggregate na.omit
+#' @importFrom utils tail
 #' @export
 sf_prod.sample <- function(df = NULL,
                            sizesDf = NULL,

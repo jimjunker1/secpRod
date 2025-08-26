@@ -19,7 +19,7 @@
 #' @returns returns a list of 2 objects:
 #' @returns P.boots: the boostrapped estimates of production, abundance, and biomass.
 #' @returns taxaSummary: is the summary of the sample production, abundance, and biomass
-#' @importFrom stats formula aggregate
+#' @importFrom stats formula aggregate na.omit
 #' @importFrom formula.tools lhs rhs
 #' @importFrom rlang := sym
 #' @importFrom tidyr unnest
@@ -40,6 +40,8 @@ calc_prod_igr <- function(taxaSampleListMass= NULL,
                          ...) {
 
   ## tests ##
+  speciesName = unique(taxaSampleListMass$taxonID)
+
   # make sure all the variables in the growth formula are in dateDf or taxaSampleListMass
   ## remove white space to each parsing
   growthFormula = stats::formula(gsub(" ","", taxaInfo$growthForm))
@@ -65,7 +67,6 @@ calc_prod_igr <- function(taxaSampleListMass= NULL,
   anyMissing <- allGrowthCharVars %ni% allDataVars
   if(sum(anyMissing) > 0) stop(paste0("Error: ",paste(allGrowthCharVars[anyMissing], collapse = ",")," are missing from sample info and environmental data."))
   ## end tests ##
-  speciesName = unique(taxaSampleListMass$taxonID)
   ## function prep ##
   ### create a data.frame of growth rates by size and date
   ### remove all size classes with density of 0
@@ -77,6 +78,9 @@ calc_prod_igr <- function(taxaSampleListMass= NULL,
   growthFormula <- stats::as.formula(paste(growthLHS,"~",charRHS, collapse = " "))
   growthDf <- merge(dateDf, sizesDf, by = dateCol)
   growthDf <- dplyr::mutate(growthDf, !!growthLHS := !!growthRHS)
+  if(!is.null(taxaInfo$min.growth)){
+    growthDf[growthDf$g_d < 0, "g_d"] <- taxaInfo$min.growth
+  }
   # ### make a list of key variables to pass to sample function
   funcList = list(
     df = taxaSampleListMass,
@@ -113,16 +117,32 @@ calc_prod_igr <- function(taxaSampleListMass= NULL,
     return(assign(speciesName, list(P.boots = P.samp,
                                     taxaSummary = taxaSummary)))
   }
+  if(is.null(lengthValue)){
+    P.boots = mapply(FUN = igr_prod.sample,
+                     df = bootList,
+                     # lengthValue = lengthValue,
+                     massValue = massValue,
+                     abunValue = abunValue,
+                     dateCol = dateCol,
+                     repCol = repCol,
+                     wrap = wrap,
+                     full = FALSE,
+                     MoreArgs = list(dateDf = dateDf,
+                                     growthDf = growthDf))
 
+  } else{
   P.boots = mapply(FUN = igr_prod.sample,
                    df = bootList,
+                   lengthValue = lengthValue,
                    massValue = massValue,
                    abunValue = abunValue,
                    dateCol = dateCol,
                    repCol = repCol,
                    wrap = wrap,
                    full = FALSE,
-                   MoreArgs = list(growthDf = growthDf))
+                   MoreArgs = list(dateDf = dateDf,
+                                   growthDf = growthDf))
+  }
 
   #### create SAMPLE information to export as summary ####
   sampSummary = create_sample_summary(df = taxaSampleListMass,

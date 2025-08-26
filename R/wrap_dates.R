@@ -118,7 +118,7 @@ wrap_dates <- function(df = NULL, envData = NULL, dateCol = NULL, wrapDate = TRU
         # if yes, wrap and average the first and last sampling date values.
         if(sum(envNAs) > 0){
           for(i in 1:length(envCols)){
-            input <- (envData[evnCols[i], 1] + envData[envCols[i],(nrow(envData)-1)])/2
+            input <- (envData[envCols[i], 1] + envData[envCols[i],(nrow(envData)-1)])/2
             envData[envCols[i], nrow(envData)] <- input
           }
           returnDf <- merge(returnDf, envData, by = dateCol, all.x = TRUE)

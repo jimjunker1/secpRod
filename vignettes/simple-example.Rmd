@@ -43,7 +43,7 @@ data('singleCohortSim', package = 'secpRod')
 
 ## Introduction 
 
-The `secpRod` package provides a number of methods to calculate secondary production of populations, both those with clear cohort structure and those where cohort structure is not possible to discern. First, we walk through the available methods using simulated populations that mimic the data structure of real sampling regimes. The parameters to create these simulated populations is outlined in companion article, vignette("Simulating the sampling of populations"). These simulated populations skip some of the steps of moving from initial sampling processes (e.g., length to mass conversions, sample subsetting, etc.) that are often part of the process. More complete examples that showcase helper functions within `secpRod` that deal with these processes can be found below in \@ref(more-complete-examples). Here, we just showcase the secondary production methods available.
+The `secpRod` package provides a number of methods to calculate secondary production of populations, both those with clear cohort structure and those where cohort structure is not possible to discern. First, we walk through the available methods using simulated populations that mimic the data structure of real sampling regimes. The parameters to create these simulated populations is outlined in companion article, vignette("Simulating the sampling of populations"). These simulated populations skip some of the steps of moving from initial sampling processes (e.g., length to mass conversions, sample subsetting, etc.) that are often part of the process. More complete examples that showcase helper functions within `secpRod` that deal with these processes can be found below in the ["A full example" vignette](). Here, we just showcase the secondary production methods available.
 
 The methods within the package use two main objects, `sampleInfo` the sample-level information (e.g., site, date , replicate) and density and length or mass. An additional dataframe, `taxaInfo` that houses species-specific information such as length to mass conversions, and method specific information such as cohort production interval estimates (CPIs), production:biomass ratios (PBs), and growth equations. The columns contain information for the calculation of production. These include, but are not limited to:
 
@@ -324,7 +324,6 @@ envData <- data.frame(
   tempC = rep(20, length(unique(singleCohortSim$dateID)))
 )
 
-debugonce(wrap_dates)
 set.seed(1312)
 calc_production(
   taxaSampleListMass = singleCohortSim,

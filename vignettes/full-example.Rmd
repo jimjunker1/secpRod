@@ -137,8 +137,7 @@ envData <- data.frame(
   tempC = c(13.69,9.45,4.03,0.78,0.14,0.21,1.28,4,7.33,10.51)
   )
 
-debugonce(igr_prod.sample)
-# debugonce(wrap_dates)
+set.seed(1312)
 calc_production(
   taxaSampleListMass = chiroMass,
   taxaInfo = chiroInfo,

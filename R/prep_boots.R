@@ -4,7 +4,6 @@
 #' @title prep_boots
 #' @param df data.frame. A dataframe of the species size, mass, and frequency data.
 #' @param bootNum integer. The number of bootstrapped data sets that should be created.
-#' @importFrom tidyr pivot_wider
 #' @importFrom stats var
 #' @export
 
@@ -52,7 +51,7 @@ prep_boots <- function(df = NULL,
             a[[repCol]] <- b
             a
           }, sampList, newRepID)
-          return(sampList)
+          do.call(rbind.data.frame,sampList)
           # mapply(FUN = function(a,b){
           #   a = data.frame(a)
           #   a[[repCol]] <- rep(b, nrow(a))
@@ -69,7 +68,8 @@ prep_boots <- function(df = NULL,
         # # of replicates for each date
         y = as.list(samp_num),
         #list of repIDs for each date
-        z = lapply(split(df, df[[dateCol]]), function(x) unique(unlist(x[[repCol]])))
+        z = lapply(split(df, df[[dateCol]]), function(x) unique(unlist(x[[repCol]]))),
+        SIMPLIFY = FALSE
       ))
     }
   )

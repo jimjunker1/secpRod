@@ -12,14 +12,10 @@
 #' @return returns a histogram of the plot of the relative frequency of size or mass classes for a single taxon for all sampling dates
 #' @importFrom magrittr %>%
 #' @importFrom dplyr group_by
-#' @importFrom rlang .data := sym
-#' @importFrom ggplot2 ggplot
+#' @importFrom rlang .data := sym !!
+#' @importFrom ggplot2 ggplot aes geom_path scale_y_continuous coord_cartesian sec_axis theme_minimal labs theme element_text
 #' @importFrom ggdist stat_halfeye
-#' @importFrom graphics hist
-#' @importFrom graphics mtext
-#' @importFrom graphics par
-#' @importFrom graphics plot.new
-#' @importFrom graphics segments
+#' @importFrom stats weighted.mean
 #' @export
 
 plot_cohorts = function(taxaSampleListMass = NULL,
@@ -86,11 +82,11 @@ plot_cohorts = function(taxaSampleListMass = NULL,
   }
 
   sim_plot =
-    ggplot(summary_stats, aes_string(x = dateCol)) +
+    ggplot(summary_stats, aes(x = .data[[dateCol]])) +
     stat_halfeye(data = taxaSampleListMass %>%
-                   dplyr::summarise(!!abunValue := sum(!!rlang::sym(abunValue), na.rm = TRUE), .by = c('taxonID',dateCol, repCol)), aes_string(x = dateCol, y = abunValue),
+                   dplyr::summarise(!!abunValue := sum(!!rlang::sym(abunValue), na.rm = TRUE), .by = c('taxonID',dateCol, repCol)), aes(x = .data[[dateCol]], y = .data[[abunValue]]),
                  color = 'black')+
-    stat_halfeye(data = taxaSampleListMass %>% dplyr::mutate(!!"sizeMean" := !!rlang::sym(plotValue) * eval(multiplier)), aes_string(x = dateCol, y = "sizeMean"),
+    stat_halfeye(data = taxaSampleListMass %>% dplyr::mutate(!!"sizeMean" := !!rlang::sym(plotValue) * eval(multiplier)), aes(x = .data[[dateCol]], y = .data[["sizeMean"]]),
                  color = 'red')+
     geom_path(aes(y = larvalDensityMean), color = 'black') +
     geom_path(aes(y = sizeMean * multiplier), color = 'red') +

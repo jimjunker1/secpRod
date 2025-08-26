@@ -49,7 +49,6 @@ calc_production = function(taxaSampleListMass = NULL,
   }
   ### end tests ###
   # prep size-abundance bootstraps. these are fixed across methods if multiple methods passed for comparisons
-  bootList = vector('list', length = bootNum)
   bootList = prep_boots(df = taxaSampleListMass,
                         bootNum = bootNum,
                         dateCol = dateCol,

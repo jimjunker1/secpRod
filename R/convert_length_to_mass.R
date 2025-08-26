@@ -35,7 +35,7 @@ convert_length_to_mass <- function(taxaSampleList = NULL, taxaInfo = NULL, lengt
   # detect if polynomial expression exists
   caret_present <- any(grepl("\\^", massRHS, ignore.case = TRUE))
   # if (caret_present) warning("R cannot parse functions with '^'.)
-  if (!any(grepl(lengthValue, massRHS, ignore.case = FALSE))) stop(paste0(lenghtValue," is not present in the length-mass (L-M) formula. This variable must be present to convert from length to mass with user-defined L-M function."))
+  if (!any(grepl(lengthValue, massRHS, ignore.case = FALSE))) stop(paste0(lengthValue," is not present in the length-mass (L-M) formula. This variable must be present to convert from length to mass with user-defined L-M function."))
   ## The code below is a work in progress to parse the formula when `^` is present. This is a feature for later. I will likely remove this note and code and add it to a development branch in the near future.
   # if(caret_present){
   #   # deparse to convert 'call' class to character

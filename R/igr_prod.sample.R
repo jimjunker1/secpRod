@@ -8,6 +8,7 @@
 #' @param abunValue character string identifying the column name of the density value
 #' @param dateCol character string identifying the column name of the sample date information. This is distinguished from *Value parameters in that Values may be used to maintain units provenance in the future. This may also change.
 #' @param repCol character string identifying the column name of the replicate information.
+#' @param minGrowth numeric. a minimum growth rate value for when growth is negative.
 #' @param wrap logical. should the calculations be wrapped by adding an additional date to make a full year?
 #' @param full logical. should the full summary be returned with mean and sd.
 #' @param ... additional arguments passed to function, including variables to predict growth rate from growth function
@@ -46,23 +47,29 @@ igr_prod.sample <- function(df = NULL,
 
 
   #### calculate SAMPLE annual production ####
-  if(wrap == TRUE){
-  # get the detilas of first and final dates with samples
-   firstLast <- dateDf[c(1,(nrow(dateDf)-1)),]
-   wrapSamples <- dplyr::filter(df, df[[dateCol]] %in% unique(unlist(firstLast[[dateCol]])))
-   wrapSamples$taxonID <- NULL
-   wrapForm_1 <- paste0(".~",dateCol,"+",lengthValue,"+",massValue)
-   wrapAgg_first <- stats::aggregate(formula(wrapForm_1), data = wrapSamples, na.rm = TRUE,  FUN = mean)
-   wrapAgg_first[[dateCol]] <- NULL
-   wrapForm_2 <- gsub(dateCol, "",wrapForm_1)
-   wrapAgg_second <- stats::aggregate(formula(wrapForm_2), data = wrapAgg_first, na.rm = TRUE, FUN = mean)
-  }
   # merge the df with the growthDf and calculate size-specific production
-  # find all columns in both growthDf and df
   df <- merge(df, growthDf)#, by = c(dateCol, massValue,lengthValue))
+  if(wrap == TRUE){
+    # get the detilas of first and final dates with samples
+    firstLast <- dateDf[c(1,(nrow(dateDf)-1)),]
+    wrapSamples <- dplyr::filter(df, df[[dateCol]] %in% unique(unlist(firstLast[[dateCol]])))
+    wrapSamples$taxonID <- NULL;wrapSamples[[repCol]] <- NULL
+    wrapForm_1 <- paste0(".~", paste0(c(dateCol,lengthValue,massValue), collapse = "+"))
+    wrapAgg_first <- stats::aggregate(formula(wrapForm_1), data = wrapSamples, na.rm = TRUE,  FUN = mean)
+    wrapAgg_first[[dateCol]] <- NULL
+    wrapAgg_first[['int_days']] <- 1
+    wrapForm_2 <- gsub(paste0(dateCol,"+."), "",wrapForm_1)
+    wrapProduction <- stats::aggregate(formula(wrapForm_2), data = wrapAgg_first, na.rm = TRUE, FUN = mean)
+    wrapProduction$production <- wrapProduction[["biomass"]] * wrapProduction[['g_d']]
+    wrapProduction[[dateCol]] <- dateDf[nrow(dateDf), dateCol]
+    wrapProduction <- stats::aggregate(formula(paste0("production~",dateCol)), data = wrapProduction, FUN = sum, na.rm = TRUE)
+  }
   df$production <- df[["biomass"]] * df[["g_d"]] * df[["int_days"]]
   dfRepAgg <- stats::aggregate(formula(paste0("production~",dateCol,"+",repCol)), data = df, sum, na.rm = TRUE)
   dfDateAgg <- stats::aggregate(formula(paste0("production~",dateCol)), data = dfRepAgg, mean)
+  if(wrap == TRUE){
+    dfDateAgg <- rbind(dfDateAgg, wrapProduction)
+  }
   P.ann.samp <- sum(dfDateAgg$production)
 
 

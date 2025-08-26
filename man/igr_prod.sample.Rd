@@ -38,6 +38,8 @@ igr_prod.sample(
 \item{...}{additional arguments passed to function, including variables to predict growth rate from growth function}
 
 \item{sizesDf}{a data.frame of the sizes}
+
+\item{minGrowth}{numeric. a minimum growth rate value for when growth is negative.}
 }
 \value{
 list object with annual production, mean biomass, and mean abundance of the sample
