@@ -64,7 +64,7 @@
       <h1>A full example</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/jimjunker1/secpRod/blob/v0.0.0.101/vignettes/full-example.Rmd" class="external-link"><code>vignettes/full-example.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/jimjunker1/secpRod/blob/main/vignettes/full-example.Rmd" class="external-link"><code>vignettes/full-example.Rmd</code></a></small>
       <div class="d-none name"><code>full-example.Rmd</code></div>
     </div>
 
@@ -72,15 +72,13 @@
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://jimjunker1.github.io/secpRod/">secpRod</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: replacing previous import 'dplyr::filter' by 'stats::filter' when</span></span>
-<span><span class="co">#&gt; loading 'secpRod'</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mjskay.github.io/ggdist/" class="external-link">ggdist</a></span><span class="op">)</span></span></code></pre></div>
 <p>Currently, the analysis is fully implemented for multiple methods
 including: increment-summation, size-frequency, production:biomass
-ratio, instantaneous growth rate. This walk through will outline a full
-example to calculate secondary production using the full workflow from
-sample data of length classes to the estimation of secondary production
-for whole communities. First, load the package with
+ratio, and instantaneous growth rate. This walk through will outline a
+full example to calculate secondary production using the full workflow
+from sample data of length classes to the estimation of secondary
+production for whole communities. First, load the package with
 <code><a href="https://jimjunker1.github.io/secpRod/">library(secpRod)</a></code>.</p>
 <p>The package comes with a number of data sets of macroinvertebrate
 species and community data:</p>
@@ -94,7 +92,8 @@ Cross (2014)</span> that can be accessed with
 <p>The simulated data set is a single data frame of artificially sampled
 size-frequency data through time. This is used in the <a href="https://jimjunker1.github.io/secpRod/articles/simple-example.html">“A
 few simple examples” vignette</a>. Here we walk through the full
-community data set to showcase the full workflow of .</p>
+community data set to showcase the full workflow of
+<code>secpRod</code>.</p>
 <p>First, load the data set with:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
@@ -132,9 +131,9 @@ the flexibility of data inputs: 1) the date information,
 <code>dateID</code> is input as a POSIX object, 2) the length and
 density information, <code>lengthClass</code> and <code>n_m2</code> are
 non-default column names, and 3) there is no individual mass values
-associated with the size classes. First, let’s load walk through a
-single taxonomic group. First let’s modify the <code>taxaInfo</code>
-associated with this group.</p>
+associated with the size classes. First, let’s walk through a single
+taxonomic group. First let’s modify the <code>taxaInfo</code> associated
+with this group.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">taxaInfo</span> <span class="op">=</span> <span class="va">wbtData</span><span class="op">[[</span><span class="st">'taxaInfo'</span><span class="op">]</span><span class="op">]</span></span>
@@ -210,7 +209,7 @@ density over time.</p>
 <p>This shows a similar lack of structure. This is not surprising given
 the life history of this taxa. This suggest we should use a non-cohort
 method for estimating production in this case. Let’s use the
-instantaneous growth rate method, using the growth equation from <span class="citation">(<strong>huryn1990?</strong>)</span>.</p>
+instantaneous growth rate method, using the growth equation from <span class="citation">Huryn (1990)</span>.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># setting the method to 'igr'</span></span>
 <span></span>
@@ -242,7 +241,52 @@ case mean monthly temperature, <code>tempC</code>.</p>
 <span>  dateCol <span class="op">=</span> <span class="st">'dateID'</span>,</span>
 <span>  repCol <span class="op">=</span> <span class="st">'repID'</span>,</span>
 <span>  envData <span class="op">=</span> <span class="va">envData</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; $P.boots</span></span>
+<span><span class="co">#&gt;            [,1]     [,2]     [,3]     [,4]     [,5]     [,6]     [,7]    </span></span>
+<span><span class="co">#&gt; P.ann.samp 1977.99  2525.241 3105.415 2565.281 3130.709 2083.44  2514.561</span></span>
+<span><span class="co">#&gt; B.ann.samp 828.494  1099.962 927.4515 955.3265 1147.914 775.4065 940.7444</span></span>
+<span><span class="co">#&gt; N.ann.samp 918.7271 1208.345 1232.868 1146.944 1347.884 876.9376 1100.208</span></span>
+<span><span class="co">#&gt;            [,8]     [,9]     [,10]   </span></span>
+<span><span class="co">#&gt; P.ann.samp 2491.577 3800.59  2293.374</span></span>
+<span><span class="co">#&gt; B.ann.samp 862.0506 999.5042 744.874 </span></span>
+<span><span class="co">#&gt; N.ann.samp 1014.737 1193.647 1035.097</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $taxaSummary</span></span>
+<span><span class="co">#&gt; $taxaSummary$taxonID</span></span>
+<span><span class="co">#&gt; [1] "Chironomidae"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $taxaSummary$method</span></span>
+<span><span class="co">#&gt; [1] "igr"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $taxaSummary$P.ann.samp</span></span>
+<span><span class="co">#&gt; [1] 2464.977</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $taxaSummary$pb</span></span>
+<span><span class="co">#&gt; [1] 2.844627</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $taxaSummary$meanN</span></span>
+<span><span class="co">#&gt; [1] 1011.622</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $taxaSummary$meanB</span></span>
+<span><span class="co">#&gt; [1] 866.5376</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $taxaSummary$meanIndMass</span></span>
+<span><span class="co">#&gt; [1] 0.8565827</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $taxaSummary$datesInfo</span></span>
+<span><span class="co">#&gt;        dateID  N n_m2_mean   n_m2_sd biomass_mean biomass_sd production</span></span>
+<span><span class="co">#&gt; 1  2008-07-17 10  475.0000  408.6969     865.9706   912.5493  660.60224</span></span>
+<span><span class="co">#&gt; 2  2008-08-13 10  861.6751 1212.5305     741.4426  1103.1644  595.43852</span></span>
+<span><span class="co">#&gt; 3  2008-09-23 10 1357.5977 1837.5083     688.3785   552.1911  156.66332</span></span>
+<span><span class="co">#&gt; 4  2008-10-26 10 1804.5430 1067.5783     962.2140   739.8756   87.41918</span></span>
+<span><span class="co">#&gt; 5  2008-11-23 10  921.1053  869.1099     764.4288   563.0330   32.59893</span></span>
+<span><span class="co">#&gt; 6  2008-12-17 10 1103.2950 1020.8328     939.2751  1340.2913   84.86127</span></span>
+<span><span class="co">#&gt; 7  2009-02-03  8  401.1773  427.6119     308.7145   244.7629   52.93343</span></span>
+<span><span class="co">#&gt; 8  2009-04-07 10 2818.0049 3896.7681    2167.6043  2701.3540  436.55304</span></span>
+<span><span class="co">#&gt; 9  2009-05-16 10  709.5295  709.9744    1327.3375  1684.6170  211.71457</span></span>
+<span><span class="co">#&gt; 10 2009-06-23 10  292.2737  320.8707     222.3751   238.1173  133.32871</span></span>
+<span><span class="co">#&gt; 11 2009-07-16 NA  592.2648  819.2050    1096.6540  1915.9020   12.86336</span></span></code></pre></div>
 <!-- This will output a lot of information though it has a simple structure: -->
 <!-- 1) P.boots--vectors of bootstrapped estimates of annual production, annual biomass, and annual abundance. -->
 <!-- 2) taxaSummary--this comes in 'full' and 'short' versions. As you see above the full can be a lot. The 'short' is a paired down version of this -->
@@ -314,6 +358,12 @@ case mean monthly temperature, <code>tempC</code>.</p>
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
 <div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="ref-huryn1990" class="csl-entry">
+Huryn, Alexander D. 1990. <span>“Growth and Voltinism of Lotic Midge
+Larvae: <span>Patterns</span> Across an <span>Appalachian
+Mountain</span> Basin.”</span> <em>Limnology and Oceanography</em> 35
+(2): 339–51. <a href="https://doi.org/10.4319/lo.1990.35.2.0339" class="external-link">https://doi.org/10.4319/lo.1990.35.2.0339</a>.
+</div>
 <div id="ref-junker2014" class="csl-entry">
 Junker, James R., and Wyatt F. Cross. 2014. <span>“Seasonality in the
 Trophic Basis of a Temperate Stream Invertebrate Assemblage:

@@ -64,7 +64,7 @@
       <h1>A few simple examples</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/jimjunker1/secpRod/blob/v0.0.0.101/vignettes/simple-example.Rmd" class="external-link"><code>vignettes/simple-example.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/jimjunker1/secpRod/blob/main/vignettes/simple-example.Rmd" class="external-link"><code>vignettes/simple-example.Rmd</code></a></small>
       <div class="d-none name"><code>simple-example.Rmd</code></div>
     </div>
 
@@ -79,14 +79,15 @@ cohort structure and those where cohort structure is not possible to
 discern. First, we walk through the available methods using simulated
 populations that mimic the data structure of real sampling regimes. The
 parameters to create these simulated populations is outlined in
-companion article, vignette(“Simulating the sampling of populations”).
-These simulated populations skip some of the steps of moving from
-initial sampling processes (e.g., length to mass conversions, sample
-subsetting, etc.) that are often part of the process. More complete
-examples that showcase helper functions within <code>secpRod</code> that
-deal with these processes can be found below in the <a href="">“A full
-example” vignette</a>. Here, we just showcase the secondary production
-methods available.</p>
+companion article, <a href="https://jimjunker1.github.io/secpRod/articles/sampling-simulation.html">“Simulating
+the sampling of populations” vignette</a>. These simulated populations
+skip some of the steps of moving from initial sampling processes (e.g.,
+length to mass conversions, sample subsetting, etc.) that are often part
+of the process. More complete examples that showcase helper functions
+within <code>secpRod</code> that deal with these processes can be found
+below in the <a href="https://jimjunker1.github.io/secpRod/articles/full-example.html">“A
+full example” vignette</a>. Here, we just showcase the secondary
+production methods available.</p>
 <p>The methods within the package use two main objects,
 <code>sampleInfo</code> the sample-level information (e.g., site, date ,
 replicate) and density and length or mass. An additional dataframe,
@@ -137,19 +138,19 @@ decrease in density across sizes classes is calculated similar to the
 <em>removal-summation</em> method. This method assumes a 1-year
 lifespan. If taxa have an average life span much shorter or longer than
 1-year, a cohort production interval (CPI) correction must be applied.
-See <span class="citation">(<strong>benke2007?</strong>)</span> or <span class="citation">(<strong>benke1979?</strong>)</span> for a more
-complete explanation. The CPI must be provided in the
-<code>min.cpi</code> and <code>max.cpi</code> variables of the
-<code>taxaInfo</code> object.</p></li>
+See <span class="citation">Benke (1979)</span> or <span class="citation">Benke and Huryn (2017)</span> for a more complete
+explanation. The CPI must be provided in the <code>min.cpi</code> and
+<code>max.cpi</code> variables of the <code>taxaInfo</code>
+object.</p></li>
 <li><p>‘igr’: instantaneous growth method. This approach is most often
 applied as a noncohort approach, but can also be used for taxa with
 identifiable cohorts. It requires the determination of daily
-instantaneous growth rates, <em>g_d</em>, specificed in
+instantaneous growth rates, <em>g_d</em>, specified in
 <code>growthForm</code>. Growth rates can be determined through a number
 of approaches such as, from growth chambers in the field or laboratory,
 mark-recapture of individuals, or statistical regression models. See
-<span class="citation">(<strong>benke2007?</strong>)</span>, <span class="citation">(<strong>morin1994?</strong>)</span>, <span class="citation">(<strong>huryn1986?</strong>)</span> and the citations
-therein for more examples of these approaches.</p></li>
+<span class="citation">Huryn and Wallace (1986)</span>, <span class="citation">Morin and Dumont (1994)</span>, <span class="citation">Benke and Huryn (2017)</span> and the citations therein
+for more examples of these approaches.</p></li>
 <li><p>‘pb’: production:biomass ratio method. This approach calculates
 production by multiplying annual biomass by a value of
 production:biomass ratio (P:B). The P:B must be supplied in the
@@ -162,15 +163,15 @@ a character string that is coercible to a formula. This formula is
 parsed and will, if necessary, reference existing information (e.g.,
 size information) if variables are included in the formula. The
 variables in the string must match exactly those in the data (e.g., if
-massValue == ‘mass’, ‘mass’ must be in the dataframe). <strong>this
-method is currently under development to include additional sources of
-environmental data (e.g. temperature). When complete, additional data
+massValue == ‘mass’, ‘mass’ must be in the dataframe). <strong>Warning:
+this method is currently under development to include additional sources
+of environmental data (e.g. temperature). When complete, additional data
 passed to <code>envData</code> will also be referenced to predict growth
-rates.</strong> <strong><em>Fair warning</em></strong>: Currently, the
-tests for this feature are still in development, it will not reject any
-nonsensical values (e.g, negative, NA, or Inf). If your equation
-predicts negative values you may get negative production estimates–at
-least until the <code>min.growth</code> feature is implemented.</p></li>
+rates.</strong> Currently, the tests for this feature are still in
+development, it will not reject any nonsensical values (e.g, negative,
+NA, or Inf). If your equation predicts negative values you may get
+negative production estimates–at least until the <code>min.growth</code>
+feature is implemented.</p></li>
 <li><p>min.cpi: integer of the minimum estimated cohort production
 interval for adjusting annual production estimates using the
 size-frequency method</p></li>
@@ -183,14 +184,14 @@ of values the same length as <code>bootNum</code>, and 3) a string of a
 distribution to randomly sample, <strong>not</strong> including the
 <code>n =</code> (e.g., ‘rnorm(mean = 5, sd = 0.5)’, ‘runif(min = 3, max
 = 8)’). The function will automatically sample the <code>bootNum</code>
-values. <strong><em>Fair warning</em></strong>: Currently, you must
-explicitly name the parameters in the distribution call string (e.g.,
-mean, sd, min, max). Possible unwanted and unknown things will happen
-otherwise. The tests for this feature are still under development, it
-will not reject any nonsensical values (e.g, negative, NA, or Inf). If
-your distribution samples negative values you will get negative
-production estimates–at least until the <code>min.growth</code> feature
-is implemented.</p></li>
+values. <strong><em>Warning: Currently, you must explicitly name the
+parameters in the distribution call string (e.g., mean, sd, min, max).
+Possible unwanted and unknown things will happen otherwise. The tests
+for this feature are still under development, it will not reject any
+nonsensical values (e.g, negative, NA, or Inf). If your distribution
+samples negative values you will get negative production
+estimates</em></strong>. At least until the <code>min.growth</code>
+feature is implemented.</p></li>
 <li><p>min.growth: a minimal growth rate value of <em>g_d</em> to assign
 when density is &gt;0 and growth estimates for a taxon are &lt;0.
 <em>This is currently not implemented, but is kept for future
@@ -200,12 +201,12 @@ estimate should wrap the first and last dates to create a full annual
 cycle. If TRUE, this will create an additional sampling interval using
 the mean densities and masses of the first and last sampling events to
 create a full annual data set. The default is FALSE.</p></li>
-<li><p>notes: notes for researcher use. This column will be maintained
-in output summaries.</p></li>
-<li><p>…: additional information or data to pass to the function. This
-is mainly used to pass environmental data to inform growth rate
+<li><p>envData: additional information or data to pass to the function.
+This is mainly used to pass environmental data to inform growth rate
 information by included information such as temperature, food
 availability, etc.</p></li>
+<li><p>notes: notes for researcher use. This column will be maintained
+in output summaries.</p></li>
 </ul>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">taxaInfo</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
@@ -260,18 +261,21 @@ taxonID from taxaInfo</p></li>
 <li><p>dateID: a column representing the date identifier. This can be a
 julian date (as in this case) or a recognized date object (e.g., Date
 class, POSIXct, etc.)</p></li>
-<li><p>repID: an identifier representing the replicate for the length
-and mass data</p></li>
-<li><p>density: organism density of each length or mass class in the
-replicate</p></li>
-<li><p>mass: individual mass. This is the mass class with a
-corresponding density. The density of each mass class sums to the total
-sample density.</p></li>
+<li><p>repID: a column representing the replicate identifier for the
+length and mass data</p></li>
+<li><p>density: (or column name specified in <code>abunValue</code>)
+organism density of each length or mass class in the replicate</p></li>
+<li><p>mass: (or column name specified in <code>massValue</code>)
+individual mass. This is the mass class with a corresponding density.
+The density of each mass class sums to the total sample
+density.</p></li>
 </ul>
 <p>These columns names above are the default column names. The exact
 names of these some columns (and additional optional columns such as
-length information) can be modified within the function. See <a href="">“A full example”</a> for more information on customizing this
-main function further.</p>
+length information) can be modified within the
+<code><a href="../reference/calc_production.html">calc_production()</a></code> function. See <a href="https://jimjunker1.github.io/secpRod/articles/full-example.html">“A
+full example”</a> for more information on customizing this main function
+further.</p>
 <p>We can summarize and visualize this data set further.</p>
 <details><div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
@@ -304,8 +308,9 @@ main function further.</p>
 </details><p><img src="simple-example_files/figure-html/view-sim-1.png" width="700"></p>
 <p>We use this data set to calculate secondary production with different
 methods. First, we start with cohort-based methods. The main function of
-<code>secpRod</code> is which is the workhorse function that will
-estimate population and/or community production.</p>
+<code>secpRod</code> is <code><a href="../reference/calc_production.html">calc_production()</a></code> which is the
+workhorse function that will estimate population and/or community
+production.</p>
 <p>To apply it to our single species example, we input the sample
 information and taxa information along with how many bootstraps we would
 like, as:</p>
@@ -560,13 +565,13 @@ annual biomass, and annual abundance.</p></li>
 passed to the production function. This additional data can inform
 growth rates. See (#Introduction) above for more details on the
 structure of this variable. In this example, we showcase the use of a
-growth fixed growth equation that gives reasonable mass-dependence of
-growth rates and an additional variable <code>tempC</code> which is
-meant to represent environmental temperature. We fix temperature in this
-example just to showcase functionality when a growth equation uses a
-variable found in the main sample data object
-<code>taxaSampleListMass</code> and in the additional environmental data
-provided in <code>envData</code>.</p>
+growth equation that gives reasonable mass-dependence of growth rates
+and an additional variable <code>tempC</code> which is meant to
+represent environmental temperature. We fix temperature in this example
+just to showcase functionality when a growth equation uses a variable
+found in the main sample data object <code>taxaSampleListMass</code> and
+in the additional environmental data provided in
+<code>envData</code>.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">taxaInfo</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
 <span>  taxonID <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sppX"</span><span class="op">)</span>,</span>
@@ -649,6 +654,33 @@ provided in <code>envData</code>.</p>
 <span><span class="co">#&gt; 10    271 10        16.60 47.2915308     83.41820 237.84375664  34.32263491</span></span>
 <span><span class="co">#&gt; 11    301 10         0.10  0.3162278      0.53820   1.70193784   2.78907276</span></span>
 <span><span class="co">#&gt; 12    365 NA       271.55 97.0354460     41.97235 237.84377173   0.08009419</span></span></code></pre></div>
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0" line-spacing="2">
+<div id="ref-benke1979" class="csl-entry">
+Benke, A. C. 1979. <a href="https://doi.org/10.4319/lo.1979.24.1.0168" class="external-link">A
+modification of the <span>Hynes</span> method for estimating secondary
+production with particular significance for multivoltine
+populations</a>. Limnology and Oceanography 24:168–171.
+</div>
+<div id="ref-benke2017" class="csl-entry">
+Benke, A. C., and A. D. Huryn. 2017. <a href="https://doi.org/10.1016/B978-0-12-813047-6.00013-9" class="external-link">Secondary
+<span>Production</span> and <span>Quantitative Food Webs</span></a>.
+Pages 235–254 Methods in <span>Stream Ecology</span>. 3rd edition.
+Elsevier.
+</div>
+<div id="ref-huryn1986" class="csl-entry">
+Huryn, A. D., and J. B. Wallace. 1986. <a href="https://doi.org/10.4319/lo.1986.31.1.0216" class="external-link">A method for obtaining
+in situ growth rates of larval <span>Chironomidae</span>
+(<span>Diptera</span>) and its application to studies of secondary
+production</a>. Limnology and Oceanography 31:216–221.
+</div>
+<div id="ref-morin1994" class="csl-entry">
+Morin, A., and P. Dumont. 1994. <a href="https://doi.org/10.2307/1467365" class="external-link">A <span>Simple Model</span> to
+<span>Estimate Growth Rate</span> of <span>Lotic Insect Larvae</span>
+and <span>Its Value</span> for <span>Estimating Population</span> and
+<span>Community Production</span></a>. Journal of the North American
+Benthological Society 13:357–367.
+</div>
+</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
