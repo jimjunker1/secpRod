@@ -43,7 +43,7 @@ data('singleCohortSim', package = 'secpRod')
 
 ## Introduction 
 
-The `secpRod` package provides a number of methods to calculate secondary production of populations, both those with clear cohort structure and those where cohort structure is not possible to discern. First, we walk through the available methods using simulated populations that mimic the data structure of real sampling regimes. The parameters to create these simulated populations is outlined in companion article, vignette("Simulating the sampling of populations"). These simulated populations skip some of the steps of moving from initial sampling processes (e.g., length to mass conversions, sample subsetting, etc.) that are often part of the process. More complete examples that showcase helper functions within `secpRod` that deal with these processes can be found below in the ["A full example" vignette](). Here, we just showcase the secondary production methods available.
+The `secpRod` package provides a number of methods to calculate secondary production of populations, both those with clear cohort structure and those where cohort structure is not possible to discern. First, we walk through the available methods using simulated populations that mimic the data structure of real sampling regimes. The parameters to create these simulated populations is outlined in companion article, ["Simulating the sampling of populations" vignette](https://jimjunker1.github.io/secpRod/articles/sampling-simulation.html). These simulated populations skip some of the steps of moving from initial sampling processes (e.g., length to mass conversions, sample subsetting, etc.) that are often part of the process. More complete examples that showcase helper functions within `secpRod` that deal with these processes can be found below in the ["A full example" vignette](https://jimjunker1.github.io/secpRod/articles/full-example.html). Here, we just showcase the secondary production methods available.
 
 The methods within the package use two main objects, `sampleInfo` the sample-level information (e.g., site, date , replicate) and density and length or mass. An additional dataframe, `taxaInfo` that houses species-specific information such as length to mass conversions, and method specific information such as cohort production interval estimates (CPIs), production:biomass ratios (PBs), and growth equations. The columns contain information for the calculation of production. These include, but are not limited to:
 
@@ -65,27 +65,27 @@ The methods within the package use two main objects, `sampleInfo` the sample-lev
   
   - 'rs': removal-summation method is similar to the increment-summation method but instead calculates the production *lost* during a sampling interval as the product of the decrease in density, $\Delta N$ and the mean individual mass, $\overline{W}$ plus the increase in biomass, $\Delta B$.
 
-  - 'sf': size-frequency method. This non-cohort approach assumes the mean size-frequency data from collected samples characterizes the mortality, growth and development of an average cohort. The densities within size classes are averaged across all sampling dates and the decrease in density across sizes classes is calculated similar to the *removal-summation* method. This method assumes a 1-year lifespan. If taxa have an average life span much shorter or longer than 1-year, a cohort production interval (CPI) correction must be applied. See @benke2007 or @benke1979 for a more complete explanation. The CPI must be provided in the `min.cpi` and `max.cpi` variables of the `taxaInfo` object.
+  - 'sf': size-frequency method. This non-cohort approach assumes the mean size-frequency data from collected samples characterizes the mortality, growth and development of an average cohort. The densities within size classes are averaged across all sampling dates and the decrease in density across sizes classes is calculated similar to the *removal-summation* method. This method assumes a 1-year lifespan. If taxa have an average life span much shorter or longer than 1-year, a cohort production interval (CPI) correction must be applied. See @benke1979 or @benke2017 for a more complete explanation. The CPI must be provided in the `min.cpi` and `max.cpi` variables of the `taxaInfo` object.
   
-  - 'igr': instantaneous growth method. This approach is most often applied as a noncohort approach, but can also be used for taxa with identifiable cohorts. It requires the determination of daily instantaneous growth rates, *g_d*, specificed in `growthForm`. Growth rates can be determined through a number of approaches such as, from growth chambers in the field or laboratory, mark-recapture of individuals, or statistical regression models. See @benke2007, @morin1994, @huryn1986 and the citations therein for more examples of these approaches.
+  - 'igr': instantaneous growth method. This approach is most often applied as a noncohort approach, but can also be used for taxa with identifiable cohorts. It requires the determination of daily instantaneous growth rates, *g_d*, specified in `growthForm`. Growth rates can be determined through a number of approaches such as, from growth chambers in the field or laboratory, mark-recapture of individuals, or statistical regression models. See  @huryn1986, @morin1994, @benke2017 and the citations therein for more examples of these approaches.
   
   - 'pb': production:biomass ratio method. This approach calculates production by multiplying annual biomass by a value of production:biomass ratio (P:B). The P:B must be supplied in the `pb` variable of the `taxaInfo` object. 
 
-- growthForm: daily growth rates, *g_d*, to calculate production from the instantaneous growth method. This takes the form of a character string that is coercible to a formula. This formula is parsed and will, if necessary, reference existing information (e.g., size information) if variables are included in the formula. The variables in the string must match exactly those in the data (e.g., if massValue == 'mass', 'mass' must be in the dataframe). **this method is currently under development to include additional sources of environmental data (e.g. temperature). When complete, additional data passed to `envData` will also be referenced to predict growth rates.** ***Fair warning***: Currently, the tests for this feature are still in development, it will not reject any nonsensical values (e.g, negative, NA, or Inf). If your equation predicts negative values you may get negative production estimates--at least until the `min.growth` feature is implemented. 
+- growthForm: daily growth rates, *g_d*, to calculate production from the instantaneous growth method. This takes the form of a character string that is coercible to a formula. This formula is parsed and will, if necessary, reference existing information (e.g., size information) if variables are included in the formula. The variables in the string must match exactly those in the data (e.g., if massValue == 'mass', 'mass' must be in the dataframe). **Warning: this method is currently under development to include additional sources of environmental data (e.g. temperature). When complete, additional data passed to `envData` will also be referenced to predict growth rates.** Currently, the tests for this feature are still in development, it will not reject any nonsensical values (e.g, negative, NA, or Inf). If your equation predicts negative values you may get negative production estimates--at least until the `min.growth` feature is implemented. 
 
 - min.cpi: integer of the minimum estimated cohort production interval for adjusting annual production estimates using the size-frequency method
 
 - max.cpi: integer of the maximum estimated cohort production interval for adjusting annual production estimates using the size-frequency method
 
-- pb: numeric of the production to biomass (PB) ratio for the specific taxa. This can take three forms 1) a single value, 2) a vector of values the same length as `bootNum`, and 3) a string of a distribution to randomly sample, **not** including the `n =` (e.g., 'rnorm(mean = 5, sd = 0.5)', 'runif(min = 3, max = 8)'). The function will automatically sample the `bootNum` values. ***Fair warning***: Currently, you must explicitly name the parameters in the distribution call string (e.g., mean, sd, min, max). Possible unwanted and unknown things will happen otherwise. The tests for this feature are still under development, it will not reject any nonsensical values (e.g, negative, NA, or Inf). If your distribution samples negative values you will get negative production estimates--at least until the `min.growth` feature is implemented.
+- pb: numeric of the production to biomass (PB) ratio for the specific taxa. This can take three forms 1) a single value, 2) a vector of values the same length as `bootNum`, and 3) a string of a distribution to randomly sample, **not** including the `n =` (e.g., 'rnorm(mean = 5, sd = 0.5)', 'runif(min = 3, max = 8)'). The function will automatically sample the `bootNum` values. ***Warning: Currently, you must explicitly name the parameters in the distribution call string (e.g., mean, sd, min, max). Possible unwanted and unknown things will happen otherwise. The tests for this feature are still under development, it will not reject any nonsensical values (e.g, negative, NA, or Inf). If your distribution samples negative values you will get negative production estimates***. At least until the `min.growth` feature is implemented.
 
 - min.growth: a minimal growth rate value of *g_d* to assign when density is >0 and growth estimates for a taxon are <0. *This is currently not implemented, but is kept for future use.*
 
 - wrap: logical (or coercible) indicating whether the production estimate should wrap the first and last dates to create a full annual cycle. If TRUE, this will create an additional sampling interval using the mean densities and masses of the first and last sampling events to create a full annual data set. The default is FALSE.
 
-- notes: notes for researcher use. This column will be maintained in output summaries.
+- envData: additional information or data to pass to the function. This is mainly used to pass environmental data to inform growth rate information by included information such as temperature, food availability, etc.
 
-- ...: additional information or data to pass to the function. This is mainly used to pass environmental data to inform growth rate information by included information such as temperature, food availability, etc.
+- notes: notes for researcher use. This column will be maintained in output summaries.
 
 ```{r simulation-taxa-info, eval = TRUE, echo = TRUE}
 taxaInfo <- tibble::tibble(
@@ -133,13 +133,13 @@ this object can be a data.frame (or coercible) or a tibble (if list-cols are use
 
 - dateID: a column representing the date identifier. This can be a julian date (as in this case) or a recognized date object (e.g., Date class, POSIXct, etc.)
 
-- repID: an identifier representing the replicate for the length and mass data
+- repID: a column representing the replicate identifier for the length and mass data
 
-- density: organism density of each length or mass class in the replicate
+- density: (or column name specified in `abunValue`) organism density of each length or mass class in the replicate
 
-- mass: individual mass. This is the mass class with a corresponding density. The density of each mass class sums to the total sample density.
+- mass: (or column name specified in `massValue`) individual mass. This is the mass class with a corresponding density. The density of each mass class sums to the total sample density.
 
-These columns names above are the default column names. The exact names of these some columns (and additional optional columns such as length information) can be modified within the \code{calc_production()} function. See ["A full example"]() for more information on customizing this main function further.
+These columns names above are the default column names. The exact names of these some columns (and additional optional columns such as length information) can be modified within the `calc_production()` function. See ["A full example"](https://jimjunker1.github.io/secpRod/articles/full-example.html) for more information on customizing this main function further.
 
 We can summarize and visualize this data set further.
 
@@ -184,7 +184,7 @@ suppressWarnings(print(sim_plot))
 
 ```
 
-We use this data set to calculate secondary production with different methods. First, we start with cohort-based methods. The main function of `secpRod` is \code{calc_production()} which is the workhorse function that will estimate population and/or community production. 
+We use this data set to calculate secondary production with different methods. First, we start with cohort-based methods. The main function of `secpRod` is `calc_production()` which is the workhorse function that will estimate population and/or community production. 
 
 To apply it to our single species example, we input the sample information and taxa information along with how many bootstraps we would like, as:
 
@@ -296,7 +296,7 @@ calc_production(
 
 ## Instantaneous growth rate (IGR)
 
-The instantaneous growth rate method allows for additional data to be passed to the production function. This additional data can inform growth rates. See (#Introduction) above for more details on the structure of this variable. In this example, we showcase the use of a growth fixed growth equation that gives reasonable mass-dependence of growth rates and an additional variable `tempC` which is meant to represent environmental temperature. We fix temperature in this example just to showcase functionality when a growth equation uses a variable found in the main sample data object `taxaSampleListMass` and in the additional environmental data provided in `envData`.
+The instantaneous growth rate method allows for additional data to be passed to the production function. This additional data can inform growth rates. See (#Introduction) above for more details on the structure of this variable. In this example, we showcase the use of a growth equation that gives reasonable mass-dependence of growth rates and an additional variable `tempC` which is meant to represent environmental temperature. We fix temperature in this example just to showcase functionality when a growth equation uses a variable found in the main sample data object `taxaSampleListMass` and in the additional environmental data provided in `envData`.
 
 ```{r single species IGR production,include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
 taxaInfo <- tibble::tibble(
