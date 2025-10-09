@@ -319,26 +319,30 @@ like, as:</p>
 <span><span class="fu"><a href="../reference/calc_production.html">calc_production</a></span><span class="op">(</span></span>
 <span>  taxaSampleListMass <span class="op">=</span> <span class="va">singleCohortSim</span>,</span>
 <span>  taxaInfo <span class="op">=</span> <span class="va">taxaInfo</span>,</span>
-<span>  bootNum <span class="op">=</span> <span class="fl">1e1</span>,</span>
+<span>  bootNum <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  taxaSummary <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  massValue <span class="op">=</span> <span class="st">'mass'</span>,</span>
 <span>  abunValue <span class="op">=</span> <span class="st">'density'</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>This will output an object with bootstrapped estimates as well as a
-summary of the sample. It has a simple structure:</p>
+summary of the samples. It has a simple structure:</p>
 <ol style="list-style-type: decimal">
 <li><p>P.boots–vectors of bootstrapped estimates of annual production,
-annual biomass, and annual abundance.</p></li>
-<li><p>taxaSummary–this can be turned off by setting
-<code>taxaSummary</code> to FALSE.</p></li>
+annual mean biomass, and annual mean abundance.</p></li>
+<li><p>taxaSummary–is a summary of the sampled data, including estimated
+production, sampling event summaries of density, biomass, and production
+(if applicable). This can be turned off by setting
+<code>taxaSummary</code> to <code>FALSE</code>.</p></li>
 </ol>
+<p>Below, we walk through each of the available methods using this
+simulated population. For further details on these methods and their
+calculations, see <span class="citation">(<strong>benke2007?</strong>)</span>.</p>
 <div class="section level3">
 <h3 id="increment-summation">Increment-summation<a class="anchor" aria-label="anchor" href="#increment-summation"></a>
 </h3>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># debug(calc_prod_is)</span></span>
+<code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1312</span><span class="op">)</span></span>
-<span><span class="co"># debugonce(calc_production)</span></span>
 <span><span class="fu"><a href="../reference/calc_production.html">calc_production</a></span><span class="op">(</span></span>
 <span>  taxaSampleListMass <span class="op">=</span> <span class="va">singleCohortSim</span>,</span>
 <span>  taxaInfo <span class="op">=</span> <span class="va">taxaInfo</span>,</span>
@@ -654,6 +658,10 @@ in the additional environmental data provided in
 <span><span class="co">#&gt; 10    271 10        16.60 47.2915308     83.41820 237.84375664  34.32263491</span></span>
 <span><span class="co">#&gt; 11    301 10         0.10  0.3162278      0.53820   1.70193784   2.78907276</span></span>
 <span><span class="co">#&gt; 12    365 NA       271.55 97.0354460     41.97235 237.84377173   0.08009419</span></span></code></pre></div>
+</div>
+<div class="section level2 unnumbered">
+<h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
 <div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0" line-spacing="2">
 <div id="ref-benke1979" class="csl-entry">
 Benke, A. C. 1979. <a href="https://doi.org/10.4319/lo.1979.24.1.0168" class="external-link">A
