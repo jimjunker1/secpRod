@@ -193,7 +193,7 @@ To apply it to our single species example, we input the sample information and t
 calc_production(
   taxaSampleListMass = singleCohortSim,
   taxaInfo = taxaInfo,
-  bootNum = 1e1,
+  bootNum = 10,
   taxaSummary = TRUE,
   massValue = 'mass',
   abunValue = 'density'
@@ -201,18 +201,19 @@ calc_production(
 
 ```
 
-This will output an object with bootstrapped estimates as well as a summary of the sample. It has a simple structure:
+This will output an object with bootstrapped estimates as well as a summary of the samples. It has a simple structure:
 
-1) P.boots--vectors of bootstrapped estimates of annual production, annual biomass, and annual abundance. 
+1) P.boots--vectors of bootstrapped estimates of annual production, annual mean biomass, and annual mean abundance. 
 
-2) taxaSummary--this can be turned off by setting `taxaSummary` to FALSE. 
+2) taxaSummary--is a summary of the sampled data, including estimated production, sampling event summaries of density, biomass, and production (if applicable). This can be turned off by setting `taxaSummary` to `FALSE`. 
+
+Below, we walk through each of the available methods using this simulated population. For further details on these methods and their calculations, see @benke2007.
 
 ### Increment-summation
 
 ```{r single species IS production,include=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
-# debug(calc_prod_is)
+
 set.seed(1312)
-# debugonce(calc_production)
 calc_production(
   taxaSampleListMass = singleCohortSim,
   taxaInfo = taxaInfo,
@@ -337,3 +338,4 @@ calc_production(
 
 ```
 
+## References
