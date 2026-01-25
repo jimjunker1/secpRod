@@ -196,7 +196,7 @@ vers_count = function (..., condition = (function(x) TRUE))
 
 #'
 #'
-string_agg = function(df, colString = NULL){
+string_agg = function(df, colString = NULL, massValue = NULL){
   if(length(colString) > 1){
     firstString = paste0("cbind(",paste0(colString, collapse = ","),")~")
     secondString = paste0('taxonID+dateID+repID+',eval(massValue))

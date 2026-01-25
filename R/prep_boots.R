@@ -4,6 +4,8 @@
 #' @title prep_boots
 #' @param df data.frame. A dataframe of the species size, mass, and frequency data.
 #' @param bootNum integer. The number of bootstrapped data sets that should be created.
+#' @param dateCol a string of the column name containing date information
+#' @param repCol a string of the column name containing the replicate information
 #' @importFrom stats var
 #' @export
 

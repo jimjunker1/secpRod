@@ -27,6 +27,10 @@ plot_cohorts = function(taxaSampleListMass = NULL,
                         repCol = 'repID',
                         ...){
   # require(purrr)
+  ## set globals to avoid warnings##
+  sizeMean <- larvalDensityMean <- NULL
+
+  ## End globals definitions ##
   #### Tests ####
   if(length(unique(taxaSampleListMass$taxonID)) > 1) stop("Error: The number of taxa is >1. Only pass single taxon at a time.")
   if(any(taxaSampleListMass$n_m2 <0)) stop("Error: some density values < 0. Only positive values accepted.")

@@ -2,7 +2,7 @@
 #' @title calc_production
 #' @description This is the main function of the secpRod package. It will calculate secondary production for all groups based on the methods described in the taxa information object. Depending on input values varying summaries are returned.
 #' @param taxaSampleListMass data.frame of sample length-masses and abundances
-#' @param infoCols integer vector; Any columns in the sizeInfo object that are not the taxonomic ID, sampling metadata, or size class columns. ** This is soft-deprecated and is not currently used. It may go away soon **
+# #' @param infoCols integer vector; Any columns in the sizeInfo object that are not the taxonomic ID, sampling metadata, or size class columns. ** This is soft-deprecated and is not currently used. It may go away soon **
 #' @param taxaInfo dataframe (or coercible); The taxonomic information for calculating secondary production. This must include a taxonomic ID column with the same name as that of \code{taxaSampleListMass}
 #' @param bootNum integer. The number of bootstrapped samples to create
 #' @param taxaSummary logical. If TRUE (default) the taxaSummary will be with annual summary information will be returned.

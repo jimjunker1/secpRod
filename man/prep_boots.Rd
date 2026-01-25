@@ -10,6 +10,10 @@ prep_boots(df = NULL, bootNum = bootNum, dateCol = "dateID", repCol = "repID")
 \item{df}{data.frame. A dataframe of the species size, mass, and frequency data.}
 
 \item{bootNum}{integer. The number of bootstrapped data sets that should be created.}
+
+\item{dateCol}{a string of the column name containing date information}
+
+\item{repCol}{a string of the column name containing the replicate information}
 }
 \description{
 This function prepares bootstrap samples.

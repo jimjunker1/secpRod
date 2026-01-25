@@ -30,10 +30,9 @@
 #' @param fallbackGrid logical. If TRUE (default) a grid search procedure will be used if `optim()` fails.
 #' @returns \code{resonstruct_split_cohort()} returns a dataframe with the original sampling date, estimated cohort ages, and remapped
 #' cohort ages to fit production methods and remap back to original timescale.
-#' @import dplyr
+#' @importFrom dplyr group_by summarise ungroup arrange bind_rows mutate
 #' @importFrom stats coef
 #' @importFrom stats optim
-#' @export
 
 reconstruct_split_cohort <- function(df = NULL,
                                      timeCol = "dateID",
@@ -72,15 +71,15 @@ reconstruct_split_cohort <- function(df = NULL,
 
   cohort1$cohort <- 1
   cohort2$cohort <- 2
-  dfOrdered <- bind_rows(cohort1, cohort2) %>% dplyr::arrange(cohort, .data[[timeCol]])
+  dfOrdered <- dplyr::bind_rows(cohort1, cohort2) %>% dplyr::arrange(cohort, .data[[timeCol]])
 
   cohort_min <-  dfOrdered %>%
-    group_by(cohort) %>%
+    dplyr::group_by(cohort) %>%
     dplyr::summarise(min_mass = min(mean_mass), .groups = "drop") %>%
     dplyr::arrange(min_mass) %>%
     pull(cohort)
 
-  dfOrdered <-  dfOrdered %>% arrange(cohort, dateID)
+  dfOrdered <-  dfOrdered %>% dplyr::arrange(cohort, dateID)
 
   # 2. Define optimization objective
   obj_fn <- function(offset) {
@@ -144,8 +143,8 @@ reconstruct_split_cohort <- function(df = NULL,
   pseudo_time <- round(pseudo_time)
 
   df_remap <- df_pseudo %>%
-    mutate(pseudotime = pseudo_time) %>%
-    arrange(pseudotime)
+    dplyr::mutate(pseudotime = pseudo_time) %>%
+    dplyr::arrange(pseudotime)
 
   return(list(
     df_remap = df_remap,
@@ -167,10 +166,10 @@ reconstruct_split_cohort <- function(df = NULL,
 #' @returns fits: the growth model fits to reordered sampling dates
 #' @returns aiccs: the Akaike Information Criterion for each model. This is used to build ensemble model estimates for remapped cohort 'times'
 #' @returns df_pseudo: a data.frame of the original date, standardized cohort 'times', and t0 corrected ages estimated from the growth models.
-#' @import dplyr
+#' @importFrom dplyr group_by summarise ungroup arrange bind_rows mutate
 #' @importFrom stats AIC
 #' @importFrom stats nls
-#' @export
+
 
 fit_with_offset <- function(dfOrdered = NULL, offset = NULL, models = c("vbg", "gompertz", "logistic", "richards"), tStart = 5) {
   stopifnot("cohort" %in% names(dfOrdered))
@@ -179,11 +178,11 @@ fit_with_offset <- function(dfOrdered = NULL, offset = NULL, models = c("vbg", "
   # Split cohorts
   youngest_dates <- dfOrdered %>%
     dplyr::filter(cohort == min(cohort)) %>%
-    arrange(dateID)
+    dplyr::arrange(dateID)
 
   oldest_dates <- dfOrdered %>%
     dplyr::filter(cohort == max(cohort)) %>%
-    arrange(dateID)
+    dplyr::arrange(dateID)
 
   # 1. Pseudotime for youngest cohort
   delta_young <- diff(youngest_dates$dateID)
@@ -255,10 +254,10 @@ fit_with_offset <- function(dfOrdered = NULL, offset = NULL, models = c("vbg", "
 #' @param models character. String vector of the names of models to fit to \eqn{M_t}. See `details` for more information.
 #' @param labelPoints logical. Should the points be labelled with the sampling date information
 #' @returns \code{plot_cohort_fit()} returns a ggplot object of the remapped cohort and growth model fits.
-#' @import dplyr
+#' @importFrom dplyr group_by summarise ungroup arrange bind_rows mutate
 #' @import ggplot2
 #' @importFrom stats coef
-#' @export
+
 plot_cohort_fit <- function(remappedCohort, models = "ensemble", labelPoints = TRUE) {
 
   #declare variables

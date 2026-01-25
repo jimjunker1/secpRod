@@ -29,6 +29,8 @@ is_prod.sample(
 
 \item{repCol}{string of the column name containing the replicate information}
 
+\item{wrap}{logical. should the calculations be wrapped by adding an additional date to make a full year?}
+
 \item{full}{logical. should the summary be returned with mean and sd}
 
 \item{...}{additional arguments passed to function}

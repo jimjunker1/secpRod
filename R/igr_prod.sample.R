@@ -2,13 +2,15 @@
 #' @title igr_prod.sample
 #' @description This function calculates taxa production based on the instantaneous growth method
 #' @param df a data.frame of long format returned from \code{convert_length_to_mass()} function
-#' @param sizesDf a data.frame of the sizes
+# #' @param sizesDf a data.frame of the sizes
+#' @param dateDf a data.frame of the dates, difference between sampling dates for growth estimate
+#' @param growthDf a data.frame of the growth rates determined from growth equations and environmental data
 #' @param lengthValue string of the column name containing the length class measurements
 #' @param massValue character string identifying the column name of the mass value
 #' @param abunValue character string identifying the column name of the density value
 #' @param dateCol character string identifying the column name of the sample date information. This is distinguished from *Value parameters in that Values may be used to maintain units provenance in the future. This may also change.
 #' @param repCol character string identifying the column name of the replicate information.
-#' @param minGrowth numeric. a minimum growth rate value for when growth is negative.
+# #' @param minGrowth numeric. a minimum growth rate value for when growth is negative.
 #' @param wrap logical. should the calculations be wrapped by adding an additional date to make a full year?
 #' @param full logical. should the full summary be returned with mean and sd.
 #' @param ... additional arguments passed to function, including variables to predict growth rate from growth function
@@ -23,6 +25,7 @@ igr_prod.sample <- function(df = NULL,
                            dateCol = "dateID",
                            repCol = "repID",
                            wrap = FALSE,
+                           #min.growth = NULL,
                            full = TRUE,
                            ...) {
 

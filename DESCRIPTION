@@ -28,7 +28,7 @@ Suggests:
     gridExtra,
     rmarkdown,
     tibble
-License: MIT
+License: MIT + file LICENSE
 VignetteBuilder: knitr
 Encoding: UTF-8
 LazyData: true

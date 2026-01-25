@@ -8,7 +8,7 @@
 #' @param full logical. should the full summary be returned with mean and sd
 #' @param ... additional arguments passed to function
 #' @return list object with taxa summary of the sampled data
-#' @export
+
 rs_prod.sample <- function(df = NULL,
                            sizesDf = NULL,
                            massValue = NULL,
@@ -73,7 +73,7 @@ rs_prod.sample <- function(df = NULL,
   }
 
   # Calculate "uncorrected" production by summing all values in the the column of biomass * number of size classes (mg AFDM m^-2)
-  P.uncorr.samp <- sum(SF.int[, 4])
+  P.ann.samp <- sum(SF.int[, 4])
 
 }
   if(full == TRUE){

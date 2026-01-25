@@ -21,6 +21,10 @@ igr_prod.sample(
 \arguments{
 \item{df}{a data.frame of long format returned from \code{convert_length_to_mass()} function}
 
+\item{dateDf}{a data.frame of the dates, difference between sampling dates for growth estimate}
+
+\item{growthDf}{a data.frame of the growth rates determined from growth equations and environmental data}
+
 \item{lengthValue}{string of the column name containing the length class measurements}
 
 \item{massValue}{character string identifying the column name of the mass value}
@@ -36,10 +40,6 @@ igr_prod.sample(
 \item{full}{logical. should the full summary be returned with mean and sd.}
 
 \item{...}{additional arguments passed to function, including variables to predict growth rate from growth function}
-
-\item{sizesDf}{a data.frame of the sizes}
-
-\item{minGrowth}{numeric. a minimum growth rate value for when growth is negative.}
 }
 \value{
 list object with annual production, mean biomass, and mean abundance of the sample

@@ -7,6 +7,7 @@
 #' @param abunValue string of the column name containing the abundance or density measurement
 #' @param dateCol string of the column name containing the date information. This can be either a recognized date object (e.g., Date, POSIX) or numeric.
 #' @param repCol string of the column name containing the replicate information
+#' @param wrap logical. should the calculations be wrapped by adding an additional date to make a full year?
 #' @param full logical. should the summary be returned with mean and sd
 #' @param ... additional arguments passed to function
 #' @return list object with annual production, mean biomass, and mean abundance of the sample

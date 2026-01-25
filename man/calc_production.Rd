@@ -40,8 +40,6 @@ calc_production(
 \item{envData}{data.frame of additional environmental data for each sampling event.  If present, this is combined with the dateDf information and passed to the IGR function for growth rate estimations.The environmental variables passed should align with the start of each sampling interval.}
 
 \item{...}{additional arguments passed to function}
-
-\item{infoCols}{integer vector; Any columns in the sizeInfo object that are not the taxonomic ID, sampling metadata, or size class columns. ** This is soft-deprecated and is not currently used. It may go away soon **}
 }
 \description{
 This is the main function of the secpRod package. It will calculate secondary production for all groups based on the methods described in the taxa information object. Depending on input values varying summaries are returned.
