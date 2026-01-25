@@ -19,15 +19,15 @@ Imports:
   rlang,
   ggplot2,
   zoo,
-  ggdist
+  ggdist,
+  tibble
 Suggests:
     knitr,
     purrr,
     plyr,
     kableExtra,
     gridExtra,
-    rmarkdown,
-    tibble
+    rmarkdown
 License: MIT + file LICENSE
 VignetteBuilder: knitr
 Encoding: UTF-8

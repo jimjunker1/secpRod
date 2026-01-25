@@ -30,9 +30,10 @@
 #' @param fallbackGrid logical. If TRUE (default) a grid search procedure will be used if `optim()` fails.
 #' @returns \code{resonstruct_split_cohort()} returns a dataframe with the original sampling date, estimated cohort ages, and remapped
 #' cohort ages to fit production methods and remap back to original timescale.
-#' @importFrom dplyr group_by summarise ungroup arrange bind_rows mutate
+#' @importFrom dplyr group_by summarise ungroup arrange bind_rows mutate lead pull
 #' @importFrom stats coef
 #' @importFrom stats optim
+#' @export
 
 reconstruct_split_cohort <- function(df = NULL,
                                      timeCol = "dateID",
@@ -42,8 +43,9 @@ reconstruct_split_cohort <- function(df = NULL,
                                      models = c("vbg", "gompertz", "logistic", "richards"),
                                      offsetBounds = c(10, 150),
                                      fallbackGrid = TRUE) {
-  # declare global vars
-  # cohort <- mean_mass <- min_mass <- dateID <- D <- pseudotime <- NULL
+  ##  declare global vars
+  cohort <- mean_mass <- min_mass <- dateID <- D <- pseudotime <- NULL
+
   # Step 1a: Aggregate replicate-level masses to daily means
   agg <- df %>%
     group_by(.data[[timeCol]]) %>%
@@ -55,7 +57,7 @@ reconstruct_split_cohort <- function(df = NULL,
   W <- agg$mean_mass
 
   # Step 2a: Detect split cohort via drop in mean mass
-  dM <- lead(W) / W
+  dM <- dplyr::lead(W) / W
   drop_idx <- which(dM < massDropThresh)[1]
   if (is.na(drop_idx)) drop_idx <- floor(length(t) / 2)  # fallback if no sharp drop
 
@@ -77,7 +79,7 @@ reconstruct_split_cohort <- function(df = NULL,
     dplyr::group_by(cohort) %>%
     dplyr::summarise(min_mass = min(mean_mass), .groups = "drop") %>%
     dplyr::arrange(min_mass) %>%
-    pull(cohort)
+    dplyr::pull(cohort)
 
   dfOrdered <-  dfOrdered %>% dplyr::arrange(cohort, dateID)
 
@@ -169,12 +171,12 @@ reconstruct_split_cohort <- function(df = NULL,
 #' @importFrom dplyr group_by summarise ungroup arrange bind_rows mutate
 #' @importFrom stats AIC
 #' @importFrom stats nls
-
+#' @export
 
 fit_with_offset <- function(dfOrdered = NULL, offset = NULL, models = c("vbg", "gompertz", "logistic", "richards"), tStart = 5) {
   stopifnot("cohort" %in% names(dfOrdered))
 # declare global variables
-  # cohort <- dateID <- pseudo_day <- NULL
+  cohort <- dateID <- pseudo_day <- NULL
   # Split cohorts
   youngest_dates <- dfOrdered %>%
     dplyr::filter(cohort == min(cohort)) %>%
@@ -257,11 +259,15 @@ fit_with_offset <- function(dfOrdered = NULL, offset = NULL, models = c("vbg", "
 #' @importFrom dplyr group_by summarise ungroup arrange bind_rows mutate
 #' @import ggplot2
 #' @importFrom stats coef
+#' @importFrom tibble tibble
+#' @export
 
 plot_cohort_fit <- function(remappedCohort, models = "ensemble", labelPoints = TRUE) {
 
   #declare variables
-  # pseudotime <- fitted_mass <- observed_mass <- NULL
+  pseudotime <- fitted_mass <- observed_mass <- NULL
+  #
+
   df <- remappedCohort$df_remap
   W <- df$mean_mass
   t <- df$pseudotime

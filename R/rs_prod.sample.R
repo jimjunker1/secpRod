@@ -78,7 +78,6 @@ rs_prod.sample <- function(df = NULL,
 }
   if(full == TRUE){
     return(list(P.ann.samp = P.ann.samp,
-                P.uncorr.samp = P.uncorr.samp,
                 B.ann.mean = B.ann.list[[paste0(massLabel,"_mean")]],
                 B.ann.sd = B.ann.list[[paste0(massLabel,"_sd")]],
                 N.ann.mean = N.ann.list$n_m2_mean,
