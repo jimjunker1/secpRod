@@ -1,0 +1,141 @@
+------------------------------------------------------------------------
+
+## Overview
+
+**secpRod** is an open source package for the analysis and calculation
+of secondary production for populations and communities in R.
+**secpRod** uses data from repeated sampling of population abundance and
+size structure in a tall data structure and a taxon information sheet as
+the base objects. In addition to estimating secondary production for
+communities with multiple methods, **secpRod** also provides a tools to
+perform data processing actions common in the workflow prior to
+calculation, such as length to mass conversions using length~mass
+relationships and visualizing population density and size structure to
+aid the determination of cohort structure and assess best methods for
+secondary production estimation.
+
+## Installation
+
+``` r
+# To install the latest version Github:
+# install.packages('devtools')
+devtools::install_github("jimjunker1/secpRod")
+```
+
+## Status: Active Development
+
+The `secpRod` package is currently under development for deployment in
+conjunction with the ’Secondary Production and Quantitative Food Webs”
+chapter in the “Methods in Stream Ecology” 4th edition. This initial
+deployment will include tools to estimate secondary production and its
+uncertainty through bootstrapping approaches. Future work will include
+additional inferential frameworks (e.g., Bayesian inference) of these
+approaches.
+
+## Usage
+
+The basic usage of the main function,
+[`calc_production()`](https://jimjunker1.github.io/secpRod/reference/calc_production.md),
+is outlined in the [“A few simple examples”
+vignette](https://jimjunker1.github.io/secpRod/articles/simple-example.html).
+This article showcases the calculation of secondary production of a
+[single simulated
+population](https://jimjunker1.github.io/secpRod/articles/sampling-simulation.html).
+For a full walkthrough showcasing some of the additional tools for data
+processing, see the [“A full example”
+here](https://jimjunker1.github.io/secpRod/).
+
+## Contributing
+
+This is an actively developing package and we welcome any contributions.
+
+Please note that the ‘secpRod’ project is released with a [Contributor
+Code of
+Conduct](https://jimjunker1.github.io/secpRod/CODE_OF_CONDUCT.md). By
+contributing to this project, you agree to abide by its terms.
+
+If you would like to contribute please see the [contributing
+document](https://jimjunker1.github.io/secpRod/CONTRIBUTING.md).
+
+These are heavily borrowed and adapted from the [WEEcology
+lab](https://www.weecology.org/) [Portal
+project](https://portal.weecology.org/) adapted from the [Contributor
+Covenant](https://www.contributor-covenant.org/) and portalr package,
+respectively.
+
+## Acknowledgments
+
+The original code base was inspired by code written by Ben Koch and was
+further developed by Jim Junker with input from Wyatt Cross, Eric
+Scholl, Dan Nelson, Mick Demi, and others.
+
+# Package index
+
+## All functions
+
+- [`calc_prod_igr()`](https://jimjunker1.github.io/secpRod/reference/calc_prod_igr.md)
+  : calc_prod_igr
+- [`calc_prod_is()`](https://jimjunker1.github.io/secpRod/reference/calc_prod_is.md)
+  : calc_prod_is
+- [`calc_prod_pb()`](https://jimjunker1.github.io/secpRod/reference/calc_prod_pb.md)
+  : calc_prod_pb
+- [`calc_prod_rs()`](https://jimjunker1.github.io/secpRod/reference/calc_prod_rs.md)
+  : calc_prod_rs
+- [`calc_prod_sf()`](https://jimjunker1.github.io/secpRod/reference/calc_prod_sf.md)
+  : calc_prod_sf
+- [`calc_production()`](https://jimjunker1.github.io/secpRod/reference/calc_production.md)
+  : calc_production
+- [`convert_length_to_mass()`](https://jimjunker1.github.io/secpRod/reference/convert_length_to_mass.md)
+  : convert_length_to_mass
+- [`create_sample_summary()`](https://jimjunker1.github.io/secpRod/reference/create_sample_summary.md)
+  : create_sample_summary
+- [`findreps()`](https://jimjunker1.github.io/secpRod/reference/findreps.md)
+  : findreps
+- [`` `%ni%` ``](https://jimjunker1.github.io/secpRod/reference/grapes-ni-grapes.md)
+  : %ni%
+- [`igr_prod.sample()`](https://jimjunker1.github.io/secpRod/reference/igr_prod.sample.md)
+  : igr_prod.sample
+- [`inv.logit()`](https://jimjunker1.github.io/secpRod/reference/inv.logit.md)
+  : inv.logit
+- [`is_prod.sample()`](https://jimjunker1.github.io/secpRod/reference/is_prod.sample.md)
+  : is_prod.sample
+- [`overlapCohortSim`](https://jimjunker1.github.io/secpRod/reference/overlapCohortSim.md)
+  : Sample data for community secondary production analysis
+- [`pb_prod.sample()`](https://jimjunker1.github.io/secpRod/reference/pb_prod.sample.md)
+  : pb_prod.sample
+- [`plot_cohorts()`](https://jimjunker1.github.io/secpRod/reference/plot_cohorts.md)
+  : plot_cohorts
+- [`prep_boots()`](https://jimjunker1.github.io/secpRod/reference/prep_boots.md)
+  : prep_boots
+- [`reconstruct_split_cohort()`](https://jimjunker1.github.io/secpRod/reference/reconstruct_cohorts.md)
+  [`fit_with_offset()`](https://jimjunker1.github.io/secpRod/reference/reconstruct_cohorts.md)
+  [`plot_cohort_fit()`](https://jimjunker1.github.io/secpRod/reference/reconstruct_cohorts.md)
+  : reconstruct_split_cohort
+- [`rs_prod.sample()`](https://jimjunker1.github.io/secpRod/reference/rs_prod.sample.md)
+  : rs_prod.sample
+- [`sf_prod.sample()`](https://jimjunker1.github.io/secpRod/reference/sf_prod.sample.md)
+  : sf_prod.sample
+- [`singleCohortSim`](https://jimjunker1.github.io/secpRod/reference/singleCohortSim.md)
+  : Sample data for community secondary production analysis
+- [`splitCohortSim`](https://jimjunker1.github.io/secpRod/reference/splitCohortSim.md)
+  : Sample data for community secondary production analysis
+- [`univoltine`](https://jimjunker1.github.io/secpRod/reference/univoltine.md)
+  : Sample data for community secondary production analysis
+- [`wbtData`](https://jimjunker1.github.io/secpRod/reference/wbtData.md)
+  : Sample data for community secondary production analysis
+- [`wrap_dates()`](https://jimjunker1.github.io/secpRod/reference/wrap_dates.md)
+  : wrap_dates
+
+# Articles
+
+### Getting Started
+
+- [A few simple
+  examples](https://jimjunker1.github.io/secpRod/articles/simple-example.md):
+- [A full
+  example](https://jimjunker1.github.io/secpRod/articles/full-example.md):
+
+### Additional Resources
+
+- [Simulating the sampling of
+  populations](https://jimjunker1.github.io/secpRod/articles/sampling-simulation.md):
