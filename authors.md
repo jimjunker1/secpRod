@@ -17,5 +17,5 @@ https://jimjunker1.github.io/secpRod/
     @Manual{,
       title = {{secpRod}: An {R} package for calculating secondary production of animal populations.},
       author = {James R. Junker},
-      url = {https://www.github.io/jimjunker1/secpRod},
+      url = {https://jimjunker1.github.io/secpRod/},
     }
