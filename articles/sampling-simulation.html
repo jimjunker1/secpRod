@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Simulating the sampling of populations • secpRod</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Simulating the sampling of populations">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
@@ -111,7 +111,7 @@ mu_N_init
 <td style="text-align:left;">
 The mean initial density of the grid cells. Values are randomly drawn
 from a
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>m</mi><msub><mi>u</mi><mrow><mi>N</mi><mi>i</mi><mi>n</mi><mi>i</mi><mi>t</mi></mrow></msub><mo>,</mo><mi>s</mi><mi>i</mi><mi>g</mi><mi>m</mi><msub><mi>a</mi><mrow><mi>N</mi><mi>i</mi><mi>n</mi><mi>i</mi><mi>t</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">N(mu_{Ninit}, sigma_{Ninit})</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo stretchy="false" form="prefix">(</mo><mi>m</mi><msub><mi>u</mi><mrow><mi>N</mi><mi>i</mi><mi>n</mi><mi>i</mi><mi>t</mi></mrow></msub><mo>,</mo><mi>s</mi><mi>i</mi><mi>g</mi><mi>m</mi><msub><mi>a</mi><mrow><mi>N</mi><mi>i</mi><mi>n</mi><mi>i</mi><mi>t</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">N(mu_{Ninit}, sigma_{Ninit})</annotation></semantics></math>
 </td>
 </tr>
 <tr>
@@ -121,7 +121,7 @@ sigma_N_init
 <td style="text-align:left;">
 The standard deviation of initial density of grid cells. Values are
 randomly drawn from
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>m</mi><msub><mi>u</mi><mrow><mi>N</mi><mi>i</mi><mi>n</mi><mi>i</mi><mi>t</mi></mrow></msub><mo>,</mo><mi>s</mi><mi>i</mi><mi>g</mi><mi>m</mi><msub><mi>a</mi><mrow><mi>N</mi><mi>i</mi><mi>n</mi><mi>i</mi><mi>t</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">N(mu_{Ninit}, sigma_{Ninit})</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo stretchy="false" form="prefix">(</mo><mi>m</mi><msub><mi>u</mi><mrow><mi>N</mi><mi>i</mi><mi>n</mi><mi>i</mi><mi>t</mi></mrow></msub><mo>,</mo><mi>s</mi><mi>i</mi><mi>g</mi><mi>m</mi><msub><mi>a</mi><mrow><mi>N</mi><mi>i</mi><mi>n</mi><mi>i</mi><mi>t</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">N(mu_{Ninit}, sigma_{Ninit})</annotation></semantics></math>
 </td>
 </tr>
 <tr>
@@ -139,7 +139,7 @@ mu_ln
 <td style="text-align:left;">
 The mean asymptotic mass of von Bertalanffy growth. Values for each
 individual are randomly draws from
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>o</mi><mi>g</mi><mi>n</mi><mi>o</mi><mi>r</mi><mi>m</mi><mi>a</mi><mi>l</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>m</mi><msub><mi>u</mi><mrow><mi>l</mi><mi>n</mi></mrow></msub><mo>,</mo><mi>s</mi><mi>i</mi><mi>g</mi><mi>m</mi><msub><mi>a</mi><mrow><mi>l</mi><mi>n</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">Lognormal(mu_{ln}, sigma_{ln})</annotation></semantics></math>.
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>o</mi><mi>g</mi><mi>n</mi><mi>o</mi><mi>r</mi><mi>m</mi><mi>a</mi><mi>l</mi><mo stretchy="false" form="prefix">(</mo><mi>m</mi><msub><mi>u</mi><mrow><mi>l</mi><mi>n</mi></mrow></msub><mo>,</mo><mi>s</mi><mi>i</mi><mi>g</mi><mi>m</mi><msub><mi>a</mi><mrow><mi>l</mi><mi>n</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">Lognormal(mu_{ln}, sigma_{ln})</annotation></semantics></math>.
 </td>
 </tr>
 <tr>
@@ -149,7 +149,7 @@ sigma_ln
 <td style="text-align:left;">
 The standard deviation of asymptotic mass of von Bertalanffy growth.
 Values for each individual are randomly draws from
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>o</mi><mi>g</mi><mi>n</mi><mi>o</mi><mi>r</mi><mi>m</mi><mi>a</mi><mi>l</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>m</mi><msub><mi>u</mi><mrow><mi>l</mi><mi>n</mi></mrow></msub><mo>,</mo><mi>s</mi><mi>i</mi><mi>g</mi><mi>m</mi><msub><mi>a</mi><mrow><mi>l</mi><mi>n</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">Lognormal(mu_{ln}, sigma_{ln})</annotation></semantics></math>.
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>o</mi><mi>g</mi><mi>n</mi><mi>o</mi><mi>r</mi><mi>m</mi><mi>a</mi><mi>l</mi><mo stretchy="false" form="prefix">(</mo><mi>m</mi><msub><mi>u</mi><mrow><mi>l</mi><mi>n</mi></mrow></msub><mo>,</mo><mi>s</mi><mi>i</mi><mi>g</mi><mi>m</mi><msub><mi>a</mi><mrow><mi>l</mi><mi>n</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">Lognormal(mu_{ln}, sigma_{ln})</annotation></semantics></math>.
 </td>
 </tr>
 <tr>
@@ -159,7 +159,7 @@ mu_z
 <td style="text-align:left;">
 The mean mortality rate for a negative exponential model. Values for
 each cell are randomly drawn from
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>m</mi><msub><mi>u</mi><mi>z</mi></msub><mo>,</mo><mi>s</mi><mi>i</mi><mi>g</mi><mi>m</mi><msub><mi>a</mi><mi>z</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">N(mu_{z}, sigma_{z})</annotation></semantics></math>.
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo stretchy="false" form="prefix">(</mo><mi>m</mi><msub><mi>u</mi><mi>z</mi></msub><mo>,</mo><mi>s</mi><mi>i</mi><mi>g</mi><mi>m</mi><msub><mi>a</mi><mi>z</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">N(mu_{z}, sigma_{z})</annotation></semantics></math>.
 </td>
 </tr>
 <tr>
@@ -169,7 +169,7 @@ sigma_z
 <td style="text-align:left;">
 The standard devation in mortality rate for a negative exponential
 model. Values for each cell are randomly drawn from
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>m</mi><msub><mi>u</mi><mi>z</mi></msub><mo>,</mo><mi>s</mi><mi>i</mi><mi>g</mi><mi>m</mi><msub><mi>a</mi><mi>z</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">N(mu_{z}, sigma_{z})</annotation></semantics></math>.
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo stretchy="false" form="prefix">(</mo><mi>m</mi><msub><mi>u</mi><mi>z</mi></msub><mo>,</mo><mi>s</mi><mi>i</mi><mi>g</mi><mi>m</mi><msub><mi>a</mi><mi>z</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">N(mu_{z}, sigma_{z})</annotation></semantics></math>.
 </td>
 </tr>
 <tr>
@@ -181,7 +181,7 @@ The lower end of the cohort production interval. This is used to modify
 the growth coefficient,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>,
 in von Bertalanffy growth. Values for each individual are drawn
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>U</mi><mi>n</mi><mi>i</mi><mi>f</mi><mi>o</mi><mi>r</mi><mi>m</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>c</mi><mi>p</mi><msub><mi>i</mi><mrow><mi>s</mi><mi>t</mi><mi>a</mi><mi>r</mi><mi>t</mi></mrow></msub><mo>,</mo><mi>c</mi><mi>p</mi><msub><mi>i</mi><mrow><mi>e</mi><mi>n</mi><mi>d</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">Uniform(cpi_{start}, cpi_{end})</annotation></semantics></math>.
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>U</mi><mi>n</mi><mi>i</mi><mi>f</mi><mi>o</mi><mi>r</mi><mi>m</mi><mo stretchy="false" form="prefix">(</mo><mi>c</mi><mi>p</mi><msub><mi>i</mi><mrow><mi>s</mi><mi>t</mi><mi>a</mi><mi>r</mi><mi>t</mi></mrow></msub><mo>,</mo><mi>c</mi><mi>p</mi><msub><mi>i</mi><mrow><mi>e</mi><mi>n</mi><mi>d</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">Uniform(cpi_{start}, cpi_{end})</annotation></semantics></math>.
 </td>
 </tr>
 <tr>
@@ -193,7 +193,7 @@ The upper end of the cohort production interval.This is used to modify
 the growth coefficient,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>,
 in von Bertalanffy growth. Values for each individual are drawn
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>U</mi><mi>n</mi><mi>i</mi><mi>f</mi><mi>o</mi><mi>r</mi><mi>m</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>c</mi><mi>p</mi><msub><mi>i</mi><mrow><mi>s</mi><mi>t</mi><mi>a</mi><mi>r</mi><mi>t</mi></mrow></msub><mo>,</mo><mi>c</mi><mi>p</mi><msub><mi>i</mi><mrow><mi>e</mi><mi>n</mi><mi>d</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">Uniform(cpi_{start}, cpi_{end})</annotation></semantics></math>.
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>U</mi><mi>n</mi><mi>i</mi><mi>f</mi><mi>o</mi><mi>r</mi><mi>m</mi><mo stretchy="false" form="prefix">(</mo><mi>c</mi><mi>p</mi><msub><mi>i</mi><mrow><mi>s</mi><mi>t</mi><mi>a</mi><mi>r</mi><mi>t</mi></mrow></msub><mo>,</mo><mi>c</mi><mi>p</mi><msub><mi>i</mi><mrow><mi>e</mi><mi>n</mi><mi>d</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">Uniform(cpi_{start}, cpi_{end})</annotation></semantics></math>.
 </td>
 </tr>
 <tr>
@@ -575,7 +575,7 @@ sampling times.</p>
 <span><span class="co">#&gt;  residual sum-of-squares: 0.007516</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Number of iterations to convergence: 6 </span></span>
-<span><span class="co">#&gt; Achieved convergence tolerance: 5.796e-07</span></span>
+<span><span class="co">#&gt; Achieved convergence tolerance: 5.922e-07</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $fits$gompertz</span></span>
 <span><span class="co">#&gt; Nonlinear regression model</span></span>
@@ -586,7 +586,7 @@ sampling times.</p>
 <span><span class="co">#&gt;  residual sum-of-squares: 0.06719</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Number of iterations to convergence: 10 </span></span>
-<span><span class="co">#&gt; Achieved convergence tolerance: 2.578e-06</span></span>
+<span><span class="co">#&gt; Achieved convergence tolerance: 2.579e-06</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $fits$logistic</span></span>
 <span><span class="co">#&gt; Nonlinear regression model</span></span>
@@ -597,7 +597,7 @@ sampling times.</p>
 <span><span class="co">#&gt;  residual sum-of-squares: 0.2081</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Number of iterations to convergence: 13 </span></span>
-<span><span class="co">#&gt; Achieved convergence tolerance: 7.797e-06</span></span></code></pre>
+<span><span class="co">#&gt; Achieved convergence tolerance: 7.766e-06</span></span></code></pre>
 <p><img src="sampling-simulation_files/figure-html/plot-remap-1.png" class="r-plt" alt="" width="75%" style="display: block; margin: auto;"></p>
 </div>
 </div>
@@ -1228,7 +1228,7 @@ sampling times.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

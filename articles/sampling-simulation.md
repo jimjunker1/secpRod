@@ -14,36 +14,37 @@ grid based on a number of parameters that control the sampling area,
 distribution of individuals, growth and mortality parameters of the
 populations, etc. (Table 1).
 
-| Parameters      | Description                                                                                                                                                                                                         |
-|:----------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| grid_size       | The grid dimension of the ‘x’ and ‘y’ direction. Total grid cells is $n^{2}$                                                                                                                                        |
-| mu_N_init       | The mean initial density of the grid cells. Values are randomly drawn from a $N\left( mu_{Ninit},sigma_{Ninit} \right)$                                                                                             |
-| sigma_N_init    | The standard deviation of initial density of grid cells. Values are randomly drawn from $N\left( mu_{Ninit},sigma_{Ninit} \right)$                                                                                  |
-| initial_mass    | The initial mass of all individuals.                                                                                                                                                                                |
-| mu_ln           | The mean asymptotic mass of von Bertalanffy growth. Values for each individual are randomly draws from $Lognormal\left( mu_{ln},sigma_{ln} \right)$.                                                                |
-| sigma_ln        | The standard deviation of asymptotic mass of von Bertalanffy growth. Values for each individual are randomly draws from $Lognormal\left( mu_{ln},sigma_{ln} \right)$.                                               |
-| mu_z            | The mean mortality rate for a negative exponential model. Values for each cell are randomly drawn from $N\left( mu_{z},sigma_{z} \right)$.                                                                          |
-| sigma_z         | The standard devation in mortality rate for a negative exponential model. Values for each cell are randomly drawn from $N\left( mu_{z},sigma_{z} \right)$.                                                          |
-| cpi_start       | The lower end of the cohort production interval. This is used to modify the growth coefficient, $k$, in von Bertalanffy growth. Values for each individual are drawn $Uniform\left( cpi_{start},cpi_{end} \right)$. |
-| cpi_end         | The upper end of the cohort production interval.This is used to modify the growth coefficient, $k$, in von Bertalanffy growth. Values for each individual are drawn $Uniform\left( cpi_{start},cpi_{end} \right)$.  |
-| days            | The number of days to simulate.                                                                                                                                                                                     |
-| sample_interval | The interval in days between sampling events.                                                                                                                                                                       |
-| sample_start    | The start date (1:days) for the first sampling event.                                                                                                                                                               |
-| sample_end      | The end date (sample_start:days) for the last sampling event.                                                                                                                                                       |
-| S               | The number of sample replicates to take at each sampling event. Samples are chosen without replacement within a sampling event.                                                                                     |
+| Parameters | Description |
+|:---|:---|
+| grid_size | The grid dimension of the ‘x’ and ‘y’ direction. Total grid cells is $`n^2`$ |
+| mu_N_init | The mean initial density of the grid cells. Values are randomly drawn from a $`N(mu_{Ninit}, sigma_{Ninit})`$ |
+| sigma_N_init | The standard deviation of initial density of grid cells. Values are randomly drawn from $`N(mu_{Ninit}, sigma_{Ninit})`$ |
+| initial_mass | The initial mass of all individuals. |
+| mu_ln | The mean asymptotic mass of von Bertalanffy growth. Values for each individual are randomly draws from $`Lognormal(mu_{ln}, sigma_{ln})`$. |
+| sigma_ln | The standard deviation of asymptotic mass of von Bertalanffy growth. Values for each individual are randomly draws from $`Lognormal(mu_{ln}, sigma_{ln})`$. |
+| mu_z | The mean mortality rate for a negative exponential model. Values for each cell are randomly drawn from $`N(mu_{z}, sigma_{z})`$. |
+| sigma_z | The standard devation in mortality rate for a negative exponential model. Values for each cell are randomly drawn from $`N(mu_{z}, sigma_{z})`$. |
+| cpi_start | The lower end of the cohort production interval. This is used to modify the growth coefficient, $`k`$, in von Bertalanffy growth. Values for each individual are drawn $`Uniform(cpi_{start}, cpi_{end})`$. |
+| cpi_end | The upper end of the cohort production interval.This is used to modify the growth coefficient, $`k`$, in von Bertalanffy growth. Values for each individual are drawn $`Uniform(cpi_{start}, cpi_{end})`$. |
+| days | The number of days to simulate. |
+| sample_interval | The interval in days between sampling events. |
+| sample_start | The start date (1:days) for the first sampling event. |
+| sample_end | The end date (sample_start:days) for the last sampling event. |
+| S | The number of sample replicates to take at each sampling event. Samples are chosen without replacement within a sampling event. |
 
 ### Single cohort
 
 We first simulate a single cohort from the following parameters. The
 individuals all have the same initial mass. Each individual grows based
 on a von Bertalanffy growth model with a randomly drawn asymptotic mass,
-$M_{inf}$, and the growth coefficient, $k$, is calculated by a randomly
-drawn lifespan (CPI) determined by user-defined inputs. Once an
-individual reaches $M_{inf}$ it transitions to an ‘adult’ and is no
+$`M_{inf}`$, and the growth coefficient, $`k`$, is calculated by a
+randomly drawn lifespan (CPI) determined by user-defined inputs. Once an
+individual reaches $`M_{inf}`$ it transitions to an ‘adult’ and is no
 longer counted in samples. Mortality is governed in each grid cell by a
-randomly draw death rate, $z$, from a negative exponential model.
+randomly draw death rate, $`z`$, from a negative exponential model.
 
 ``` r
+
 # Parameters
 grid_size <- 20
 mu_N_init <- 500
@@ -65,6 +66,7 @@ S <- 10
 Click below to see the code to simulate a single cohort.
 
 ``` r
+
 ## not run
 # Function to initialize a cohort
 init_cohort <- function(i, j, start_day) {
@@ -186,6 +188,7 @@ specific conditions.
 To see the code to produce the simulated data set click below
 
 ``` r
+
 # Spatial growth and mortality simulation in R
 library(dplyr)
 library(tidyr)
@@ -369,7 +372,7 @@ times.
     #>  residual sum-of-squares: 0.007516
     #> 
     #> Number of iterations to convergence: 6 
-    #> Achieved convergence tolerance: 5.796e-07
+    #> Achieved convergence tolerance: 5.922e-07
     #> 
     #> $fits$gompertz
     #> Nonlinear regression model
@@ -380,7 +383,7 @@ times.
     #>  residual sum-of-squares: 0.06719
     #> 
     #> Number of iterations to convergence: 10 
-    #> Achieved convergence tolerance: 2.578e-06
+    #> Achieved convergence tolerance: 2.579e-06
     #> 
     #> $fits$logistic
     #> Nonlinear regression model
@@ -391,7 +394,7 @@ times.
     #>  residual sum-of-squares: 0.2081
     #> 
     #> Number of iterations to convergence: 13 
-    #> Achieved convergence tolerance: 7.797e-06
+    #> Achieved convergence tolerance: 7.766e-06
 
 ![](sampling-simulation_files/figure-html/plot-remap-1.png)
 

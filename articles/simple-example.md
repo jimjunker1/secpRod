@@ -43,18 +43,20 @@ include, but are not limited to:
   following:
 
   - ‘is’: increment-summation method. This cohort-based method
-    calculates interval and annual production, $P$, from field data as
+    calculates interval and annual production, $`P`$, from field data as
     the sum of all interval production,
-    $\sum_{i = 1}^{t}\overline{N}\Delta W$, plus initial biomass,
-    $B_{iniital}$:
+    $`\sum_{i = 1}^{t} \overline{N} \Delta W`$, plus initial biomass,
+    $`B_{iniital}`$:
 
-  $$P = B_{initial} + \sum\limits_{i = 1}^{t}\overline{N}\Delta W$$
+  ``` math
+  P = B_{initial} + \sum_{i = 1}^{t} \overline{N} \Delta W 
+  ```
 
   - ‘rs’: removal-summation method is similar to the increment-summation
     method but instead calculates the production *lost* during a
     sampling interval as the product of the decrease in density,
-    $\Delta N$ and the mean individual mass, $\overline{W}$ plus the
-    increase in biomass, $\Delta B$.
+    $`\Delta N`$ and the mean individual mass, $`\overline{W}`$ plus the
+    increase in biomass, $`\Delta B`$.
 
   - ‘sf’: size-frequency method. This non-cohort approach assumes the
     mean size-frequency data from collected samples characterizes the
@@ -139,6 +141,7 @@ include, but are not limited to:
   output summaries.
 
 ``` r
+
 taxaInfo <- tibble::tibble(
   taxonID = c("sppX"),
   massForm = c("mass~(a*lengthClass^b)*percAsh"),
@@ -169,6 +172,7 @@ distribution of individual masses through it life cycle.
 The data set is available within the `secpRod` package with:
 
 ``` r
+
 data('singleCohortSim', package = 'secpRod')
 ```
 
@@ -220,6 +224,7 @@ We can summarize and visualize this data set further.
 
 ``` r
 
+
 summary_stats <- singleCohortSim %>%
   dplyr::mutate(density = sum(density, na.rm = TRUE), .by = c('taxonID','dateID','repID')) %>% 
   dplyr::summarise(
@@ -263,6 +268,7 @@ like, as:
 
 ``` r
 
+
 calc_production(
   taxaSampleListMass = singleCohortSim,
   taxaInfo = taxaInfo,
@@ -291,6 +297,7 @@ calculations, see (**benke2007?**).
 ### Increment-summation
 
 ``` r
+
 
 set.seed(1312)
 calc_production(
@@ -354,6 +361,7 @@ calc_production(
 ### Size-frequency
 
 ``` r
+
 taxaInfo <- tibble::tibble(
   taxonID = c("sppX"),
   massForm = c("mass~(a*lengthClass^b)*percAsh"),
@@ -436,6 +444,7 @@ calc_production(
 ## Production:Biomass ratio
 
 ``` r
+
 taxaInfo <- tibble::tibble(
   taxonID = c("sppX"),
   massForm = c("mass~(a*lengthClass^b)*percAsh"),
@@ -526,6 +535,7 @@ the main sample data object `taxaSampleListMass` and in the additional
 environmental data provided in `envData`.
 
 ``` r
+
 taxaInfo <- tibble::tibble(
   taxonID = c("sppX"),
   massForm = c("mass~(a*lengthClass^b)*percAsh"),

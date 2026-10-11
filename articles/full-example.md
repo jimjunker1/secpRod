@@ -1,6 +1,7 @@
 # A full example
 
 ``` r
+
 library(secpRod)
 library(ggdist)
 ```
@@ -33,6 +34,7 @@ First, load the data set with:
 
 ``` r
 
+
 data("wbtData", package="secpRod")
 ```
 
@@ -42,6 +44,7 @@ A quick walkthrough of the calculation of secondary production for a
 single species.
 
 ``` r
+
 ## isolate a single species data frame from sampleInfo object
 
 chironomid <- wbtData[["sampleInfo"]][["Chironomidae"]]
@@ -76,6 +79,7 @@ let’s modify the `taxaInfo` associated with this group.
 
 ``` r
 
+
 taxaInfo = wbtData[['taxaInfo']]
 
 chiroInfo = subset(taxaInfo, taxonID == "Chironomidae")
@@ -102,6 +106,7 @@ We can take a look at what this looks like:
 
 ``` r
 
+
 chiroInfo
 #> # A tibble: 1 × 13
 #> # Groups:   taxonID [1]
@@ -115,6 +120,7 @@ Information on its use can be viewed with
 [`?convert_length_to_mass`](https://jimjunker1.github.io/secpRod/reference/convert_length_to_mass.md)
 
 ``` r
+
 
 chiroMass = convert_length_to_mass(taxaSampleList = chironomid,
                                          taxaInfo = chiroInfo,
@@ -139,6 +145,7 @@ function. Check out the function options with
 [`?plot_cohorts`](https://jimjunker1.github.io/secpRod/reference/plot_cohorts.md).
 
 ``` r
+
 plot_cohorts(taxaSampleListMass = chiroMass,
              param = 'length',
              lengthValue = 'lengthClass',
@@ -158,6 +165,7 @@ density over time.
 We can also plot this taxa using mass as the size variable:
 
 ``` r
+
 plot_cohorts(taxaSampleListMass = chiroMass,
              param = 'mass',
              massValue = 'mass',
@@ -173,6 +181,7 @@ instantaneous growth rate method, using the growth equation from Huryn
 (1990).
 
 ``` r
+
 # setting the method to 'igr'
 
 chiroInfo$method <- 'igr'
@@ -190,6 +199,7 @@ also provide some environmental data to inform the growth rates, in this
 case mean monthly temperature, `tempC`.
 
 ``` r
+
 
 envData <- data.frame(
   dateID = as.Date(unique(unlist(chiroMass$dateID))),

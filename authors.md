@@ -12,7 +12,7 @@ Source:
 
 Jim Junker (2025). secpRod: An R package for calculating secondary
 production of animal populations. URL
-https://www.github.io/jimjunker1/secpRod
+https://jimjunker1.github.io/secpRod/
 
     @Manual{,
       title = {{secpRod}: An {R} package for calculating secondary production of animal populations.},
